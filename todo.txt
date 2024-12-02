@@ -1,0 +1,10 @@
+renderer: sprout
+physics: twig
+animation: leafmotion
+asset manager: seedbank
+ai: spirit
+sound: whisperwind
+scripting: acorn
+scene manager: canopy
+ui: bark
+networking: rootlink
