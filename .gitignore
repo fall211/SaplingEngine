@@ -1,8 +1,22 @@
-*.log
+# Compiled & Build
+Build/
+*.dll
+*.com
+*.class
+*.exe
+*.o
+*.so
 
+# Logs & temp
+*.log
 temp/
 
-Build/
-
+# OS garbage
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.ehthumbs.db
+Thumbs.db
 
