@@ -6,8 +6,6 @@
 //
 
 #include "Physics.hpp"
-#include "Component.hpp"
-#include "Math.hpp"
 
 
 auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> Vector2 {

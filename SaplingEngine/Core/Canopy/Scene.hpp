@@ -5,14 +5,22 @@
 //  Created by Tuukka Virtanen on 1/25/24.
 //
 
-#ifndef Scene_hpp
-#define Scene_hpp
+#pragma once
+
+#include "SaplingEngine.hpp"
 
 #include <cstdio>
 #include <random>
-#include "SaplingEngine.hpp"
 
+class Entity;
+class Input;
+class EntityManager;
 class Engine;
+
+
+
+typedef std::vector<std::shared_ptr<Entity>> EntityList;
+
 
 class Scene {
 protected:
@@ -58,4 +66,3 @@ public:
     void update() override;
 };
 
-#endif /* Scene_hpp */

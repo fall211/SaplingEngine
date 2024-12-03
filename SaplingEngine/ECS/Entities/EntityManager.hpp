@@ -5,8 +5,7 @@
 //  Created by Tuukka Virtanen on 1/6/24.
 //
 
-#ifndef EntityManager_hpp
-#define EntityManager_hpp
+#pragma once
 
 #include <string>
 #include <map>
@@ -15,6 +14,7 @@
 
 typedef std::vector<std::shared_ptr<Entity>> EntityList;
 typedef std::map<std::string, EntityList> EntityMap;
+typedef std::vector<std::string> TagList;
 
 class EntityManager {
     EntityList m_entities;
@@ -34,4 +34,3 @@ public:
     void destroyEntity(const std::shared_ptr<Entity>& entity);
 };
 
-#endif /* EntityManager_hpp */

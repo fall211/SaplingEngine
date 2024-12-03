@@ -5,8 +5,7 @@
 //  Created by Tuukka Virtanen on 1/6/24.
 //
 
-#ifndef Debug_h
-#define Debug_h
+#pragma once
 
 #include <iostream>
 
@@ -17,4 +16,3 @@ class Debug {
         }
 };
 
-#endif /* Debug_h */

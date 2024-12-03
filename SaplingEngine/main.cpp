@@ -6,6 +6,7 @@
 //
 
 #include "Core/Engine.hpp"
+#include <memory>
 
 auto main() -> int {
 

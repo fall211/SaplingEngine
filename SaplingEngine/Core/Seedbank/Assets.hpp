@@ -5,14 +5,13 @@
 //  Created by Tuukka Virtanen on 1/9/24.
 //
 
-#ifndef Assets_hpp
-#define Assets_hpp
+#pragma once
 
 #include <string>
 #include <map>
 #include <unordered_map>
 
-#include <SFML/Graphics.hpp>
+#include "SaplingEngine.hpp"
 
 
 class Assets {
@@ -25,4 +24,3 @@ public:
     auto getTexture(const std::string& name) -> std::shared_ptr<sf::Texture>;
 };
 
-#endif /* Assets_hpp */

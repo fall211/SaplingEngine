@@ -5,12 +5,11 @@
 //  Created by Tuukka Virtanen on 1/6/24.
 //
 
-#ifndef Component_hpp
-#define Component_hpp
+#pragma once
 
-#include <string>
-#include "../../Physics/Math.hpp"
-#include <SFML/Graphics.hpp>
+
+#include "SaplingEngine.hpp"
+#include "Physics/Math.hpp"
 
 class Component{
 public:
@@ -21,8 +20,8 @@ public:
 
 class CTransform final : public Component{
     public:
-        Vector2 position = Vector2(0,0);
-        Vector2 velocity = Vector2(0,0);
+        Vector2 position = Vector2(0, 0);
+        Vector2 velocity = Vector2(0, 0);
 
         CTransform(const Vector2& positionin, const Vector2& velocityin);
 };
@@ -82,4 +81,3 @@ public:
     CPlayerControls(float speedIn, int jumpStrIn);
 };
 
-#endif /* Component_hpp */

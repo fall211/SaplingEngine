@@ -1,0 +1,22 @@
+CompileFlags:
+  Add: [-Isrc, -std=c++17, -xc++, -Wall, -Wextra, -Werror, -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine]
+
+Diagnostics:
+  ClangTidy:
+    Add: [
+      readability-*, 
+      performance-*, 
+      portability-*, 
+      modernize-*,
+      cppcoreguidelines-*,
+      cert-*
+    ]
+    Remove: [
+      modernize-use-using,
+      cppcoreguidelines-pro-type-union-access,
+      cppcoreguidelines-pro-type-member-init,
+      cppcoreguidelines-avoid-magic-numbers,
+      readability-uppercase-literal-suffix,
+      readability-magic-numbers,
+      readability-identifier-length
+    ]

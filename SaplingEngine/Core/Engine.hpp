@@ -5,17 +5,16 @@
 //  Created by Tuukka Virtanen on 1/6/24.
 //
 
-#ifndef Engine_hpp
-#define Engine_hpp
+#pragma once
 
-#include <SFML/Graphics.hpp>
-#include "../ECS/Entities/EntityManager.hpp"
-#include "Debug.hpp"
-#include "Assets.hpp"
-#include <unordered_map>
+#include "SaplingEngine.hpp"
+
+#include <chrono>
+#include <string>
+
 
 class Scene;
-#include "Canopy/Scene.hpp"
+class Assets;
 
 using namespace std::chrono;
 
@@ -83,7 +82,6 @@ public:
 
     
 };
-#endif /* Engine_hpp */
 
 
 

@@ -6,7 +6,7 @@
 //
 
 #include "Scene.hpp"
-#include "Debug.hpp"
+
 
 Scene::Scene(Engine& engine) : m_engine(engine){
     m_entityManager = std::make_shared<EntityManager>();
@@ -26,8 +26,8 @@ void Scene::sRender(EntityList& entities){
             m_engine.getWindow().draw(animatedSprite.sprite);
         }
         else if (e->hasComponent<CShape>()){
-            e->getComponent<CShape>().shape.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
-            m_engine.getWindow().draw(e->getComponent<CShape>().shape);
+            e->getComponent<CShape>().rectShape.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
+            m_engine.getWindow().draw(e->getComponent<CShape>().rectShape);
         }
     }
 }

@@ -8,7 +8,7 @@
 #ifndef Input_hpp
 #define Input_hpp
 
-#include <SFML/Graphics.hpp>
+#include "SaplingEngine.hpp"
 #include <string>
 #include <map>
 

@@ -13,7 +13,9 @@
 #include <unordered_map>
 #include <typeindex>
 
-#include "../Components/Component.hpp"
+class Component;
+
+#include "SaplingEngine.hpp"
 
 typedef std::vector<std::string> TagList;
 

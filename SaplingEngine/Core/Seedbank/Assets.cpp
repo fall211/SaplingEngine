@@ -7,8 +7,6 @@
 
 #include "Assets.hpp"
 
-#include <SFML/Graphics.hpp>
-
 
 Assets::Assets() {
     m_textures = std::unordered_map<std::string, std::shared_ptr<sf::Texture>>();

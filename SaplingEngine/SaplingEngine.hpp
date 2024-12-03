@@ -1,6 +1,5 @@
 
-#ifndef SaplingEngine_hpp
-#define SaplingEngine_hpp
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
@@ -13,7 +12,6 @@
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECS/Entities/Entity.hpp"
 #include "ECS/Components/Component.hpp"
-#include "ECS/Physics/Physics.hpp"
-#include "ECS/Physics/Math.hpp"
+#include "Physics/Physics.hpp"
+#include "Physics/Math.hpp"
 
-#endif /* SaplingEngine_hpp */

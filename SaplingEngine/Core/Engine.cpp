@@ -5,21 +5,19 @@
 //  Created by Tuukka Virtanen on 1/6/24.
 //
 
-#include <SFML/Graphics.hpp>
 
-#include "Debug.hpp"
-#include "scenes/TestScene.hpp"
 #include "Engine.hpp"
-
+#include <memory>
+#include <chrono>
 
 Engine::Engine() {
     m_scenes = sceneMap();
     
     assets = std::make_shared<Assets>();
-    assets->addTexture("test", "resources/test.png");
-    assets->addTexture("player", "resources/player.png");
-    assets->addTexture("playerSheet", "resources/playerSheet.png");
-    assets->addTexture("obstacle", "resources/obstacle.png");
+    assets->addTexture("test", "../GameContent/Assets/Sprites/test.png");
+    assets->addTexture("player", "../GameContent/Assets/Sprites/player.png");
+    assets->addTexture("playerSheet", "../GameContent/Assets/Sprites/playerSheet.png");
+    assets->addTexture("obstacle", "../GameContent/Assets/Sprites/obstacle.png");
 
     
     m_window.create(sf::VideoMode(1280, 720), "engine window");
@@ -29,8 +27,6 @@ Engine::Engine() {
     changeCurrentScene("game");
     addScene("menu", std::make_shared<MenuScene>(*this));
     changeCurrentScene("menu");
-    addScene("collisionTest", std::make_shared<TestScene>(*this));
-    changeCurrentScene("collisionTest");
 
     Debug::log("init completed");
 }

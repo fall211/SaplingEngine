@@ -7,7 +7,6 @@
 
 #include "Component.hpp"
 
-#include "Debug.hpp"
 
 
 CTransform::CTransform(const Vector2& positionin, const Vector2& velocityin)

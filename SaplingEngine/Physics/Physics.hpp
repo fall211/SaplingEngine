@@ -8,7 +8,11 @@
 #ifndef Physics_hpp
 #define Physics_hpp
 
-#include "Entity.hpp"
+#include "Math.hpp"
+class Entity;
+class Vector2;
+
+#include "SaplingEngine.hpp"
 
 class Physics2D {
 public:
