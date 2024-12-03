@@ -1,8 +1,6 @@
 //
 //  Scene.cpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/25/24.
+//  SaplingEngine, Canopy Scene Manager
 //
 
 #include "Scene.hpp"
@@ -70,9 +68,9 @@ void GameScene::update(){
 
 void GameScene::sSpawnPlayer() const {
     const auto e = m_entityManager->addEntity({"player", "dynamic"});
-    e->addComponent<CTransform>(Vector2(m_engine.getWindow().getSize().x/4 - 32, 100), Vector2::zero());
+    e->addComponent<CTransform>(Vector2(static_cast<float>(m_engine.getWindow().getSize().x ) / 4 - 32, 100), Vector2::zero());
     // e->addComponent<CSprite>(m_engine.assets->getTexture("player"));
-    e->addComponent<CAnimatedSprite>(m_engine.assets->getTexture("playerSheet"));
+    e->addComponent<CAnimatedSprite>(m_engine.getAssets()->getTexture("playerSheet"));
     e->addComponent<CPlayerControls>(0.0f, 400.0f);
     e->addComponent<CBBox>(64, 64);
 }
@@ -122,7 +120,7 @@ void GameScene::sObstacleSpawner(){
     
     const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
     e->addComponent<CTransform>(Vector2(1420, randomY), Vector2(-100.0f, 0));
-    e->addComponent<CSprite>(m_engine.assets->getTexture("obstacle"));
+    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
     e->addComponent<CBBox>(64, 64);
 }
 

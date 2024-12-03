@@ -1,8 +1,6 @@
 //
 //  Input.cpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/16/24.
+//  SaplingEngine, SFML Input Wrapper
 //
 
 #include "Input.hpp"

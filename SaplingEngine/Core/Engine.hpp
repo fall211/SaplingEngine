@@ -1,8 +1,6 @@
 //
 //  Engine.hpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/6/24.
+//  SaplingEngine
 //
 
 #pragma once
@@ -10,6 +8,7 @@
 #include "SaplingEngine.hpp"
 
 #include <chrono>
+#include <memory>
 #include <string>
 
 
@@ -29,13 +28,15 @@ class Engine {
     std::shared_ptr<Scene> m_currentScene = nullptr;
     
 
-    size_t m_currentFrame;
+    size_t m_currentFrame = 0;
     void calculateDeltaTime(const time_point<system_clock>& start, time_point<system_clock>& previous);
+    
+    std::shared_ptr<Assets> m_assets;
 
 public:
-    std::shared_ptr<Assets> assets;
 
     Engine();
+    ~Engine() = default;
     
     /**
      * The main loop of the engine. Started as soon as the program starts.
@@ -80,6 +81,8 @@ public:
     auto getScene(const std::string& name) -> std::shared_ptr<Scene>;
     auto getCurrentScene() -> std::shared_ptr<Scene>&;
 
+    auto getAssets() const -> std::shared_ptr<Assets>;
+    void setAssets(const std::shared_ptr<Assets>& newAssets);
     
 };
 

@@ -1,8 +1,6 @@
 //
 //  Physics.cpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/16/24.
+//  SaplingEngine, Twig Physics
 //
 
 #include "Physics.hpp"

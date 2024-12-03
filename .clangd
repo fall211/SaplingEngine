@@ -1,7 +1,17 @@
 CompileFlags:
-  Add: [-Isrc, -std=c++17, -xc++, -Wall, -Wextra, -Werror, -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine]
+  Add: [
+    -Isrc, 
+    -std=c++17, 
+    -xc++, 
+    -Wall, 
+    -Wextra, 
+    -Werror, 
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine
+    ]
+
 
 Diagnostics:
+  UnusedIncludes : None
   ClangTidy:
     Add: [
       readability-*, 
@@ -16,7 +26,9 @@ Diagnostics:
       cppcoreguidelines-pro-type-union-access,
       cppcoreguidelines-pro-type-member-init,
       cppcoreguidelines-avoid-magic-numbers,
+      cppcoreguidelines-special-member-functions,
       readability-uppercase-literal-suffix,
       readability-magic-numbers,
-      readability-identifier-length
+      readability-identifier-length,
+      readability-braces-around-statements,
     ]

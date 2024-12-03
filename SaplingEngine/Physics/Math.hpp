@@ -1,8 +1,6 @@
 //
 //  Math.hpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/16/24.
+//  SaplingEngine, Twig Physics
 //
 
 #ifndef Math_hpp

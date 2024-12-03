@@ -1,8 +1,6 @@
 //
 //  Entity.cpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/6/24.
+//  SaplingEngine
 //
 
 #include "Entity.hpp"

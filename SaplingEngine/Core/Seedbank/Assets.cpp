@@ -1,8 +1,6 @@
 //
 //  Assets.cpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/9/24.
+//  SaplingEngine, Seedbank Asset Manager
 //
 
 #include "Assets.hpp"

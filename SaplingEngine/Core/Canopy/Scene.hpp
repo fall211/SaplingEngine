@@ -1,8 +1,6 @@
 //
 //  Scene.hpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/25/24.
+//  SaplingEngine, Canopy Scene Manager
 //
 
 #pragma once

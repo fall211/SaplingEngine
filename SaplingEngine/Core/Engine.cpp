@@ -1,28 +1,23 @@
 //
 //  Engine.cpp
-//  ECS_Engine
-//
-//  Created by Tuukka Virtanen on 1/6/24.
+//  SaplingEngine
 //
 
 
 #include "Engine.hpp"
-#include <memory>
-#include <chrono>
 
 Engine::Engine() {
     m_scenes = sceneMap();
     
-    assets = std::make_shared<Assets>();
-    assets->addTexture("test", "../GameContent/Assets/Sprites/test.png");
-    assets->addTexture("player", "../GameContent/Assets/Sprites/player.png");
-    assets->addTexture("playerSheet", "../GameContent/Assets/Sprites/playerSheet.png");
-    assets->addTexture("obstacle", "../GameContent/Assets/Sprites/obstacle.png");
+    m_assets = std::make_shared<Assets>();
+    m_assets->addTexture("test", "../GameContent/Assets/Sprites/test.png");
+    m_assets->addTexture("player", "../GameContent/Assets/Sprites/player.png");
+    m_assets->addTexture("playerSheet", "../GameContent/Assets/Sprites/playerSheet.png");
+    m_assets->addTexture("obstacle", "../GameContent/Assets/Sprites/obstacle.png");
 
     
     m_window.create(sf::VideoMode(1280, 720), "engine window");
     m_window.setFramerateLimit(0);
-    m_currentFrame = 0;
     addScene("game", std::make_shared<GameScene>(*this));
     changeCurrentScene("game");
     addScene("menu", std::make_shared<MenuScene>(*this));
@@ -78,3 +73,12 @@ auto Engine::getScene(const std::string& name) -> std::shared_ptr<Scene>{
 auto Engine::getCurrentScene() -> std::shared_ptr<Scene>&{
     return m_currentScene;
 }
+
+auto Engine::getAssets() const -> std::shared_ptr<Assets> { 
+    return m_assets; 
+}
+
+void Engine::setAssets(const std::shared_ptr<Assets>& newAssets) {
+    m_assets = newAssets; 
+}
+
