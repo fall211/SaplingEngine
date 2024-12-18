@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "Renderer/Sprout.hpp"
 #include "SaplingEngine.hpp"
 
 #include <chrono>
@@ -20,7 +21,7 @@ using namespace std::chrono;
 using sceneMap = std::unordered_map<std::string, std::shared_ptr<Scene>>;
 
 class Engine {
-    sf::RenderWindow m_window;
+    Sprout::Window m_window = Sprout::Window(1280, 720, "Sapling Engine");
     float m_deltaTime = 0.0f;
     float m_simTime = 0.0f;
 
@@ -41,7 +42,12 @@ public:
     /**
      * The main loop of the engine. Started as soon as the program starts.
      */
-    void mainLoop();
+    void main();
+    
+    /**
+     * The main update function of the game, called each frame. Must be set as callback to the window.
+    */
+    void update(double dt);
     
     /**
      * Gets the current frame of the simulation.
@@ -67,7 +73,7 @@ public:
      *
      * @return The SFML window.
      */
-    auto getWindow() -> sf::RenderWindow& { return m_window; }
+    auto getWindow() -> Sprout::Window& { return m_window; }
 
 
     /**

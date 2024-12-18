@@ -6,6 +6,8 @@
 #include "Assets.hpp"
 
 
+/*
+
 Assets::Assets() {
     m_textures = std::unordered_map<std::string, std::shared_ptr<sf::Texture>>();
 }
@@ -22,3 +24,5 @@ void Assets::addTexture(const std::string& name, const std::string& path) {
 auto Assets::getTexture(const std::string& name) -> std::shared_ptr<sf::Texture> {
     return m_textures[name];
 }
+
+*/

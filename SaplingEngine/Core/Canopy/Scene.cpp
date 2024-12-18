@@ -14,22 +14,22 @@ Scene::Scene(Engine& engine) : m_engine(engine){
 }
 
 void Scene::sRender(EntityList& entities){
-    for (const auto& e : entities){
-        if (e->hasComponent<CSprite>()){
-            e->getComponent<CSprite>().sprite.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
-            m_engine.getWindow().draw(e->getComponent<CSprite>().sprite);
-        }
-        else if (e->hasComponent<CAnimatedSprite>()) {
-            auto& animatedSprite = e->getComponent<CAnimatedSprite>();
-            animatedSprite.sprite.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
-            animatedSprite.setAnimationFrame(m_engine.simTime(), m_engine.deltaTime());
-            m_engine.getWindow().draw(animatedSprite.sprite);
-        }
-        else if (e->hasComponent<CShape>()){
-            e->getComponent<CShape>().rectShape.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
-            m_engine.getWindow().draw(e->getComponent<CShape>().rectShape);
-        }
-    }
+    // for (const auto& e : entities){
+    //     if (e->hasComponent<CSprite>()){
+    //         e->getComponent<CSprite>().sprite.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
+    //         //m_engine.getWindow().draw(e->getComponent<CSprite>().sprite);
+    //     }
+    //     else if (e->hasComponent<CAnimatedSprite>()) {
+    //         auto& animatedSprite = e->getComponent<CAnimatedSprite>();
+    //         animatedSprite.sprite.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
+    //         animatedSprite.setAnimationFrame(m_engine.simTime(), m_engine.deltaTime());
+    //         //m_engine.getWindow().draw(animatedSprite.sprite);
+    //     }
+    //     else if (e->hasComponent<CShape>()){
+    //         e->getComponent<CShape>().rectShape.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
+    //         //m_engine.getWindow().draw(e->getComponent<CShape>().rectShape);
+    //     }
+    // }
 }
 
 GameScene::GameScene(Engine& engine) : Scene(engine){
@@ -38,10 +38,10 @@ GameScene::GameScene(Engine& engine) : Scene(engine){
 
 void GameScene::init(){
     /// Setup input actions
-    m_input->makeAxis("moveX", sf::Keyboard::Scan::Scancode::D, sf::Keyboard::Scan::Scancode::A);
-    m_input->makeAxis("moveY", sf::Keyboard::Scan::Scancode::S, sf::Keyboard::Scan::Scancode::W);
-    m_input->makeAction("jump", {sf::Keyboard::Scan::Scancode::Space, 57});
-    m_input->makeAction("spawn", {sf::Keyboard::Scan::Scancode::R});
+    // m_input->makeAxis("moveX", sf::Keyboard::Scan::Scancode::D, sf::Keyboard::Scan::Scancode::A);
+    // m_input->makeAxis("moveY", sf::Keyboard::Scan::Scancode::S, sf::Keyboard::Scan::Scancode::W);
+    // m_input->makeAction("jump", {sf::Keyboard::Scan::Scancode::Space, 57});
+    // m_input->makeAction("spawn", {sf::Keyboard::Scan::Scancode::R});
 
     
     /// Initial systems to run one time
@@ -70,12 +70,12 @@ void GameScene::update(){
 }
 
 void GameScene::sSpawnPlayer() const {
-    const auto e = m_entityManager->addEntity({"player", "dynamic"});
-    e->addComponent<CTransform>(glm::vec2(static_cast<float>(m_engine.getWindow().getSize().x ) / 4 - 32, 100), glm::vec2(0, 0));
-    // e->addComponent<CSprite>(m_engine.assets->getTexture("player"));
-    e->addComponent<CAnimatedSprite>(m_engine.getAssets()->getTexture("playerSheet"));
-    e->addComponent<CPlayerControls>(0.0f, 400.0f);
-    e->addComponent<CBBox>(64, 64);
+    // const auto e = m_entityManager->addEntity({"player", "dynamic"});
+    // e->addComponent<CTransform>(glm::vec2(static_cast<float>(m_engine.getWindow().getSize().x ) / 4 - 32, 100), glm::vec2(0, 0));
+    // // e->addComponent<CSprite>(m_engine.assets->getTexture("player"));
+    // e->addComponent<CAnimatedSprite>(m_engine.getAssets()->getTexture("playerSheet"));
+    // e->addComponent<CPlayerControls>(0.0f, 400.0f);
+    // e->addComponent<CBBox>(64, 64);
 }
 
 void GameScene::sPlayerGravity(const std::shared_ptr<Entity>& player) {
@@ -121,10 +121,10 @@ void GameScene::sObstacleSpawner(){
     std::uniform_real_distribution<float> range(200.0f, 500.0f);
     const float randomY = range(gen);
     
-    const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
-    e->addComponent<CTransform>(glm::vec2(1420, randomY), glm::vec2(-100.0f, 0));
-    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
-    e->addComponent<CBBox>(64, 64);
+    // const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
+    // e->addComponent<CTransform>(glm::vec2(1420, randomY), glm::vec2(-100.0f, 0));
+    // e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
+    // e->addComponent<CBBox>(64, 64);
 }
 
 void GameScene::sDeleteOffScreen(const EntityList& entities){
@@ -152,7 +152,7 @@ MenuScene::MenuScene(Engine& engine) : Scene(engine){
 
 void MenuScene::init(){
     Debug::log("init menu scene");
-    m_input->makeAction("sceneChange", {sf::Keyboard::Scan::Scancode::R});
+    //m_input->makeAction("sceneChange", {sf::Keyboard::Scan::Scancode::R});
 
 }
 

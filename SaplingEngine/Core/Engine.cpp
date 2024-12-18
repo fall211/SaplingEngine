@@ -5,19 +5,17 @@
 
 
 #include "Engine.hpp"
+#include "Core/Debug.hpp"
 
 Engine::Engine() {
     m_scenes = sceneMap();
     
-    m_assets = std::make_shared<Assets>();
-    m_assets->addTexture("test", "../GameContent/Assets/Sprites/test.png");
-    m_assets->addTexture("player", "../GameContent/Assets/Sprites/player.png");
-    m_assets->addTexture("playerSheet", "../GameContent/Assets/Sprites/playerSheet.png");
-    m_assets->addTexture("obstacle", "../GameContent/Assets/Sprites/obstacle.png");
-
+    // m_assets = std::make_shared<Assets>();
+    // m_assets->addTexture("test", "../GameContent/Assets/Sprites/test.png");
+    // m_assets->addTexture("player", "../GameContent/Assets/Sprites/player.png");
+    // m_assets->addTexture("playerSheet", "../GameContent/Assets/Sprites/playerSheet.png");
+    // m_assets->addTexture("obstacle", "../GameContent/Assets/Sprites/obstacle.png");
     
-    m_window.create(sf::VideoMode(1280, 720), "engine window");
-    m_window.setFramerateLimit(0);
     addScene("game", std::make_shared<GameScene>(*this));
     changeCurrentScene("game");
     addScene("menu", std::make_shared<MenuScene>(*this));
@@ -26,20 +24,19 @@ Engine::Engine() {
     Debug::log("init completed");
 }
 
-void Engine::mainLoop(){
+void Engine::main(){
     const auto start = system_clock::now();
     auto previous = system_clock::now();
 
-    while (m_window.isOpen()){
-        calculateDeltaTime(start, previous);
+    m_window.SetUpdateFrameCallback([this](double dt) { this -> update(dt);});
+    
+    m_window.Run(); // nothing after this gets called
+}
 
-        m_window.clear(sf::Color::White);
-        
-        m_currentScene->update();
-        
-        m_currentFrame++;
-        m_window.display();
-    }
+void Engine::update(double dt){
+    // Debug::log("update, dt: " + std::to_string(dt));
+    m_currentScene->update();
+    m_currentFrame++;
 }
 
 void Engine::calculateDeltaTime(const time_point<system_clock>& start, time_point<system_clock>& previous) {

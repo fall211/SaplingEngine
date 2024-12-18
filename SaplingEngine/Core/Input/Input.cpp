@@ -4,6 +4,7 @@
 //
 
 #include "Input.hpp"
+#include "Renderer/Sprout.hpp"
 #include <stdexcept>
 
 InputAxis::InputAxis(std::string  name, const int pKey, const int nKey) : name(std::move(name)), postiveKey(pKey), negativeKey(nKey){}
@@ -20,7 +21,7 @@ Input::Input(){
     m_mouseKeys = std::array<Key, static_cast<size_t>(MouseButton::COUNT)>();
 }
 
-void Input::update(sf::RenderWindow& window){
+void Input::update(Sprout::Window& window){
     
     for (const auto& pair : m_keyMap){
         const std::shared_ptr<Key> key = pair.second;
@@ -32,7 +33,7 @@ void Input::update(sf::RenderWindow& window){
         key.justPressed = false;
         key.justReleased = false;
     }
-    
+    /*
     sf::Event event{};
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
@@ -67,6 +68,7 @@ void Input::update(sf::RenderWindow& window){
                 m_mousePosition = glm::vec2(event.mouseMove.x, event.mouseMove.y);
             }
         }
+    */
 }
 
 auto Input::getKey(const int key) -> bool{
