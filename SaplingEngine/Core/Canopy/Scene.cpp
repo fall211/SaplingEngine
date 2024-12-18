@@ -1,9 +1,11 @@
 //
 //  Scene.cpp
 //  SaplingEngine, Canopy Scene Manager
-//
+//  
 
 #include "Scene.hpp"
+#include "Core/Debug.hpp"
+#include <string>
 
 
 Scene::Scene(Engine& engine) : m_engine(engine){
@@ -64,6 +66,7 @@ void GameScene::update(){
     sMove(m_entityManager->getEntities("dynamic"));
     sRender(m_entityManager->getEntities());
     sDeleteOffScreen(m_entityManager->getEntities("obstacle"));
+
 }
 
 void GameScene::sSpawnPlayer() const {

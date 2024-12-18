@@ -3,9 +3,8 @@
 //  SaplingEngine, SFML Input Wrapper
 //
 
+#pragma once
 
-#ifndef Input_hpp
-#define Input_hpp
 
 #include "SaplingEngine.hpp"
 #include <string>
@@ -28,10 +27,10 @@ struct Key {
     Key() = default;
 };
 
+
 using ActionsMap = std::map<std::string, std::vector<int>>;
 using AxisMap = std::map<std::string, std::shared_ptr<InputAxis>>;
 using KeyMap = std::map<int, std::shared_ptr<Key>>;
-
 
 /*
  TODO: support mouse inputs
@@ -42,9 +41,12 @@ class Input {
     AxisMap m_axisMap;
     KeyMap m_keyMap;
     
+    Vector2 m_mousePosition;
+    
     auto getKey(int key) -> bool;
     auto getKeyDown(int key) -> bool;
     auto getKeyUp(int key) -> bool;
+    
     
 public:
     void update(sf::RenderWindow& window);
@@ -55,12 +57,29 @@ public:
 
     void makeAxis(const std::string& name, int positiveKey, int negativeKey);
     auto getAxis(const std::string& name) -> int;
-
-    auto getMouseDown(int button) -> bool;
+    
+    enum MouseButton {
+        LEFT = 0,
+        RIGHT = 1,
+        MIDDLE = 2,
+        COUNT
+    };
+    
+    auto getMouseDown(Input::MouseButton button) -> bool;
+    auto getMouseUp(Input::MouseButton button) -> bool;
+    auto getMouse(Input::MouseButton button) -> bool;
+    
+    auto getMousePosition() -> Vector2;
     
     Input();
+
+private:
+    std::array<Key, static_cast<size_t>(Input::MouseButton::COUNT)> m_mouseKeys;
+    
+    auto getMouseKey(Input::MouseButton button) -> Key&;
+
+    
 };
 
 
 
-#endif /* Input_hpp */

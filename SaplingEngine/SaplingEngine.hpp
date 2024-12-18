@@ -9,6 +9,9 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "Physics/Physics.hpp"
+#include "Physics/Math.hpp"
+
 #include "Core/Engine.hpp"
 #include "Core/Debug.hpp"
 #include "Core/Canopy/Scene.hpp"
@@ -18,6 +21,5 @@
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECS/Entities/Entity.hpp"
 #include "ECS/Components/Component.hpp"
-#include "Physics/Physics.hpp"
-#include "Physics/Math.hpp"
+
 

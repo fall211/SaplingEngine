@@ -6,7 +6,8 @@ CompileFlags:
     -Wall, 
     -Wextra, 
     -Werror, 
-    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine,
+    -I/opt/homebrew/include
     ]
 
 

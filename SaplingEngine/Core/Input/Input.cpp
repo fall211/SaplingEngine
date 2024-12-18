@@ -4,6 +4,7 @@
 //
 
 #include "Input.hpp"
+#include <stdexcept>
 
 InputAxis::InputAxis(std::string  name, const int pKey, const int nKey) : name(std::move(name)), postiveKey(pKey), negativeKey(nKey){}
 
@@ -13,6 +14,10 @@ Input::Input(){
     m_actionsMap = std::map<std::string, std::vector<int>>();
     m_axisMap = std::map<std::string, std::shared_ptr<InputAxis>>();
     m_keyMap = std::map<int, std::shared_ptr<Key>>();
+    
+    m_mousePosition = Vector2(0, 0);
+    
+    m_mouseKeys = std::array<Key, static_cast<size_t>(MouseButton::COUNT)>();
 }
 
 void Input::update(sf::RenderWindow& window){
@@ -21,6 +26,11 @@ void Input::update(sf::RenderWindow& window){
         const std::shared_ptr<Key> key = pair.second;
         key->justPressed = false;
         key->justReleased = false;
+    }
+    
+    for (auto& key : m_mouseKeys){
+        key.justPressed = false;
+        key.justReleased = false;
     }
     
     sf::Event event{};
@@ -44,10 +54,17 @@ void Input::update(sf::RenderWindow& window){
 
             }
             else if (event.type == sf::Event::MouseButtonPressed) {
-
+                if (event.mouseButton.button >= m_mouseKeys.size()) continue;
+                m_mouseKeys[event.mouseButton.button].justPressed = true;
+                m_mouseKeys[event.mouseButton.button].pressed = true;
             }
             else if (event.type == sf::Event::MouseButtonReleased) {
-
+                if (event.mouseButton.button >= m_mouseKeys.size()) continue;
+                m_mouseKeys[event.mouseButton.button].justReleased = true;
+                m_mouseKeys[event.mouseButton.button].pressed = false;
+            }
+            else if (event.type == sf::Event::MouseMoved){
+                m_mousePosition = Vector2(event.mouseMove.x, event.mouseMove.y);
             }
         }
 }
@@ -125,6 +142,26 @@ auto Input::getAxis(const std::string& name) -> int{
     return pos - neg;
 }
 
-auto Input::getMouseDown(int button) -> bool {
-    return false;
+auto Input::getMouseKey(MouseButton button) -> Key& {
+    if (button >= m_mouseKeys.size()){
+        throw std::out_of_range("tried to get invalid button");
+    }
+    return m_mouseKeys[button];
 }
+
+auto Input::getMouseDown(MouseButton button) -> bool {
+    return getMouseKey(button).justPressed;
+}
+
+auto Input::getMouseUp(MouseButton button) -> bool {
+    return getMouseKey(button).justReleased;
+}
+
+auto Input::getMouse(MouseButton button) -> bool {
+    return getMouseKey(button).pressed;
+}
+
+auto Input::getMousePosition() -> Vector2 {
+    return m_mousePosition;
+}
+
