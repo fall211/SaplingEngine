@@ -7,7 +7,7 @@
 
 
 
-CTransform::CTransform(const Vector2& positionin, const Vector2& velocityin)
+CTransform::CTransform(const glm::vec2& positionin, const glm::vec2& velocityin)
     : position(positionin), velocity(velocityin) {}
 
 CShape::CShape(sf::RectangleShape  shapeIn) : rectShape(std::move(shapeIn)) {}

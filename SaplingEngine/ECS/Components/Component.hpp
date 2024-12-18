@@ -7,7 +7,7 @@
 
 
 #include "SaplingEngine.hpp"
-#include "Physics/Math.hpp"
+#include "glm/glm.hpp"
 
 class Component{
 public:
@@ -18,10 +18,10 @@ public:
 
 class CTransform final : public Component{
     public:
-        Vector2 position = Vector2(0, 0);
-        Vector2 velocity = Vector2(0, 0);
+        glm::vec2 position = glm::vec2(0, 0);
+        glm::vec2 velocity = glm::vec2(0, 0);
 
-        CTransform(const Vector2& positionin, const Vector2& velocityin);
+        CTransform(const glm::vec2& positionin, const glm::vec2& velocityin);
 };
 
 class CShape final : public Component{

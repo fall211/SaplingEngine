@@ -71,7 +71,7 @@ void GameScene::update(){
 
 void GameScene::sSpawnPlayer() const {
     const auto e = m_entityManager->addEntity({"player", "dynamic"});
-    e->addComponent<CTransform>(Vector2(static_cast<float>(m_engine.getWindow().getSize().x ) / 4 - 32, 100), Vector2::zero());
+    e->addComponent<CTransform>(glm::vec2(static_cast<float>(m_engine.getWindow().getSize().x ) / 4 - 32, 100), glm::vec2(0, 0));
     // e->addComponent<CSprite>(m_engine.assets->getTexture("player"));
     e->addComponent<CAnimatedSprite>(m_engine.getAssets()->getTexture("playerSheet"));
     e->addComponent<CPlayerControls>(0.0f, 400.0f);
@@ -122,7 +122,7 @@ void GameScene::sObstacleSpawner(){
     const float randomY = range(gen);
     
     const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
-    e->addComponent<CTransform>(Vector2(1420, randomY), Vector2(-100.0f, 0));
+    e->addComponent<CTransform>(glm::vec2(1420, randomY), glm::vec2(-100.0f, 0));
     e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
     e->addComponent<CBBox>(64, 64);
 }
@@ -138,7 +138,7 @@ void GameScene::sDeleteOffScreen(const EntityList& entities){
 void GameScene::sCollisionHandler(const std::shared_ptr<Entity>& player, const EntityList& obstacles) {
     for (const auto& e : obstacles) {
         if (e->hasComponent<CBBox>()) { // ignore entities with no bounding box
-            if (const Vector2 collision = Physics2D::bBoxCollision(player, e); collision != Vector2::zero()) {
+            if (const glm::vec2 collision = Physics2D::bBoxCollision(player, e); collision != glm::vec2(0, 0)) {
                 e->destroy();
             }
         }

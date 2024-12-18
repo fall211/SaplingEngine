@@ -3,9 +3,6 @@ project(Sapling)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(SFML 2.5 COMPONENTS graphics audio window system REQUIRED)
-
-
 add_executable(Sapling)
 
 target_sources(Sapling PRIVATE
@@ -18,7 +15,6 @@ target_sources(Sapling PRIVATE
     SaplingEngine/ECS/Entities/Entity.cpp
     SaplingEngine/ECS/Entities/EntityManager.cpp
     SaplingEngine/Physics/Physics.cpp
-    SaplingEngine/Physics/Math.cpp
 )
 
 target_sources(Sapling PRIVATE
@@ -30,12 +26,12 @@ target_sources(Sapling PRIVATE
     SaplingEngine/ECS/Entities/Entity.hpp
     SaplingEngine/ECS/Entities/EntityManager.hpp
     SaplingEngine/Physics/Physics.hpp
-    SaplingEngine/Physics/Math.hpp
 )
     
 
-target_link_libraries(Sapling sfml-graphics sfml-audio sfml-window sfml-system)
 
 target_include_directories(Sapling PUBLIC
 	${CMAKE_SOURCE_DIR}/SaplingEngine
+	/opt/homebrew/include
+	${CMAKE_SOURCE_DIR}/thirdparty
 )

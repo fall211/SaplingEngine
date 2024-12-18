@@ -41,7 +41,7 @@ class Input {
     AxisMap m_axisMap;
     KeyMap m_keyMap;
     
-    Vector2 m_mousePosition;
+    glm::vec2 m_mousePosition;
     
     auto getKey(int key) -> bool;
     auto getKeyDown(int key) -> bool;
@@ -69,7 +69,7 @@ public:
     auto getMouseUp(Input::MouseButton button) -> bool;
     auto getMouse(Input::MouseButton button) -> bool;
     
-    auto getMousePosition() -> Vector2;
+    auto getMousePosition() -> glm::vec2;
     
     Input();
 

@@ -15,7 +15,7 @@ Input::Input(){
     m_axisMap = std::map<std::string, std::shared_ptr<InputAxis>>();
     m_keyMap = std::map<int, std::shared_ptr<Key>>();
     
-    m_mousePosition = Vector2(0, 0);
+    m_mousePosition = glm::vec2(0, 0);
     
     m_mouseKeys = std::array<Key, static_cast<size_t>(MouseButton::COUNT)>();
 }
@@ -64,7 +64,7 @@ void Input::update(sf::RenderWindow& window){
                 m_mouseKeys[event.mouseButton.button].pressed = false;
             }
             else if (event.type == sf::Event::MouseMoved){
-                m_mousePosition = Vector2(event.mouseMove.x, event.mouseMove.y);
+                m_mousePosition = glm::vec2(event.mouseMove.x, event.mouseMove.y);
             }
         }
 }
@@ -161,7 +161,7 @@ auto Input::getMouse(MouseButton button) -> bool {
     return getMouseKey(button).pressed;
 }
 
-auto Input::getMousePosition() -> Vector2 {
+auto Input::getMousePosition() -> glm::vec2 {
     return m_mousePosition;
 }
 
