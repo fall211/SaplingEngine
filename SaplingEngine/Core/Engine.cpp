@@ -34,7 +34,7 @@ void Engine::main(){
 }
 
 void Engine::update(double dt){
-    // Debug::log("update, dt: " + std::to_string(dt));
+
     m_currentScene->update();
     m_currentFrame++;
 }

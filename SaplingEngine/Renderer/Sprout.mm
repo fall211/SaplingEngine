@@ -12,9 +12,32 @@
 
 #include <cassert>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
 namespace Sprout {
 
+Texture::~Texture() {
+    stbi_image_free(m_image.pixels);
+}
     
+bool Texture::loadFromFile(const std::string& path) {
+    int width, height, channels;
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+    if (!data) {
+        // Debug::log(("Failed to load image: %s", path.c_str()));
+        return false;
+    }
+        
+    // stbi_image_free(data);
+        
+    m_image.pixels = data;
+    m_image.width = width;
+    m_image.height = height;
+    
+    return true;
+}
+
 Window::Window(int width, int height, const char* title)
     : m_width(width), m_height(height), m_title(std::move(title)) {    
         m_instance = this;
@@ -82,15 +105,29 @@ void Window::Init(){
     
     m_state.bind.index_buffer = sg_make_buffer(&ibuf_desc);
     
+    sg_sampler_desc sampler_desc = {
+        .min_filter = SG_FILTER_NEAREST,
+        .mag_filter = SG_FILTER_NEAREST,
+        .mipmap_filter = SG_FILTER_NEAREST,
+        .wrap_u = SG_WRAP_REPEAT,
+        .wrap_v = SG_WRAP_REPEAT,
+    };
+    
+    m_state.bind.samplers[SMP_default_sampler] = sg_make_sampler(&sampler_desc);
+    
     // pipeline
-    sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));
+    sg_shader shd = sg_make_shader(quad_shader_desc(sg_query_backend()));
     
     sg_pipeline_desc pip_desc = {
         .shader = shd,
         .index_type = SG_INDEXTYPE_UINT16,
         .layout = {
             .attrs = {
-                [ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
+                [ATTR_quad_position].format = SG_VERTEXFORMAT_FLOAT2,
+                [ATTR_quad_color0].format = SG_VERTEXFORMAT_FLOAT4,
+                [ATTR_quad_uv0].format = SG_VERTEXFORMAT_FLOAT2,
+                [ATTR_quad_bytes0].format = SG_VERTEXFORMAT_UBYTE4N,
+                [ATTR_quad_color_override0].format = SG_VERTEXFORMAT_FLOAT4
             }
         },
         .label = "quad-pipeline"
@@ -101,24 +138,73 @@ void Window::Init(){
     m_state.pass_action = (sg_pass_action){
         .colors[0] = { .load_action=SG_LOADACTION_CLEAR, .clear_value = { 0.0f, 0.0f, 0.0f, 1.0f } }
     };
+    
+    // bake images into atlas
+    Debug::log("baking atlas");
+    bake_atlas();
+    Debug::log("atlas baked");
+    
+    
 }
 
+void Window::bake_atlas() {
+    
+    m_atlas.width = 1024;
+    m_atlas.height = 1024;
+    
+    // data
+    const void *atlas_data = malloc(m_atlas.width * m_atlas.height * 4);
+    
+    sg_image_desc img_desc = {
+        .width = m_atlas.width,
+        .height = m_atlas.height,
+        .pixel_format = SG_PIXELFORMAT_RGBA8,
+        .data.subimage[0][0] = {
+            .ptr = atlas_data,
+            .size = (size_t)m_atlas.width * m_atlas.height * 4
+        }
+    };
+    
+    Debug::log("loading image");
+    m_atlas.img = sg_make_image(&img_desc);
+    
+    // free data
+    free((void*)atlas_data);
+    
+}
+
+
 void Window::Frame() {
+    // reset draw frame
+    draw_frame.num_quads = 0;
+    std::fill(draw_frame.quads.begin(), draw_frame.quads.end(), Quad{});
+    
+    
+    //draw_test();
     
     if (m_update_frame_callback) {
         m_update_frame_callback(sapp_frame_duration());
     }
-    
+
+    m_state.bind.images[IMG_tex0] = m_atlas.img;
+
+    sg_update_buffer(m_state.bind.vertex_buffers[0], SG_RANGE(draw_frame.quads));
     sg_pass pass = {
         .action = m_state.pass_action,
         .swapchain = sglue_swapchain()
     };
     sg_begin_pass(&pass);
+
     sg_apply_pipeline(m_state.pip);
+
     sg_apply_bindings(&m_state.bind);
+
     sg_draw(0, 6 * draw_frame.num_quads, 1);
+
     sg_end_pass();
+
     sg_commit();
+
 }
 
 void Window::Cleanup() {
@@ -154,7 +240,6 @@ void Window::Run() {
 
 void Window::SetUpdateFrameCallback(UpdateFrameCallback callback) {
     m_update_frame_callback = std::move(callback);
-    Debug::log("set frame update callback");
     if (m_update_frame_callback) {
         Debug::log("frame update callback is set");
     }

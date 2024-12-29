@@ -42,4 +42,5 @@ target_include_directories(Sapling PUBLIC
     ${CMAKE_SOURCE_DIR}/SaplingEngine
     /opt/homebrew/include
     ${CMAKE_SOURCE_DIR}/thirdparty
+    ${CMAKE_SOURCE_DIR}/thirdparty/stb
 )
