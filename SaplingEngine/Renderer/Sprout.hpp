@@ -5,12 +5,6 @@
 
 #pragma once
 #include "glm/fwd.hpp"
-#include <functional>
-#pragma clang diagnostic ignored "-Wunused-variable"
-
-
-
-
 #include "glm/glm.hpp"
 #include "string"
 
@@ -58,28 +52,31 @@ static struct DrawFrame {
     glm::mat4 camera_xform;
 } draw_frame;
 
-struct Image {
-    glm::i32 width, height;
-    glm::vec4 atlas_uvs;
-    unsigned char* pixels;
-};
-
 class Texture {
 public:
     Texture() = default;
     ~Texture();
     
     auto loadFromFile(const std::string& path) -> bool;
-    auto getImage() -> Image&;
+    auto getPixels() -> unsigned char*;
+    auto getWidth() -> glm::i32;
+    auto getHeight() -> glm::i32;
+    auto getAtlasUVs() -> glm::vec4;
+    auto setAtlasUVs(glm::vec4& uvs) -> void;
+    
+    auto registerTexture() -> void;
     
 private:
-    Image m_image;
+    glm::i32 m_width, m_height;
+    glm::vec4 m_atlas_uvs;
+    unsigned char* m_pixels;
 };
 
 class Window {
 public: 
     Window(int width, int height, const char* title);
     ~Window();
+    static Window* instance;
 
     void Run();
     
@@ -90,17 +87,21 @@ public:
 
     // void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
     
+    // texture stuff
+    void addTexture(const Texture& tex);
 
 private:
     int m_width = 0;
     int m_height = 0;
     const char* m_title;
     
-    static Window* m_instance;
-    
     State m_state;
     UpdateFrameCallback m_update_frame_callback;
+    
     Atlas m_atlas;
+    std::vector<Texture> m_textures;
+    void bake_atlas();
+
 
     static void init_cb();
     static void frame_cb();
@@ -112,11 +113,8 @@ private:
     void Cleanup();
     void Event(const sapp_event* e);
     
-    void bake_atlas();
-    
     
     // drawing things onto the screen
-    
     void draw_test();
     
     void draw(

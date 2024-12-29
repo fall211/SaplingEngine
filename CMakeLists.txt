@@ -36,6 +36,11 @@ target_sources(Sapling PRIVATE
 set_source_files_properties(Sprout.mm PROPERTIES LANGUAGE CXX)
 target_link_libraries(Sapling "-framework Cocoa -framework QuartzCore -framework Metal")
 target_link_libraries(Sapling "-framework OpenGL")
+	
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/")
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC COMPONENTS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Components/")
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PREFABS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Prefabs/")
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SYSTEMS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Systems/")
 
 # Add include directories
 target_include_directories(Sapling PUBLIC

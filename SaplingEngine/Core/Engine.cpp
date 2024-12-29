@@ -10,11 +10,11 @@
 Engine::Engine() {
     m_scenes = sceneMap();
     
-    // m_assets = std::make_shared<Assets>();
-    // m_assets->addTexture("test", "../GameContent/Assets/Sprites/test.png");
-    // m_assets->addTexture("player", "../GameContent/Assets/Sprites/player.png");
-    // m_assets->addTexture("playerSheet", "../GameContent/Assets/Sprites/playerSheet.png");
-    // m_assets->addTexture("obstacle", "../GameContent/Assets/Sprites/obstacle.png");
+    m_assets = std::make_shared<Assets>();
+    m_assets->addTexture("test", "Sprites/test.png");
+    m_assets->addTexture("player", "Sprites/player.png");
+    m_assets->addTexture("playerSheet", "Sprites/playerSheet.png");
+    m_assets->addTexture("obstacle", "Sprites/obstacle.png");
     
     addScene("game", std::make_shared<GameScene>(*this));
     changeCurrentScene("game");

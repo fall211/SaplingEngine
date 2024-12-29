@@ -15,10 +15,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
+#define STB_RECT_PACK_IMPLEMENTATION
+#include "stb/stb_rect_pack.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
+
 namespace Sprout {
 
 Texture::~Texture() {
-    stbi_image_free(m_image.pixels);
+    //stbi_image_free(m_pixels);
 }
     
 bool Texture::loadFromFile(const std::string& path) {
@@ -31,36 +37,59 @@ bool Texture::loadFromFile(const std::string& path) {
         
     // stbi_image_free(data);
         
-    m_image.pixels = data;
-    m_image.width = width;
-    m_image.height = height;
+    m_pixels = data;
+    m_width = width;
+    m_height = height;
+    
+    registerTexture();
     
     return true;
 }
 
+void Texture::registerTexture() {
+    Window::instance->addTexture(*this);
+}
+
+glm::i32 Texture::getWidth() {
+    return m_width;
+}
+
+glm::i32 Texture::getHeight() {
+    return m_height;
+}
+
+glm::vec4 Texture::getAtlasUVs() {
+    return m_atlas_uvs;
+}
+
+void Texture::setAtlasUVs(glm::vec4& uvs) {
+    m_atlas_uvs = uvs;
+}
+
+unsigned char* Texture::getPixels() {
+    return m_pixels;
+}
+
 Window::Window(int width, int height, const char* title)
     : m_width(width), m_height(height), m_title(std::move(title)) {    
-        m_instance = this;
+        instance = this;
 }
 
 Window::~Window() {
-    delete m_instance;
+    delete instance;
 }
 
 void Window::init_cb() {
-    m_instance->Init();
+    instance->Init();
 }
-
 void Window::frame_cb() {
-    m_instance->Frame();
+    instance->Frame();
 }
-
 void Window::cleanup_cb() {
-    m_instance->Cleanup();
+    instance->Cleanup();
 }
-
 void Window::event_cb(const sapp_event* e) {
-    m_instance->Event(e);
+    instance->Event(e);
 }
 
 void Window::Init(){
@@ -153,8 +182,59 @@ void Window::bake_atlas() {
     m_atlas.height = 1024;
     
     // data
-    const void *atlas_data = malloc(m_atlas.width * m_atlas.height * 4);
+    unsigned char* atlas_data = (unsigned char*)malloc(m_atlas.width * m_atlas.height * 4);
     
+    // clear atlas
+    memset((void*)atlas_data, 0, m_atlas.width * m_atlas.height * 4);
+    
+    // all textures are in m_textures (std::vector<Texture>)
+    // we need to rect_pack (stb) all textures into the atlas, 
+    // and save the uv coordinates in the texture object
+    // image data is unsigned char* and can be accessed with getPixels()
+    // image width and height can be accessed with getWidth() and getHeight()
+    
+    stbrp_context context;
+    stbrp_node* nodes = (stbrp_node*)malloc(sizeof(stbrp_node) * m_atlas.width);
+    stbrp_init_target(&context, m_atlas.width, m_atlas.height, nodes, m_atlas.width);
+    
+    for (auto& tex : m_textures) {
+        stbrp_rect rect;
+        rect.id = 0;
+        rect.w = tex.getWidth();
+        rect.h = tex.getHeight();
+        
+        if (!stbrp_pack_rects(&context, &rect, 1)) {
+            Debug::log("Failed to pack rect");
+            continue;
+        }
+        
+        // copy data to atlas
+        for (int y = 0; y < tex.getHeight(); y++) {
+            for (int x = 0; x < tex.getWidth(); x++) {
+                int src_index = (y * tex.getWidth() + x) * 4;
+                int dst_index = ((rect.y + y) * m_atlas.width + (rect.x + x)) * 4;
+                
+                atlas_data[dst_index + 0] = tex.getPixels()[src_index + 0];
+                atlas_data[dst_index + 1] = tex.getPixels()[src_index + 1];
+                atlas_data[dst_index + 2] = tex.getPixels()[src_index + 2];
+                atlas_data[dst_index + 3] = tex.getPixels()[src_index + 3];
+            }
+        }
+        
+        // save uv coordinates
+        glm::vec4 uv = glm::vec4(
+            (float)rect.x / m_atlas.width,
+            (float)rect.y / m_atlas.height,
+            (float)(rect.x + rect.w) / m_atlas.width,
+            (float)(rect.y + rect.h) / m_atlas.height
+        );
+        
+        tex.setAtlasUVs(uv);    
+        
+    }
+    
+    
+    // create image
     sg_image_desc img_desc = {
         .width = m_atlas.width,
         .height = m_atlas.height,
@@ -168,11 +248,18 @@ void Window::bake_atlas() {
     Debug::log("loading image");
     m_atlas.img = sg_make_image(&img_desc);
     
-    // free data
-    free((void*)atlas_data);
+    // write image to png
+    stbi_write_png("atlas.png", m_atlas.width, m_atlas.height, 4, atlas_data, m_atlas.width * 4);
     
+    // free data
+    free(atlas_data);
+    free(nodes);
+
 }
 
+void Window::addTexture(const Texture& tex) {
+    m_textures.push_back(tex);
+}
 
 void Window::Frame() {
     // reset draw frame
@@ -225,14 +312,14 @@ auto Window::sokol_main(int argc, char* argv[], int width, int height, const cha
         .frame_cb = frame_cb,
         .cleanup_cb = cleanup_cb,
         .event_cb = event_cb,
-        .width = m_instance->m_width,
-        .height = m_instance->m_height,
+        .width = instance->m_width,
+        .height = instance->m_height,
         .high_dpi = true,
-        .window_title = m_instance->m_title,
+        .window_title = instance->m_title,
     };
 }
 
-Sprout::Window* Window::m_instance = nullptr;
+Sprout::Window* Window::instance = nullptr;
 
 void Window::Run() {
     sapp_run(sokol_main(0, nullptr, m_width, m_height, m_title));

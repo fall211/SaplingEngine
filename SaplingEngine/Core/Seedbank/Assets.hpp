@@ -12,6 +12,9 @@
 #include "SaplingEngine.hpp"
 #include "Renderer/Sprout.hpp"
 
+#ifndef ASSETS_PATH
+#define ASSETS_PATH "../GameContent/Assets/"
+#endif
 
 class Assets {
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures;
