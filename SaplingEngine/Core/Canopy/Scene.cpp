@@ -14,22 +14,17 @@ Scene::Scene(Engine& engine) : m_engine(engine){
 }
 
 void Scene::sRender(EntityList& entities){
-    // for (const auto& e : entities){
-    //     if (e->hasComponent<CSprite>()){
-    //         e->getComponent<CSprite>().sprite.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
-    //         //m_engine.getWindow().draw(e->getComponent<CSprite>().sprite);
-    //     }
+    for (const auto& e : entities){
+        if (e->hasComponent<CSprite>()){
+            m_engine.getWindow().draw_sprite(e->getComponent<CSprite>().texture, e->getComponent<CTransform>().position);
+        }
     //     else if (e->hasComponent<CAnimatedSprite>()) {
     //         auto& animatedSprite = e->getComponent<CAnimatedSprite>();
     //         animatedSprite.sprite.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
     //         animatedSprite.setAnimationFrame(m_engine.simTime(), m_engine.deltaTime());
     //         //m_engine.getWindow().draw(animatedSprite.sprite);
     //     }
-    //     else if (e->hasComponent<CShape>()){
-    //         e->getComponent<CShape>().rectShape.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
-    //         //m_engine.getWindow().draw(e->getComponent<CShape>().rectShape);
-    //     }
-    // }
+    }
 }
 
 GameScene::GameScene(Engine& engine) : Scene(engine){
@@ -58,9 +53,9 @@ void GameScene::update(){
     
     /// Systems
     sObstacleSpawner();
-    sCollisionHandler(m_entityManager->getEntities("player").front(), m_entityManager->getEntities("obstacle"));
-    sPlayerGravity(m_entityManager->getEntities("player").front());
-    sPlayerController(m_entityManager->getEntities("player").front());
+    // sCollisionHandler(m_entityManager->getEntities("player").front(), m_entityManager->getEntities("obstacle"));
+    // sPlayerGravity(m_entityManager->getEntities("player").front());
+    // sPlayerController(m_entityManager->getEntities("player").front());
     
     /// Systems (ordered)
     sMove(m_entityManager->getEntities("dynamic"));
@@ -112,19 +107,20 @@ void GameScene::sSceneTime(){
     m_obstacleSpawnTimer += m_engine.deltaTime();
 }
 
-void GameScene::sObstacleSpawner(){
+void GameScene::sObstacleSpawner(){    
     if (m_obstacleSpawnTimer < 1) return;
     m_obstacleSpawnTimer = 0;
     // Generate random position
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> range(200.0f, 500.0f);
+    std::uniform_real_distribution<float> range(-50.0f, 50.0f);
     const float randomY = range(gen);
+    const float randomX = range(gen);
     
-    // const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
-    // e->addComponent<CTransform>(glm::vec2(1420, randomY), glm::vec2(-100.0f, 0));
-    // e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
-    // e->addComponent<CBBox>(64, 64);
+    const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
+    e->addComponent<CTransform>(glm::vec2(randomX, randomY), glm::vec2(0, 0));
+    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
+    e->addComponent<CBBox>(64, 64);
 }
 
 void GameScene::sDeleteOffScreen(const EntityList& entities){

@@ -6,13 +6,21 @@
 #pragma once
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+
 #include "string"
+#include <cassert>
+#include <memory>
 
 #include "sokol/sokol_gfx.h"
 #include "sokol/sokol_app.h"
 #include "sokol/sokol_glue.h"
 
 #include "quad.h"
+#include "../Core/Debug.hpp"
+
+
 
 namespace Sprout {
 
@@ -30,8 +38,6 @@ struct Vertex {
     glm::vec2 pos;
     glm::vec4 color;
     glm::vec2 uv;
-    glm::u8 tex_index;
-    std::array<glm::u8, 3> pad;
     glm::vec4 color_override;
 };
 
@@ -44,13 +50,12 @@ struct Atlas {
     sg_image img;
 };
 
-static struct DrawFrame {
+struct DrawFrame {
     std::array<Quad, MAX_QUADS> quads;
     int num_quads = 0;
-    
     glm::mat4 view_projection;
     glm::mat4 camera_xform;
-} draw_frame;
+};
 
 class Texture {
 public:
@@ -62,13 +67,13 @@ public:
     auto getWidth() -> glm::i32;
     auto getHeight() -> glm::i32;
     auto getAtlasUVs() -> glm::vec4;
-    auto setAtlasUVs(glm::vec4& uvs) -> void;
+    auto setAtlasUVs(glm::vec4 uvs) -> void;
     
     auto registerTexture() -> void;
     
 private:
     glm::i32 m_width, m_height;
-    glm::vec4 m_atlas_uvs;
+    glm::vec4 m_atlas_uvs = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     unsigned char* m_pixels;
 };
 
@@ -77,6 +82,7 @@ public:
     Window(int width, int height, const char* title);
     ~Window();
     static Window* instance;
+    DrawFrame draw_frame; 
 
     void Run();
     
@@ -88,8 +94,19 @@ public:
     // void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
     
     // texture stuff
-    void addTexture(const Texture& tex);
+    void addTexture(std::shared_ptr<Texture> tex);
 
+    // this is what will be called from game code
+    void draw_sprite(
+        const std::shared_ptr<Sprout::Texture> texture,
+        const glm::vec2 position, 
+        const glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+        const glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
+    );
+    
+    // TODO: draw text
+    void draw_text();
+    
 private:
     int m_width = 0;
     int m_height = 0;
@@ -99,7 +116,7 @@ private:
     UpdateFrameCallback m_update_frame_callback;
     
     Atlas m_atlas;
-    std::vector<Texture> m_textures;
+    std::vector<std::shared_ptr<Texture>> m_textures;
     void bake_atlas();
 
 
@@ -117,18 +134,12 @@ private:
     // drawing things onto the screen
     void draw_test();
     
-    void draw(
-        Sprout::Texture& texture,
-        glm::vec2 position, 
-        glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
-    );
-    
     void draw_rect_projected(
         glm::mat4 projection, 
         glm::vec2 size, 
-        glm::vec4 color,
         glm::vec4 uv,
-        glm::vec4 color_override
+        glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
     );
     
     void draw_quad_projected(
@@ -136,7 +147,6 @@ private:
         std::array<glm::vec2, 4> positions,
         std::array<glm::vec4, 4> colors,
         std::array<glm::vec2, 4> uvs,
-        std::array<glm::u8, 4> tex_indices,
         std::array<glm::vec4, 4> color_overrides
     );
     

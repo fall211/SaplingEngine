@@ -18,8 +18,8 @@ Engine::Engine() {
     
     addScene("game", std::make_shared<GameScene>(*this));
     changeCurrentScene("game");
-    addScene("menu", std::make_shared<MenuScene>(*this));
-    changeCurrentScene("menu");
+    // addScene("menu", std::make_shared<MenuScene>(*this));
+    // changeCurrentScene("menu");
 
     Debug::log("init completed");
 }
@@ -34,7 +34,8 @@ void Engine::main(){
 }
 
 void Engine::update(double dt){
-
+    m_deltaTime = dt;
+    
     m_currentScene->update();
     m_currentFrame++;
 }

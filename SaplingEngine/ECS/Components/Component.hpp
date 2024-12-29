@@ -8,6 +8,7 @@
 
 #include "SaplingEngine.hpp"
 #include "glm/glm.hpp"
+#include <memory>
 
 class Component{
 public:
@@ -44,11 +45,11 @@ public:
     explicit CBCircle(float rin);
 };
 
-// class CSprite final : public Component {
-// public:
-//     sf::Sprite sprite;
-//     explicit CSprite(const std::shared_ptr<sf::Texture>& texin);
-// };
+class CSprite final : public Component {
+public:
+    std::shared_ptr<Sprout::Texture> texture;
+    explicit CSprite(const std::shared_ptr<Sprout::Texture>& texin);
+};
 
 // class CAnimatedSprite final : public Component {
 // public:

@@ -16,9 +16,7 @@ CBBox::CBBox(const float win, const float hin) : w(win), h(hin) {}
 
 CBCircle::CBCircle(const float rin) : radius(rin) {}
 
-// CSprite::CSprite(const std::shared_ptr<sf::Texture>& texin){
-//     sprite.setTexture(*texin);
-// }
+CSprite::CSprite(const std::shared_ptr<Sprout::Texture>& texin): texture(texin) {}
 
 // CAnimatedSprite::CAnimatedSprite(const std::shared_ptr<sf::Texture>& texture, const float animSpeed) : animationSpeed(animSpeed){
 //     sprite.setTexture(*texture);

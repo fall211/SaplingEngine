@@ -18,6 +18,8 @@ target_sources(Sapling PRIVATE
     SaplingEngine/ECS/Entities/EntityManager.cpp
     SaplingEngine/Physics/Physics.cpp
     SaplingEngine/Renderer/Sprout.mm
+    SaplingEngine/Renderer/Texture.cpp
+    SaplingEngine/Renderer/Window.cpp
 )
 
 # Add header files
