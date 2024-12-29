@@ -113,19 +113,18 @@ void GameScene::sObstacleSpawner(){
     // Generate random position
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> range(-50.0f, 50.0f);
+    std::uniform_real_distribution<float> range(-250.0f, 250.0f);
     const float randomY = range(gen);
-    const float randomX = range(gen);
     
     const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
-    e->addComponent<CTransform>(glm::vec2(randomX, randomY), glm::vec2(0, 0));
+    e->addComponent<CTransform>(glm::vec2(640, randomY), glm::vec2(-100, 0));
     e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
     e->addComponent<CBBox>(64, 64);
 }
 
 void GameScene::sDeleteOffScreen(const EntityList& entities){
     for (const auto& e : entities){
-        if (e->getComponent<CTransform>().position.x < -100){
+        if (e->getComponent<CTransform>().position.x < -640){
             e->destroy();
         }
     }

@@ -104,6 +104,18 @@ namespace Sprout {
             .label = "quad-pipeline"
         };
         
+        sg_blend_state blend_state = {
+            .enabled = true,
+            .src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+            .dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+            .op_rgb = SG_BLENDOP_ADD,
+            .src_factor_alpha = SG_BLENDFACTOR_ONE,
+            .dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+            .op_alpha = SG_BLENDOP_ADD
+        };
+        
+        pip_desc.colors[0].blend = blend_state;
+        
         m_state.pip = sg_make_pipeline(&pip_desc);
         
         m_state.pass_action = (sg_pass_action){
@@ -113,7 +125,6 @@ namespace Sprout {
         // bake images into atlas
         Debug::log("baking atlas");
         bake_atlas();
-        Debug::log("atlas baked");    
     }
     
     void Window::Frame() {
@@ -132,15 +143,10 @@ namespace Sprout {
         draw_frame.camera_xform = glm::mat4(1.0f);
         
         
-        //draw_test();
         
         if (m_update_frame_callback) {
             m_update_frame_callback(sapp_frame_duration());
         }
-    
-        std::string msg = "num quds: " + std::to_string(draw_frame.num_quads);
-        
-        Debug::log(msg);
         
         m_state.bind.images[IMG_tex0] = m_atlas.img;
     

@@ -141,13 +141,13 @@ namespace Sprout {
         auto top_left = glm::vec2(0.0f, size.y);
         auto top_right = glm::vec2(size.x, size.y);
         
-        std::array<glm::vec2, 4> positions = {bottom_left, bottom_right, top_left, top_right};
+        std::array<glm::vec2, 4> positions = {bottom_left, top_left, top_right, bottom_right};
         std::array<glm::vec4, 4> colors = {color, color, color, color};
         std::array<glm::vec2, 4> uvs = {
             glm::vec2(uv.x, uv.y),
-            glm::vec2(uv.z, uv.y),
             glm::vec2(uv.x, uv.w),
-            glm::vec2(uv.z, uv.w)
+            glm::vec2(uv.z, uv.w),
+            glm::vec2(uv.z, uv.y)
         };
         std::array<glm::vec4, 4> color_overrides = {color_override, color_override, color_override, color_override};
         
