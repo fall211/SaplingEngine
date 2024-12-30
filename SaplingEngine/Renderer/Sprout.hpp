@@ -89,6 +89,9 @@ public:
     using UpdateFrameCallback = std::function<void(double)>;
     void SetUpdateFrameCallback(UpdateFrameCallback cb);
     
+    using EventCallback = std::function<void(const sapp_event*)>;
+    void SetEventCallback(EventCallback cb);
+    
     static auto sokol_main(int argc, char* argv[], int width, int height, const char* title) -> sapp_desc;
 
     // void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
@@ -114,6 +117,7 @@ private:
     
     State m_state;
     UpdateFrameCallback m_update_frame_callback;
+    EventCallback m_event_callback;
     
     Atlas m_atlas;
     std::vector<std::shared_ptr<Texture>> m_textures;

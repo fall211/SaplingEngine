@@ -168,15 +168,27 @@ namespace Sprout {
     }
     
     void Window::Event(const sapp_event* e) {
-        if (e->type == SAPP_EVENTTYPE_KEY_DOWN) {
-            if (e->key_code == SAPP_KEYCODE_ESCAPE) {
-                sapp_request_quit();
+        
+        if (m_event_callback) 
+        {
+            m_event_callback(e);
+        }
+        else // no event callback, default behavior
+        {
+            if (e->type == SAPP_EVENTTYPE_KEY_DOWN) 
+            {   
+                if (e->key_code == SAPP_KEYCODE_ESCAPE) 
+                {
+                    sapp_request_quit();
+                }
             }
         }
     }
     
-    auto Window::sokol_main(int argc, char* argv[], int width, int height, const char* title) -> sapp_desc {
-        return (sapp_desc){
+    auto Window::sokol_main(int argc, char* argv[], int width, int height, const char* title) -> sapp_desc 
+    {
+        return (sapp_desc)
+        {
             .init_cb = init_cb,
             .frame_cb = frame_cb,
             .cleanup_cb = cleanup_cb,

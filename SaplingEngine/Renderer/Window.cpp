@@ -110,6 +110,10 @@ namespace Sprout {
         }
     }
     
+    void Window::SetEventCallback(EventCallback callback) {
+        m_event_callback = std::move(callback);
+    }
+    
     
     //  RENDERING
     

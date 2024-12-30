@@ -1,6 +1,6 @@
 //
 //  Input.hpp
-//  SaplingEngine, SFML Input Wrapper
+//  SaplingEngine, sokol Input Wrapper
 //
 
 #pragma once
@@ -49,7 +49,7 @@ class Input {
     
     
 public:
-    void update(Sprout::Window& window);
+    void update(const sapp_event * event);
     void makeAction(const std::string& name, const std::vector<int>& keycodes);
     auto isAction(const std::string& name) -> bool;
     auto isActionDown(const std::string& name) -> bool;

@@ -62,6 +62,7 @@ void Engine::addScene(const std::string& name, const std::shared_ptr<Scene>& ptr
 
 void Engine::changeCurrentScene(const std::string& name){
     m_currentScene = getScene(name);
+    m_currentScene->enable();
 }
 
 auto Engine::getScene(const std::string& name) -> std::shared_ptr<Scene>{

@@ -33,6 +33,9 @@ public:
     virtual void init() = 0;
     virtual void update() = 0;
     virtual void sRender(EntityList& entities);
+    
+    void enable();
+    void disable();
 };
 
 
