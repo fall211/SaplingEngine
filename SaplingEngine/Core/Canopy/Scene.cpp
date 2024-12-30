@@ -50,6 +50,11 @@ void Scene::enable() {
     m_engine.getWindow().SetEventCallback([this](const sapp_event* e) { m_input->update(e); });
 }
 
+void Scene::disable()
+{
+    Debug::log("disabling scene");
+}
+
 void GameScene::update(){
     //  Updates
     sSceneTime();
