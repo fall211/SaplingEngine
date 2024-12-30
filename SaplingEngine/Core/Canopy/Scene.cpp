@@ -51,17 +51,17 @@ void Scene::enable() {
 }
 
 void GameScene::update(){
-    /// Updates
+    //  Updates
     sSceneTime();
     m_entityManager->update();
     
-    /// Systems
+    //  Systems
     sObstacleSpawner();
     sCollisionHandler(m_entityManager->getEntities("player").front(), m_entityManager->getEntities("obstacle"));
     sPlayerGravity(m_entityManager->getEntities("player").front());
     sPlayerController(m_entityManager->getEntities("player").front());
     
-    /// Systems (ordered)
+    //  Systems (ordered)
     sMove(m_entityManager->getEntities("dynamic"));
     sRender(m_entityManager->getEntities());
     sDeleteOffScreen(m_entityManager->getEntities("obstacle"));
@@ -140,30 +140,5 @@ void GameScene::sCollisionHandler(const std::shared_ptr<Entity>& player, const E
                 e->destroy();
             }
         }
-    }
-}
-
-
-MenuScene::MenuScene(Engine& engine) : Scene(engine){
-    init();
-}
-
-void MenuScene::init(){
-    Debug::log("init menu scene");
-    //m_input->makeAction("sceneChange", {sf::Keyboard::Scan::Scancode::R});
-
-}
-
-void MenuScene::update(){
-    m_entityManager->update();
-    
-    sTest();
-    
-    sRender(m_entityManager->getEntities());
-}
-
-void MenuScene::sTest() const {
-    if (m_input->isActionDown("sceneChange")){
-        m_engine.changeCurrentScene("game");
     }
 }

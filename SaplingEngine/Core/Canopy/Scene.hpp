@@ -39,7 +39,6 @@ public:
 };
 
 
-
 class GameScene final : public Scene {
     void sSpawnPlayer() const;
     void sPlayerGravity(const std::shared_ptr<Entity>& player) ;
@@ -57,13 +56,3 @@ public:
     void init() override;
     void update() override;
 };
-
-class MenuScene final : public Scene {
-    void sTest() const ;
-
-public:
-    explicit MenuScene(Engine& engine);
-    void init() override;
-    void update() override;
-};
-

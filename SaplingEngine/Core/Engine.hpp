@@ -30,7 +30,6 @@ class Engine {
     
 
     size_t m_currentFrame = 0;
-    void calculateDeltaTime(const time_point<system_clock>& start, time_point<system_clock>& previous);
     
     std::shared_ptr<Assets> m_assets;
 
@@ -69,9 +68,9 @@ public:
     auto simTime() const -> float { return m_simTime; }
 
     /**
-     * Gets the active SFML window..
+     * Gets the Sprout window.
      *
-     * @return The SFML window.
+     * @return The Sorout window.
      */
     auto getWindow() -> Sprout::Window& { return m_window; }
 

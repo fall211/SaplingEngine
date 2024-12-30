@@ -18,16 +18,12 @@ Engine::Engine() {
     
     addScene("game", std::make_shared<GameScene>(*this));
     changeCurrentScene("game");
-    // addScene("menu", std::make_shared<MenuScene>(*this));
-    // changeCurrentScene("menu");
+
 
     Debug::log("init completed");
 }
 
 void Engine::main(){
-    const auto start = system_clock::now();
-    auto previous = system_clock::now();
-
     m_window.SetUpdateFrameCallback([this](double dt) { this -> update(dt);});
     
     m_window.Run(); // nothing after this gets called
@@ -40,17 +36,6 @@ void Engine::update(double dt){
     m_currentFrame++;
 }
 
-void Engine::calculateDeltaTime(const time_point<system_clock>& start, time_point<system_clock>& previous) {
-    const auto now = system_clock::now();
-    const duration<float> elapsedTime = now - start;
-    const duration<float> delta = now - previous;
-    previous = now;
-
-    m_deltaTime = delta.count();
-    m_simTime = elapsedTime.count();
-}
-
-
 void Engine::addScene(const std::string& name, const std::shared_ptr<Scene>& ptr){
     if (m_scenes.find(name) == m_scenes.end()){
         m_scenes[name] = ptr;
@@ -61,6 +46,10 @@ void Engine::addScene(const std::string& name, const std::shared_ptr<Scene>& ptr
 }
 
 void Engine::changeCurrentScene(const std::string& name){
+    if (m_currentScene)
+    {
+        m_currentScene->disable();
+    }
     m_currentScene = getScene(name);
     m_currentScene->enable();
 }
