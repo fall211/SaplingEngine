@@ -1,9 +1,10 @@
 //
 //  Input.cpp
-//  SaplingEngine, SFML Input Wrapper
+//  SaplingEngine, sokol Input Wrapper
 //
 
 #include "Input.hpp"
+#include "Renderer/Sprout.hpp"
 #include <stdexcept>
 
 InputAxis::InputAxis(std::string  name, const int pKey, const int nKey) : name(std::move(name)), postiveKey(pKey), negativeKey(nKey){}
@@ -15,12 +16,14 @@ Input::Input(){
     m_axisMap = std::map<std::string, std::shared_ptr<InputAxis>>();
     m_keyMap = std::map<int, std::shared_ptr<Key>>();
     
-    m_mousePosition = Vector2(0, 0);
+    m_mousePosition = glm::vec2(0, 0);
     
     m_mouseKeys = std::array<Key, static_cast<size_t>(MouseButton::COUNT)>();
 }
 
-void Input::update(sf::RenderWindow& window){
+void Input::update(const sapp_event * event){
+    
+    m_mousePosition = glm::vec2(event->mouse_x, event->mouse_y);
     
     for (const auto& pair : m_keyMap){
         const std::shared_ptr<Key> key = pair.second;
@@ -33,40 +36,34 @@ void Input::update(sf::RenderWindow& window){
         key.justReleased = false;
     }
     
-    sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) window.close();
-            
-            else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
+    //if (event->type == SAPP_EVENTTYPE_QUIT_REQUESTED) sapp_request_quit();
+    
+    if (event->type == SAPP_EVENTTYPE_KEY_DOWN || event->type == SAPP_EVENTTYPE_KEY_UP) {
 
-                // check if there is a key for this code in m_keyMap
-                if (m_keyMap.count(event.key.code) == 0) continue;
+        // check if there is a key for this code in m_keyMap
+        if (m_keyMap.count(event->key_code) == 0) return;
 
-                const std::shared_ptr<Key> key = m_keyMap[event.key.code];
-                
-                if (event.type == sf::Event::KeyPressed){
-                    key->justPressed = true;
-                    key->pressed = true;
-                } else {
-                    key->justReleased = true;
-                    key->pressed = false;
-                }
-
-            }
-            else if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button >= m_mouseKeys.size()) continue;
-                m_mouseKeys[event.mouseButton.button].justPressed = true;
-                m_mouseKeys[event.mouseButton.button].pressed = true;
-            }
-            else if (event.type == sf::Event::MouseButtonReleased) {
-                if (event.mouseButton.button >= m_mouseKeys.size()) continue;
-                m_mouseKeys[event.mouseButton.button].justReleased = true;
-                m_mouseKeys[event.mouseButton.button].pressed = false;
-            }
-            else if (event.type == sf::Event::MouseMoved){
-                m_mousePosition = Vector2(event.mouseMove.x, event.mouseMove.y);
-            }
+        const std::shared_ptr<Key> key = m_keyMap[event->key_code];
+        
+        if (event->type == SAPP_EVENTTYPE_KEY_DOWN){
+            key->justPressed = true;
+            key->pressed = true;
+        } else {
+            key->justReleased = true;
+            key->pressed = false;
         }
+
+    }
+    else if (event->type == SAPP_EVENTTYPE_MOUSE_DOWN) {
+        if (event->mouse_button >= m_mouseKeys.size()) return;
+        m_mouseKeys[event->mouse_button].justPressed = true;
+        m_mouseKeys[event->mouse_button].pressed = true;
+    }
+    else if (event->type == SAPP_EVENTTYPE_MOUSE_UP) {
+        if (event->mouse_button >= m_mouseKeys.size()) return;
+        m_mouseKeys[event->mouse_button].justReleased = true;
+        m_mouseKeys[event->mouse_button].pressed = false;
+    }
 }
 
 auto Input::getKey(const int key) -> bool{
@@ -161,7 +158,7 @@ auto Input::getMouse(MouseButton button) -> bool {
     return getMouseKey(button).pressed;
 }
 
-auto Input::getMousePosition() -> Vector2 {
+auto Input::getMousePosition() -> glm::vec2 {
     return m_mousePosition;
 }
 

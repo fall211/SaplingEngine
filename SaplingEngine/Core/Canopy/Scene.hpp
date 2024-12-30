@@ -33,8 +33,10 @@ public:
     virtual void init() = 0;
     virtual void update() = 0;
     virtual void sRender(EntityList& entities);
+    
+    void enable();
+    void disable();
 };
-
 
 
 class GameScene final : public Scene {
@@ -54,13 +56,3 @@ public:
     void init() override;
     void update() override;
 };
-
-class MenuScene final : public Scene {
-    void sTest() const ;
-
-public:
-    explicit MenuScene(Engine& engine);
-    void init() override;
-    void update() override;
-};
-

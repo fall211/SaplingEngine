@@ -9,7 +9,7 @@
 auto main() -> int {
 
     const auto engine = std::make_shared<Engine>();
-    engine->mainLoop();
+    engine->main();
 
     return 0;
 }

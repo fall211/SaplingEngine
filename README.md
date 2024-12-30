@@ -1,5 +1,5 @@
 This is Sapling Engine - a very work-in-progress 2D game engine based loosely on ECS architecture.
 
-Currently it is powered by SFML for rendering, audio, and input (input has a wrapper) but I plan to write my own frameworks to handle this later down the line.
+Recently upgraded to use Sokol and my own custom 2d sprite renderer. Input wrapper included for easy input handling. TODO: sound, text rendering, shaders, shapes.
 
 In addition, I plan to add networking and my own fletched out 2D physics engine.

@@ -1,6 +1,6 @@
 //
 //  Input.hpp
-//  SaplingEngine, SFML Input Wrapper
+//  SaplingEngine, sokol Input Wrapper
 //
 
 #pragma once
@@ -41,7 +41,7 @@ class Input {
     AxisMap m_axisMap;
     KeyMap m_keyMap;
     
-    Vector2 m_mousePosition;
+    glm::vec2 m_mousePosition;
     
     auto getKey(int key) -> bool;
     auto getKeyDown(int key) -> bool;
@@ -49,7 +49,7 @@ class Input {
     
     
 public:
-    void update(sf::RenderWindow& window);
+    void update(const sapp_event * event);
     void makeAction(const std::string& name, const std::vector<int>& keycodes);
     auto isAction(const std::string& name) -> bool;
     auto isActionDown(const std::string& name) -> bool;
@@ -69,7 +69,7 @@ public:
     auto getMouseUp(Input::MouseButton button) -> bool;
     auto getMouse(Input::MouseButton button) -> bool;
     
-    auto getMousePosition() -> Vector2;
+    auto getMousePosition() -> glm::vec2;
     
     Input();
 

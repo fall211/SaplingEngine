@@ -7,7 +7,8 @@
 
 
 #include "SaplingEngine.hpp"
-#include "Physics/Math.hpp"
+#include "glm/glm.hpp"
+#include <memory>
 
 class Component{
 public:
@@ -18,19 +19,12 @@ public:
 
 class CTransform final : public Component{
     public:
-        Vector2 position = Vector2(0, 0);
-        Vector2 velocity = Vector2(0, 0);
+        glm::vec2 position = glm::vec2(0, 0);
+        glm::vec2 velocity = glm::vec2(0, 0);
 
-        CTransform(const Vector2& positionin, const Vector2& velocityin);
+        CTransform(const glm::vec2& positionin, const glm::vec2& velocityin);
 };
 
-class CShape final : public Component{
-    public:
-        sf::RectangleShape rectShape;
-        sf::CircleShape circleShape;
-        explicit CShape(sf::RectangleShape shapeIn);
-        explicit CShape(sf::CircleShape shapeIn);
-};
 
 class CLifetime final : public Component {
 public:
@@ -53,20 +47,20 @@ public:
 
 class CSprite final : public Component {
 public:
-    sf::Sprite sprite;
-    explicit CSprite(const std::shared_ptr<sf::Texture>& texin);
+    std::shared_ptr<Sprout::Texture> texture;
+    explicit CSprite(const std::shared_ptr<Sprout::Texture>& texin);
 };
 
-class CAnimatedSprite final : public Component {
-public:
-    sf::Sprite sprite;
-    size_t numFrames;
-    size_t frameSize;
-    float animationSpeed;
+// class CAnimatedSprite final : public Component {
+// public:
+//     sf::Sprite sprite;
+//     size_t numFrames;
+//     size_t frameSize;
+//     float animationSpeed;
 
-    explicit CAnimatedSprite(const std::shared_ptr<sf::Texture>& texture, float animSpeed = 0.5f);
-    void setAnimationFrame(float simTime, float deltaTime);
-};
+//     explicit CAnimatedSprite(const std::shared_ptr<sf::Texture>& texture, float animSpeed = 0.5f);
+//     void setAnimationFrame(float simTime, float deltaTime);
+// };
 
 class CFollowMouse final : public Component {
 };
