@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include "Core/Debug.hpp"
+
 #include "Renderer/Sprout.hpp"
-#include "SaplingEngine.hpp"
+#include "Core/Canopy/Scene.hpp"
+#include "Core/Seedbank/Assets.hpp"
 
 #include <chrono>
 #include <memory>
@@ -81,7 +84,7 @@ public:
      * @param name  The name of the new scene
      * @param ptr  Pointer to the scene
      */
-    void addScene(const std::string& name, const std::shared_ptr<Scene>& ptr);
+    void addScene(const std::string& name);
     void changeCurrentScene(const std::string& name);
     auto getScene(const std::string& name) -> std::shared_ptr<Scene>;
     auto getCurrentScene() -> std::shared_ptr<Scene>&;

@@ -6,7 +6,7 @@
 #pragma once
 
 
-#include "SaplingEngine.hpp"
+#include "Renderer/Texture.hpp"
 #include "glm/glm.hpp"
 #include <memory>
 
@@ -21,6 +21,7 @@ class CTransform final : public Component{
     public:
         glm::vec2 position = glm::vec2(0, 0);
         glm::vec2 velocity = glm::vec2(0, 0);
+        glm::vec4 rotation = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
         CTransform(const glm::vec2& positionin, const glm::vec2& velocityin);
 };
@@ -49,6 +50,28 @@ class CSprite final : public Component {
 public:
     std::shared_ptr<Sprout::Texture> texture;
     explicit CSprite(const std::shared_ptr<Sprout::Texture>& texin);
+    explicit CSprite(const std::shared_ptr<Sprout::Texture>& texin, float animSpeed);
+    
+    enum class Layer {
+        Background,
+        Midground,
+        Foreground,
+        UserInterface
+    };
+    
+    enum class Type {
+        Static,
+        Animated
+    };
+    
+    Type type = Type::Static;
+    Layer layer = Layer::Midground;
+    
+    // animated frame stuff
+    size_t numFrames = 1;
+    size_t currentFrame = 0;
+    size_t frameSize;
+    size_t animationSpeed = 60;
 };
 
 // class CAnimatedSprite final : public Component {

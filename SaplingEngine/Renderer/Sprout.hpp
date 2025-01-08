@@ -20,12 +20,13 @@
 #include "quad.h"
 #include "../Core/Debug.hpp"
 
+#include "Texture.hpp"
 
 
 namespace Sprout {
 
 const int MAX_QUADS = 8192;
-const int MAX_VERTS = MAX_QUADS * 4;
+//const int MAX_VERTS = MAX_QUADS * 4;
     
 
 struct State {
@@ -57,25 +58,7 @@ struct DrawFrame {
     glm::mat4 camera_xform;
 };
 
-class Texture {
-public:
-    Texture() = default;
-    ~Texture();
-    
-    auto loadFromFile(const std::string& path) -> bool;
-    auto getPixels() -> unsigned char*;
-    auto getWidth() -> glm::i32;
-    auto getHeight() -> glm::i32;
-    auto getAtlasUVs() -> glm::vec4;
-    auto setAtlasUVs(glm::vec4 uvs) -> void;
-    
-    auto registerTexture() -> void;
-    
-private:
-    glm::i32 m_width, m_height;
-    glm::vec4 m_atlas_uvs = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-    unsigned char* m_pixels;
-};
+
 
 class Window {
 public: 
@@ -93,18 +76,18 @@ public:
     void SetEventCallback(EventCallback cb);
     
     static auto sokol_main(int argc, char* argv[], int width, int height, const char* title) -> sapp_desc;
-
-    // void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
     
     // texture stuff
-    void addTexture(std::shared_ptr<Texture> tex);
+    void addTexture(std::shared_ptr<Sprout::Texture> tex);
 
     // this is what will be called from game code
     void draw_sprite(
-        const std::shared_ptr<Sprout::Texture> texture,
-        const glm::vec2 position, 
-        const glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
-        const glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
+        std::shared_ptr<Sprout::Texture> texture,
+        glm::vec2 position, 
+        glm::vec4 rotation = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+        glm::i32 frameNumber = 1,
+        glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
     );
     
     // TODO: draw text
@@ -120,7 +103,7 @@ private:
     EventCallback m_event_callback;
     
     Atlas m_atlas;
-    std::vector<std::shared_ptr<Texture>> m_textures;
+    std::vector<std::shared_ptr<Sprout::Texture>> m_textures;
     void bake_atlas();
 
 

@@ -5,7 +5,6 @@
 
 #include "Entity.hpp"
 
-#include <string>
 
 
 Entity::Entity(TagList  tags, const size_t id) : m_tags(std::move(tags)), m_id(id) {}

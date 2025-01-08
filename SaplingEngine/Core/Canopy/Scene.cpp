@@ -4,26 +4,36 @@
 //  
 
 #include "Scene.hpp"
-#include "Core/Debug.hpp"
-#include <string>
 
 
-Scene::Scene(Engine& engine) : m_engine(engine){
+Scene::Scene(Engine& engine) : m_engine(engine)
+{
     m_entityManager = std::make_shared<EntityManager>();
     m_input = std::make_shared<Input>();
 }
 
-void Scene::sRender(EntityList& entities){
-    for (const auto& e : entities){
-        if (e->hasComponent<CSprite>()){
-            m_engine.getWindow().draw_sprite(e->getComponent<CSprite>().texture, e->getComponent<CTransform>().position);
+void Scene::sRender(EntityList& entities)
+{
+    for (const auto& e : entities)
+    {
+        if (e->hasComponent<CSprite>())
+        {
+            
+            auto& cSprite = e->getComponent<CSprite>();
+            auto& cTransform = e->getComponent<CTransform>();
+
+            if (cSprite.type == CSprite::Type::Animated)
+            {
+                // update the animation frame                
+                if (m_engine.getCurrentFrame() % cSprite.animationSpeed == 0 )
+                {
+                    cSprite.currentFrame = (cSprite.currentFrame + 1) % cSprite.numFrames;
+                }
+                // m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, cTransform.rotation, (int)cSprite.currentFrame);
+                // return;
+            }
+            m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, cTransform.rotation, (int)cSprite.currentFrame);
         }
-    //     else if (e->hasComponent<CAnimatedSprite>()) {
-    //         auto& animatedSprite = e->getComponent<CAnimatedSprite>();
-    //         animatedSprite.sprite.setPosition(e->getComponent<CTransform>().position.x, e->getComponent<CTransform>().position.y);
-    //         animatedSprite.setAnimationFrame(m_engine.simTime(), m_engine.deltaTime());
-    //         //m_engine.getWindow().draw(animatedSprite.sprite);
-    //     }
     }
 }
 
@@ -59,16 +69,18 @@ void GameScene::update(){
     //  Updates
     sSceneTime();
     m_entityManager->update();
-    
+
     //  Systems
     sObstacleSpawner();
     sCollisionHandler(m_entityManager->getEntities("player").front(), m_entityManager->getEntities("obstacle"));
     sPlayerGravity(m_entityManager->getEntities("player").front());
     sPlayerController(m_entityManager->getEntities("player").front());
-    
+
     //  Systems (ordered)
     sMove(m_entityManager->getEntities("dynamic"));
-    sRender(m_entityManager->getEntities());
+    // sRender(m_entityManager->getEntities());
+    auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<CSprite>();
+    sRender(entitiesWithSprite);
     sDeleteOffScreen(m_entityManager->getEntities("obstacle"));
 
 }
@@ -76,7 +88,7 @@ void GameScene::update(){
 void GameScene::sSpawnPlayer() const {
     const auto e = m_entityManager->addEntity({"player", "dynamic"});
     e->addComponent<CTransform>(glm::vec2(-500, 100), glm::vec2(0, 0));
-    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("player"));
+    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("playerSheet"), 4);
     e->addComponent<CPlayerControls>(0.0f, 400.0f);
     e->addComponent<CBBox>(64, 64);
 }

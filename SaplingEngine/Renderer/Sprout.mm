@@ -13,7 +13,7 @@
 namespace Sprout {
     
     Window::Window(int width, int height, const char* title)
-        : m_width(width), m_height(height), m_title(std::move(title)) {    
+        : m_width(width), m_height(height), m_title(title) {    
             instance = this;
     }
     
@@ -173,7 +173,7 @@ namespace Sprout {
         {
             m_event_callback(e);
         }
-        else // no event callback, default behavior
+        // default behavior
         {
             if (e->type == SAPP_EVENTTYPE_KEY_DOWN) 
             {   

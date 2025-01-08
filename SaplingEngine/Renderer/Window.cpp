@@ -119,7 +119,10 @@ namespace Sprout {
     
     void Window::draw_sprite(
         const std::shared_ptr<Sprout::Texture> texture,
-        const glm::vec2 position, const glm::vec4 color_override,
+        const glm::vec2 position, 
+        const glm::vec4 rotation,
+        const glm::i32 frameNum,
+        const glm::vec4 color_override,
         const glm::vec3 scale)
     {   
         glm::mat4 xform0 = glm::mat4(1.0f);
@@ -130,12 +133,28 @@ namespace Sprout {
         // scale
         xform0 = glm::scale(xform0, scale);
         
-        glm::vec2 size = glm::vec2(texture->getWidth(), texture->getHeight());
+        // rotate
+        xform0 = glm::rotate(xform0, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        glm::vec2 size = texture->getSize();                
+        glm::vec2 frame_size = texture->getFrameSize();
         glm::vec4 uv = texture->getAtlasUVs();
-    
-
+        
+        if (frame_size != size)
+        {
+            glm::i32 numFrames = texture->getNumFrames();
+            
+            glm::vec4 offset_uv = glm::vec4(
+                uv.x + ((uv.z - uv.x) / (float)numFrames) * (float)frameNum,
+                uv.y,
+                uv.x + ((uv.z - uv.x) / (float)numFrames) * ((float)frameNum + 1),
+                uv.w
+            );
+            uv = offset_uv;
+        }
+        
         // draw
-        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, size, uv, color_override);
+        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, uv, color_override);
     }
     
     void Window::draw_rect_projected(glm::mat4 projection, glm::vec2 size, glm::vec4 uv, glm::vec4 color_override, glm::vec4 color)
@@ -180,9 +199,7 @@ namespace Sprout {
             vertex.color = colors[i];
             vertex.uv = uvs[i];
             vertex.color_override = color_overrides[i];
-            
-            // std::string debug = "pos: " + std::to_string(vertex.pos.x) + ", " + std::to_string(vertex.pos.y) + " uv: " + std::to_string(vertex.uv.x) + ", " + std::to_string(vertex.uv.y);
-            // Debug::log(debug);
+
         }
         
         draw_frame.num_quads++;

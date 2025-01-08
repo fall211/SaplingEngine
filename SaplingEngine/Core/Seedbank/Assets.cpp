@@ -11,10 +11,10 @@ Assets::Assets() {
 
 }
 
-void Assets::addTexture(const std::string& name, const std::string& path) {
+void Assets::addTexture(const std::string& name, const std::string& path, const glm::i32 numFrames) {
     auto tex = std::make_shared<Sprout::Texture>();
     
-    if (!tex->loadFromFile(ASSETS_PATH + path)) 
+    if (!tex->loadFromFile(ASSETS_PATH + path, numFrames)) 
     {
         throw std::runtime_error("Error loading texture file: " + path);
     }

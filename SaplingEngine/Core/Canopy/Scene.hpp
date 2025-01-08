@@ -5,10 +5,19 @@
 
 #pragma once
 
-#include "SaplingEngine.hpp"
+#include "Physics/Physics.hpp"
+
+#include "Core/Engine.hpp"
+#include "Core/Debug.hpp"
+
+#include "ECS/Entities/EntityManager.hpp"
+#include "ECS/Entities/Entity.hpp"
+#include "ECS/Components/Component.hpp"
 
 #include <cstdio>
 #include <random>
+#include <cstddef>
+#include <string>
 
 class Entity;
 class Input;

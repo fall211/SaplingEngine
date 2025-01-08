@@ -9,8 +9,8 @@
 #include <map>
 #include <unordered_map>
 
-#include "SaplingEngine.hpp"
-#include "Renderer/Sprout.hpp"
+#include "Renderer/Texture.hpp"
+#include "glm/glm.hpp"
 
 #ifndef ASSETS_PATH
 #define ASSETS_PATH "../GameContent/Assets/"
@@ -22,7 +22,10 @@ class Assets {
 public:
     Assets();
 
-    void addTexture(const std::string& name, const std::string& path);
+    void addTexture(const std::string& name, 
+        const std::string& path,
+        glm::i32 numFrames = 1
+    );
     auto getTexture(const std::string& name) -> std::shared_ptr<Sprout::Texture>;
 };
 

@@ -3,24 +3,26 @@
 //  SaplingEngine
 //
 
-#ifndef Entity_hpp
-#define Entity_hpp
+#pragma once
 
 #include <string>
 #include <tuple>
 #include <unordered_map>
 #include <typeindex>
+#include <memory>
+#include <vector>
+
+#include "ECS/Components/Component.hpp"
 
 class Component;
 
-#include "SaplingEngine.hpp"
 
 typedef std::vector<std::string> TagList;
 
 
 class Entity {
     TagList m_tags;
-    const size_t m_id = 0;
+    size_t m_id = 0;
     bool m_active = true;
     std::unordered_map<std::type_index, std::shared_ptr<Component>> m_components;
 
@@ -61,4 +63,3 @@ public:
 
 };
 
-#endif /* Entity_hpp */
