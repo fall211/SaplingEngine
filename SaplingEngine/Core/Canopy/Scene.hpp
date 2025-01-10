@@ -15,6 +15,7 @@
 #include "ECS/Components/Component.hpp"
 
 #include <cstdio>
+#include <memory>
 #include <random>
 #include <cstddef>
 #include <string>
@@ -53,6 +54,9 @@ class GameScene final : public Scene {
     void sPlayerGravity(const std::shared_ptr<Entity>& player) ;
     void sPlayerController(const std::shared_ptr<Entity>& player) const;
     void sMove(const EntityList& entities) ;
+    
+    void sSpawnSquare();
+    void sMoveSquare(const std::shared_ptr<Entity>& square) const;
     
     float m_obstacleSpawnTimer = 0;
     void sSceneTime();

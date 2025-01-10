@@ -11,17 +11,14 @@ CompileFlags:
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty
     ]
 
-
 Diagnostics:
   UnusedIncludes : None
+  Includes: 
+    IgnoreHeader: ".*/quad\\.h$"
   ClangTidy:
     Add: [
-      readability-*, 
       performance-*, 
       portability-*, 
-      modernize-*,
-      cppcoreguidelines-*,
-      cert-*
     ]
     Remove: [
       modernize-use-using,
@@ -32,5 +29,6 @@ Diagnostics:
       readability-uppercase-literal-suffix,
       readability-magic-numbers,
       readability-identifier-length,
-      readability-braces-around-statements,
+      readability-braces-around-statements
     ]
+

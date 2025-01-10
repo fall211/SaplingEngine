@@ -9,11 +9,15 @@
 #define SOKOL_NO_ENTRY
 #include "Sprout.hpp"
 
+#include <algorithm>
 
 namespace Sprout {
     
     Window::Window(int width, int height, const char* title)
-        : m_width(width), m_height(height), m_title(title) {    
+        :   m_width(width), 
+            m_height(height), 
+            m_title(title)
+    {    
             instance = this;
     }
     
@@ -35,7 +39,7 @@ namespace Sprout {
     }
     
     
-    void Window::Init(){
+    void Window::Init(){      
         
         sg_desc desc = {
             .environment = sglue_environment()
@@ -95,7 +99,7 @@ namespace Sprout {
             .index_type = SG_INDEXTYPE_UINT16,
             .layout = {
                 .attrs = {
-                    [ATTR_quad_position].format = SG_VERTEXFORMAT_FLOAT2,
+                    [ATTR_quad_position0].format = SG_VERTEXFORMAT_FLOAT4,
                     [ATTR_quad_color0].format = SG_VERTEXFORMAT_FLOAT4,
                     [ATTR_quad_uv0].format = SG_VERTEXFORMAT_FLOAT2,
                     [ATTR_quad_color_override0].format = SG_VERTEXFORMAT_FLOAT4
@@ -127,6 +131,10 @@ namespace Sprout {
         bake_atlas();
     }
     
+    bool sortByZ(const Quad& a, const Quad& b) {
+        return a.vertices[0].pos.z < b.vertices[0].pos.z;
+    }
+    
     void Window::Frame() {
         // reset draw frame
         draw_frame.num_quads = 0;
@@ -147,6 +155,9 @@ namespace Sprout {
         if (m_update_frame_callback) {
             m_update_frame_callback(sapp_frame_duration());
         }
+        
+        
+        std::sort(draw_frame.quads.begin(), draw_frame.quads.begin() + draw_frame.num_quads, sortByZ);
         
         m_state.bind.images[IMG_tex0] = m_atlas.img;
     
@@ -185,7 +196,7 @@ namespace Sprout {
         }
     }
     
-    auto Window::sokol_main(int argc, char* argv[], int width, int height, const char* title) -> sapp_desc 
+    auto Window::sokol_main() -> sapp_desc 
     {
         return (sapp_desc)
         {
@@ -203,7 +214,7 @@ namespace Sprout {
     Sprout::Window* Window::instance = nullptr;
     
     void Window::Run() {
-        sapp_run(sokol_main(0, nullptr, m_width, m_height, m_title));
+        sapp_run(sokol_main());
     }
 
 

@@ -4,12 +4,23 @@
 //  
 
 #include "Scene.hpp"
+#include "ECS/Components/Component.hpp"
 
 
 Scene::Scene(Engine& engine) : m_engine(engine)
 {
     m_entityManager = std::make_shared<EntityManager>();
     m_input = std::make_shared<Input>();
+}
+
+void Scene::enable() {
+    // set the window's event callback to our input system
+    m_engine.getWindow().SetEventCallback([this](const sapp_event* e) { m_input->update(e); });
+}
+
+void Scene::disable()
+{
+    Debug::log("disabling scene");
 }
 
 void Scene::sRender(EntityList& entities)
@@ -32,7 +43,8 @@ void Scene::sRender(EntityList& entities)
                 // m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, cTransform.rotation, (int)cSprite.currentFrame);
                 // return;
             }
-            m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, cTransform.rotation, (int)cSprite.currentFrame);
+            glm::f32 layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(CSprite::Layer::Count);
+            m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, layer, cTransform.rotation, (int)cSprite.currentFrame);
         }
     }
 }
@@ -46,24 +58,16 @@ void GameScene::init(){
     m_input->makeAxis("moveX", SAPP_KEYCODE_D, SAPP_KEYCODE_A);
     m_input->makeAxis("moveY", SAPP_KEYCODE_S, SAPP_KEYCODE_W);
     m_input->makeAction("jump", {SAPP_KEYCODE_SPACE, 57});
-    // m_input->makeAction("spawn", {sf::Keyboard::Scan::Scancode::R});
 
     
     /// Initial systems to run one time
+    sSpawnSquare();
     sSpawnPlayer();
-    
+
+
     Debug::log("init game scene");
 }
 
-void Scene::enable() {
-    // set the window's event callback to our input system
-    m_engine.getWindow().SetEventCallback([this](const sapp_event* e) { m_input->update(e); });
-}
-
-void Scene::disable()
-{
-    Debug::log("disabling scene");
-}
 
 void GameScene::update(){
     //  Updates
@@ -75,20 +79,25 @@ void GameScene::update(){
     sCollisionHandler(m_entityManager->getEntities("player").front(), m_entityManager->getEntities("obstacle"));
     sPlayerGravity(m_entityManager->getEntities("player").front());
     sPlayerController(m_entityManager->getEntities("player").front());
-
+    sMoveSquare(m_entityManager->getEntities("square").front());
+    
+    
     //  Systems (ordered)
     sMove(m_entityManager->getEntities("dynamic"));
-    // sRender(m_entityManager->getEntities());
+    
     auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<CSprite>();
     sRender(entitiesWithSprite);
     sDeleteOffScreen(m_entityManager->getEntities("obstacle"));
-
+    
+    // clean input to avoid double inputs
+    m_input->clean();
 }
 
 void GameScene::sSpawnPlayer() const {
     const auto e = m_entityManager->addEntity({"player", "dynamic"});
     e->addComponent<CTransform>(glm::vec2(-500, 100), glm::vec2(0, 0));
     e->addComponent<CSprite>(m_engine.getAssets()->getTexture("playerSheet"), 4);
+    e->getComponent<CSprite>().setLayer(CSprite::Layer::Foreground);
     e->addComponent<CPlayerControls>(0.0f, 400.0f);
     e->addComponent<CBBox>(64, 64);
 }
@@ -121,6 +130,32 @@ void GameScene::sMove(const EntityList& entities) {
             transform.position += transform.velocity * m_engine.deltaTime();
         }
     }
+}
+
+void GameScene::sSpawnSquare(){
+    const auto e = m_entityManager->addEntity({"square", "dynamic"});
+    e->addComponent<CTransform>(glm::vec2(0, 0), glm::vec2(0, 0));
+    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("test"));
+    e->addComponent<CBBox>(64, 64);
+}
+
+void GameScene::sMoveSquare(const std::shared_ptr<Entity>& square) const {
+    auto& transform = square->getComponent<CTransform>();
+    transform.position = m_input->getMousePosition() - glm::vec2(720, 360);
+    
+    if (m_input->getMouseUp(Input::MouseButton::LEFT))
+    {
+        if (square->hasComponent<CSprite>())
+        {
+            auto& cSprite = square->getComponent<CSprite>();
+            // cycle through the layers
+            cSprite.setLayer(static_cast<CSprite::Layer>((static_cast<int>(cSprite.layer) + 1) % static_cast<int>(CSprite::Layer::Count)));
+            
+            const std::string debugLayer = "Layer: " + std::to_string(static_cast<int>(cSprite.layer));
+            Debug::log(debugLayer);
+        }
+    }
+    
 }
 
 void GameScene::sSceneTime(){

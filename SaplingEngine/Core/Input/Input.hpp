@@ -50,6 +50,7 @@ class Input {
     
 public:
     void update(const sapp_event * event);
+    void clean();
     void makeAction(const std::string& name, const std::vector<int>& keycodes);
     auto isAction(const std::string& name) -> bool;
     auto isActionDown(const std::string& name) -> bool;

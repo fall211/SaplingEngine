@@ -12,6 +12,7 @@
 #include "string"
 #include <cassert>
 #include <memory>
+#include <chrono>
 
 #include "sokol/sokol_gfx.h"
 #include "sokol/sokol_app.h"
@@ -21,6 +22,7 @@
 #include "../Core/Debug.hpp"
 
 #include "Texture.hpp"
+
 
 
 namespace Sprout {
@@ -36,7 +38,7 @@ struct State {
 };
 
 struct Vertex {
-    glm::vec2 pos;
+    glm::vec4 pos;
     glm::vec4 color;
     glm::vec2 uv;
     glm::vec4 color_override;
@@ -75,7 +77,7 @@ public:
     using EventCallback = std::function<void(const sapp_event*)>;
     void SetEventCallback(EventCallback cb);
     
-    static auto sokol_main(int argc, char* argv[], int width, int height, const char* title) -> sapp_desc;
+    static auto sokol_main() -> sapp_desc;
     
     // texture stuff
     void addTexture(std::shared_ptr<Sprout::Texture> tex);
@@ -84,6 +86,7 @@ public:
     void draw_sprite(
         std::shared_ptr<Sprout::Texture> texture,
         glm::vec2 position, 
+        glm::f32 layer,
         glm::vec4 rotation = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
         glm::i32 frameNumber = 1,
         glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
@@ -106,6 +109,9 @@ private:
     std::vector<std::shared_ptr<Sprout::Texture>> m_textures;
     void bake_atlas();
 
+    std::chrono::time_point<std::chrono::system_clock> m_init_time = std::chrono::system_clock::now();
+    std::chrono::time_point<std::chrono::system_clock> m_last_frame_time;
+    double m_delta_time = 0.0;
 
     static void init_cb();
     static void frame_cb();
@@ -124,6 +130,7 @@ private:
     void draw_rect_projected(
         glm::mat4 projection, 
         glm::vec2 size, 
+        glm::f32 layer,
         glm::vec4 uv,
         glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
         glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -131,7 +138,7 @@ private:
     
     void draw_quad_projected(
         glm::mat4 projection, 
-        std::array<glm::vec2, 4> positions,
+        std::array<glm::vec4, 4> positions,
         std::array<glm::vec4, 4> colors,
         std::array<glm::vec2, 4> uvs,
         std::array<glm::vec4, 4> color_overrides

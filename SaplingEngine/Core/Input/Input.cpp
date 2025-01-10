@@ -21,6 +21,20 @@ Input::Input(){
     m_mouseKeys = std::array<Key, static_cast<size_t>(MouseButton::COUNT)>();
 }
 
+void Input::clean()
+{
+    for (const auto& pair : m_keyMap){
+        const std::shared_ptr<Key> key = pair.second;
+        key->justPressed = false;
+        key->justReleased = false;
+    }
+    
+    for (auto& key : m_mouseKeys){
+        key.justPressed = false;
+        key.justReleased = false;
+    }
+}
+
 void Input::update(const sapp_event * event){
     
     m_mousePosition = glm::vec2(event->mouse_x, event->mouse_y);

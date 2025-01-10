@@ -56,8 +56,11 @@ public:
         Background,
         Midground,
         Foreground,
-        UserInterface
+        UserInterface,
+        Count
     };
+    
+    void setLayer(Layer layerIn) { layer = layerIn; }
     
     enum class Type {
         Static,
@@ -73,17 +76,6 @@ public:
     size_t frameSize;
     size_t animationSpeed = 60;
 };
-
-// class CAnimatedSprite final : public Component {
-// public:
-//     sf::Sprite sprite;
-//     size_t numFrames;
-//     size_t frameSize;
-//     float animationSpeed;
-
-//     explicit CAnimatedSprite(const std::shared_ptr<sf::Texture>& texture, float animSpeed = 0.5f);
-//     void setAnimationFrame(float simTime, float deltaTime);
-// };
 
 class CFollowMouse final : public Component {
 };

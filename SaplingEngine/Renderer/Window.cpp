@@ -120,6 +120,7 @@ namespace Sprout {
     void Window::draw_sprite(
         const std::shared_ptr<Sprout::Texture> texture,
         const glm::vec2 position, 
+        const glm::f32 layer,
         const glm::vec4 rotation,
         const glm::i32 frameNum,
         const glm::vec4 color_override,
@@ -154,17 +155,17 @@ namespace Sprout {
         }
         
         // draw
-        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, uv, color_override);
+        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override);
     }
     
-    void Window::draw_rect_projected(glm::mat4 projection, glm::vec2 size, glm::vec4 uv, glm::vec4 color_override, glm::vec4 color)
+    void Window::draw_rect_projected(glm::mat4 projection, glm::vec2 size, glm::f32 layer, glm::vec4 uv, glm::vec4 color_override, glm::vec4 color)
     {
-        auto bottom_left = glm::vec2(0.0f, 0.0f);
-        auto bottom_right = glm::vec2(size.x, 0.0f);
-        auto top_left = glm::vec2(0.0f, size.y);
-        auto top_right = glm::vec2(size.x, size.y);
+        auto bottom_left = glm::vec4(0.0f, 0.0f, layer, 1.0f);
+        auto bottom_right = glm::vec4(size.x, 0.0f, layer, 1.0f);
+        auto top_left = glm::vec4(0.0f, size.y, layer, 1.0f);
+        auto top_right = glm::vec4(size.x, size.y, layer, 1.0f);
         
-        std::array<glm::vec2, 4> positions = {bottom_left, top_left, top_right, bottom_right};
+        std::array<glm::vec4, 4> positions = {bottom_left, top_left, top_right, bottom_right};
         std::array<glm::vec4, 4> colors = {color, color, color, color};
         std::array<glm::vec2, 4> uvs = {
             glm::vec2(uv.x, uv.y),
@@ -181,7 +182,7 @@ namespace Sprout {
     
     void Window::draw_quad_projected(
         glm::mat4 projection, 
-        std::array<glm::vec2, 4> positions,
+        std::array<glm::vec4, 4> positions,
         std::array<glm::vec4, 4> colors,
         std::array<glm::vec2, 4> uvs,
         std::array<glm::vec4, 4> color_overrides)
@@ -195,7 +196,7 @@ namespace Sprout {
             
             Vertex& vertex = draw_frame.quads[draw_frame.num_quads].vertices[i];
             
-            vertex.pos = glm::vec2{(projection * glm::vec4(positions[i], 0.0f, 1.0f)).x, (projection * glm::vec4(positions[i], 0.0f, 1.0f)).y};
+            vertex.pos = projection * positions[i];
             vertex.color = colors[i];
             vertex.uv = uvs[i];
             vertex.color_override = color_overrides[i];

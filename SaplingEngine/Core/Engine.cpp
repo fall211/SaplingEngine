@@ -5,6 +5,7 @@
 
 
 #include "Engine.hpp"
+#include <memory>
 
 
 Engine::Engine()
@@ -17,8 +18,8 @@ Engine::Engine()
     m_assets->addTexture("playerSheet", "Sprites/playerSheet.png", 2);
     m_assets->addTexture("obstacle", "Sprites/obstacle.png");
     
-    addScene("game");
-    changeCurrentScene("game");
+    newScene<GameScene>("game");
+    changeScene("game");
 
 
     Debug::log("init completed");
@@ -39,12 +40,11 @@ void Engine::update(double dt)
     m_currentFrame++;
 }
 
-void Engine::addScene(const std::string& name)
+void Engine::makeScene(const std::string& name, std::shared_ptr<Scene> ptr)
 {
-    std::shared_ptr<Scene> ptr = std::make_shared<GameScene>(*this);
     if (m_scenes.find(name) == m_scenes.end())
     {
-        m_scenes[name] = ptr;
+        m_scenes[name] = std::move(ptr);
     }
     else
     {
@@ -52,7 +52,7 @@ void Engine::addScene(const std::string& name)
     }
 }
 
-void Engine::changeCurrentScene(const std::string& name)
+void Engine::changeScene(const std::string& name)
 {
     if (m_currentScene)
     {

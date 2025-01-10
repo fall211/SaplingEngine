@@ -4,7 +4,7 @@
 // VERTEX SHADER
 //
 @vs vs
-in vec2 position;
+in vec4 position0;
 in vec4 color0;
 in vec2 uv0;
 in vec4 color_override0;
@@ -15,7 +15,7 @@ out vec4 color_override;
 
 
 void main() {
-	gl_Position = vec4(position, 0, 1);
+	gl_Position = position0;
 	color = color0;
 	uv = uv0;
 	color_override = color_override0;

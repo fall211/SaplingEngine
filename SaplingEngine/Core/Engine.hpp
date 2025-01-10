@@ -5,13 +5,10 @@
 
 #pragma once
 
-#include "Core/Debug.hpp"
-
 #include "Renderer/Sprout.hpp"
 #include "Core/Canopy/Scene.hpp"
 #include "Core/Seedbank/Assets.hpp"
 
-#include <chrono>
 #include <memory>
 #include <string>
 
@@ -24,7 +21,7 @@ using namespace std::chrono;
 using sceneMap = std::unordered_map<std::string, std::shared_ptr<Scene>>;
 
 class Engine {
-    Sprout::Window m_window = Sprout::Window(1280, 720, "Sapling Engine");
+    Sprout::Window m_window = Sprout::Window(640 * 2, 360 * 2, "Sapling Engine");
     float m_deltaTime = 0.0f;
     float m_simTime = 0.0f;
 
@@ -79,13 +76,26 @@ public:
 
 
     /**
-     * Adds a scene to the engine simulation.
+     * Makes a scene and adds it to the engine simulation.
      *
      * @param name  The name of the new scene
      * @param ptr  Pointer to the scene
      */
-    void addScene(const std::string& name);
-    void changeCurrentScene(const std::string& name);
+    void makeScene(const std::string& name, std::shared_ptr<Scene> ptr);
+    
+    /**
+     * Adds a scene to the engine simulation.
+     *
+     * @tparam SceneType  The type of the scene
+     * @param name  The name of the scene
+     */
+    template <typename SceneType>
+    void newScene(const std::string& name)
+    {
+        makeScene(name, std::make_shared<SceneType>(*this));
+    }
+    
+    void changeScene(const std::string& name);
     auto getScene(const std::string& name) -> std::shared_ptr<Scene>;
     auto getCurrentScene() -> std::shared_ptr<Scene>&;
 
