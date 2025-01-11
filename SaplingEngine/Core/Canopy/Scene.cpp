@@ -4,7 +4,6 @@
 //  
 
 #include "Scene.hpp"
-#include "ECS/Components/Component.hpp"
 
 
 Scene::Scene(Engine& engine) : m_engine(engine)
@@ -37,13 +36,13 @@ void Scene::sRender(EntityList& entities)
 {
     for (const auto& e : entities)
     {
-        if (e->hasComponent<CSprite>())
+        if (e->hasComponent<Comp::Sprite>())
         {
             
-            auto& cSprite = e->getComponent<CSprite>();
-            auto& cTransform = e->getComponent<CTransform>();
+            auto& cSprite = e->getComponent<Comp::Sprite>();
+            auto& cTransform = e->getComponent<Comp::Transform>();
 
-            if (cSprite.type == CSprite::Type::Animated)
+            if (cSprite.type == Comp::Sprite::Type::Animated)
             {
                 // update the animation frame                
                 if (m_engine.getCurrentFrame() % cSprite.animationSpeed == 0 )
@@ -53,7 +52,7 @@ void Scene::sRender(EntityList& entities)
                 // m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, cTransform.rotation, (int)cSprite.currentFrame);
                 // return;
             }
-            glm::f32 layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(CSprite::Layer::Count);
+            glm::f32 layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
             m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, layer, cTransform.rotation, (int)cSprite.currentFrame);
         }
     }
@@ -98,7 +97,7 @@ void TestScene::update()
     //  Systems (ordered)
     sMove(m_entityManager->getEntities("dynamic"));
     
-    auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<CSprite>();
+    auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<Comp::Sprite>();
     sRender(entitiesWithSprite);
     sDeleteOffScreen(m_entityManager->getEntities("obstacle"));
 }
@@ -106,18 +105,18 @@ void TestScene::update()
 void TestScene::sSpawnPlayer() const
 {
     const auto e = m_entityManager->addEntity({"player", "dynamic", "cameraTarget"});
-    e->addComponent<CTransform>(glm::vec2(-500, 100), glm::vec2(0, 0));
-    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("playerSheet"), 4);
-    e->getComponent<CSprite>().setLayer(CSprite::Layer::Foreground);
-    e->addComponent<CPlayerControls>(0.0f, 400.0f);
-    e->addComponent<CBBox>(64, 64);
+    e->addComponent<Comp::Transform>(glm::vec2(-500, 100), glm::vec2(0, 0));
+    e->addComponent<Comp::Sprite>(m_engine.getAssets()->getTexture("playerSheet"), 4);
+    e->getComponent<Comp::Sprite>().setLayer(Comp::Sprite::Layer::Foreground);
+    e->addComponent<Comp::PlayerControls>(0.0f, 400.0f);
+    e->addComponent<Comp::BBox>(64, 64);
 }
 
 void TestScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
 {
     const float GRAVITY = 900.0f;
-    auto& transform = player->getComponent<CTransform>();
-    auto& controls = player->getComponent<CPlayerControls>();
+    auto& transform = player->getComponent<Comp::Transform>();
+    auto& controls = player->getComponent<Comp::PlayerControls>();
     if (transform.position.y >= 200){
         transform.velocity.y = 0;
         controls.grounded = true;
@@ -129,8 +128,8 @@ void TestScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
 
 void TestScene::sPlayerController(const std::shared_ptr<Entity>& player) const
 {
-    const auto& controls = player->getComponent<CPlayerControls>();
-    auto& transform = player->getComponent<CTransform>();
+    const auto& controls = player->getComponent<Comp::PlayerControls>();
+    auto& transform = player->getComponent<Comp::Transform>();
     if (m_input->isAction("jump") && controls.grounded) {
         transform.velocity.y -= static_cast<float>(controls.jumpStr);
     }
@@ -140,9 +139,9 @@ void TestScene::sMove(const EntityList& entities)
 {
     for (const auto& e : entities)
     {
-        if (e->hasComponent<CTransform>())
+        if (e->hasComponent<Comp::Transform>())
         {
-            auto& transform = e->getComponent<CTransform>();
+            auto& transform = e->getComponent<Comp::Transform>();
             transform.position += transform.velocity * m_engine.deltaTime();
         }
     }
@@ -151,23 +150,23 @@ void TestScene::sMove(const EntityList& entities)
 void TestScene::sSpawnSquare()
 {
     const auto e = m_entityManager->addEntity({"square", "dynamic"});
-    e->addComponent<CTransform>(glm::vec2(0, 0), glm::vec2(0, 0));
-    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("test"));
-    e->addComponent<CBBox>(64, 64);
+    e->addComponent<Comp::Transform>(glm::vec2(0, 0), glm::vec2(0, 0));
+    e->addComponent<Comp::Sprite>(m_engine.getAssets()->getTexture("test"));
+    e->addComponent<Comp::BBox>(64, 64);
 }
 
 void TestScene::sMoveSquare(const std::shared_ptr<Entity>& square) const 
 {
-    auto& transform = square->getComponent<CTransform>();
+    auto& transform = square->getComponent<Comp::Transform>();
     transform.position = m_input->getMouseWorldPosition();
     
     if (m_input->getMouseUp(Input::MouseButton::LEFT))
     {
-        if (square->hasComponent<CSprite>())
+        if (square->hasComponent<Comp::Sprite>())
         {
-            auto& cSprite = square->getComponent<CSprite>();
+            auto& cSprite = square->getComponent<Comp::Sprite>();
             // cycle through the layers
-            cSprite.setLayer(static_cast<CSprite::Layer>((static_cast<int>(cSprite.layer) + 1) % static_cast<int>(CSprite::Layer::Count)));
+            cSprite.setLayer(static_cast<Comp::Sprite::Layer>((static_cast<int>(cSprite.layer) + 1) % static_cast<int>(Comp::Sprite::Layer::Count)));
             
             const std::string debugLayer = "Layer: " + std::to_string(static_cast<int>(cSprite.layer));
             Debug::log(debugLayer);
@@ -185,7 +184,7 @@ void TestScene::sMoveCamera()
     
     if (m_input->isActionUp("lockCamera"))
     {
-        auto& target = m_entityManager->getEntities("cameraTarget").front()->getComponent<CTransform>();
+        auto& target = m_entityManager->getEntities("cameraTarget").front()->getComponent<Comp::Transform>();
         m_engine.getWindow().setCameraPosition({target.position.x, target.position.y});
         
         Debug::log("camera moved");
@@ -209,16 +208,16 @@ void TestScene::sObstacleSpawner()
     const float randomY = range(gen);
     
     const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
-    e->addComponent<CTransform>(glm::vec2(640, randomY), glm::vec2(-100, 0));
-    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("obstacle"));
-    e->addComponent<CBBox>(64, 64);
+    e->addComponent<Comp::Transform>(glm::vec2(640, randomY), glm::vec2(-100, 0));
+    e->addComponent<Comp::Sprite>(m_engine.getAssets()->getTexture("obstacle"));
+    e->addComponent<Comp::BBox>(64, 64);
 }
 
 void TestScene::sDeleteOffScreen(const EntityList& entities)
 {
     for (const auto& e : entities)
     {
-        if (e->getComponent<CTransform>().position.x < -640)
+        if (e->getComponent<Comp::Transform>().position.x < -640)
         {
             e->destroy();
         }
@@ -229,7 +228,7 @@ void TestScene::sCollisionHandler(const std::shared_ptr<Entity>& player, const E
 {
     for (const auto& e : obstacles)
     {
-        if (e->hasComponent<CBBox>()) // ignore entities with no bounding box
+        if (e->hasComponent<Comp::BBox>()) // ignore entities with no bounding box
         { 
             if (const glm::vec2 collision = Physics2D::bBoxCollision(player, e); collision != glm::vec2(0, 0))
             {

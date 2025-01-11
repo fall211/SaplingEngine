@@ -7,8 +7,13 @@
 
 #include "Component.hpp"
 
-class CRotate : public Component {
-public:
-    float rotationSpeed = 0.0f;
-    explicit CRotate(float speed) : rotationSpeed(speed) {}
-};
+namespace Comp
+{
+
+    class Rotate : public Component {
+    public:
+        float rotationSpeed = 0.0f;
+        explicit Rotate(float speed) : rotationSpeed(speed) {}
+    };
+
+}

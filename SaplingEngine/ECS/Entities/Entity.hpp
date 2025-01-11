@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include "ECS/Components/Component.hpp"
+#include "Component.hpp"
 
 class Component;
 
@@ -24,7 +24,7 @@ class Entity {
     TagList m_tags;
     size_t m_id = 0;
     bool m_active = true;
-    std::unordered_map<std::type_index, std::shared_ptr<Component>> m_components;
+    std::unordered_map<std::type_index, std::shared_ptr<Comp::Component>> m_components;
 
     friend class EntityManager;
     Entity(TagList  tags, size_t id);

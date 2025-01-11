@@ -18,18 +18,18 @@ void PrototypeScene::init()
 
 void PrototypeScene::update()
 {
-    Systems::sRotate(m_entityManager->getEntities(), m_engine.deltaTime());
+    Systems::Rotate(m_entityManager->getEntities(), m_engine.deltaTime());
     
-    auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<CSprite>();
+    auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<Comp::Sprite>();
     sRender(entitiesWithSprite);
 }
 
 void PrototypeScene::sSpawn()
 {
     const auto e = m_entityManager->addEntity({"square", "dynamic"});
-    e->addComponent<CTransform>(glm::vec2(0, 0), glm::vec2(0, 0));
-    e->addComponent<CSprite>(m_engine.getAssets()->getTexture("test"));
-    e->addComponent<CBBox>(64, 64);
-    e->addComponent<CRotate>(1.0f);
+    e->addComponent<Comp::Transform>(glm::vec2(0, 0), glm::vec2(0, 0));
+    e->addComponent<Comp::Sprite>(m_engine.getAssets()->getTexture("test"));
+    e->addComponent<Comp::BBox>(64, 64);
+    e->addComponent<Comp::Rotate>(1.0f);
 }
 

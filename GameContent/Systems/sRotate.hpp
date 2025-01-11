@@ -12,14 +12,14 @@
 namespace Systems
 {
     
-    inline void sRotate(EntityList& entities, double dt)
+    inline void Rotate(EntityList& entities, double dt)
     {
         for (const auto& e : entities)
         {
-            if (e->hasComponent<CTransform>() && e->hasComponent<CRotate>())
+            if (e->hasComponent<Comp::Transform>() && e->hasComponent<Comp::Rotate>())
             {
-                auto& transform = e->getComponent<CTransform>();
-                transform.rotation += e->getComponent<CRotate>().rotationSpeed * dt;
+                auto& transform = e->getComponent<Comp::Transform>();
+                transform.rotation += e->getComponent<Comp::Rotate>().rotationSpeed * dt;
             }
         }
     }

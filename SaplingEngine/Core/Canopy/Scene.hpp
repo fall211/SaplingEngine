@@ -7,12 +7,12 @@
 
 #include "Physics/Physics.hpp"
 
-#include "Core/Engine.hpp"
-#include "Core/Debug.hpp"
+#include "Engine.hpp"
+#include "Debug.hpp"
 
-#include "ECS/Entities/EntityManager.hpp"
-#include "ECS/Entities/Entity.hpp"
-#include "ECS/Components/Component.hpp"
+#include "EntityManager.hpp"
+#include "Entity.hpp"
+#include "Component.hpp"
 
 #include <cstdio>
 #include <memory>
