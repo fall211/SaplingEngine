@@ -1,17 +1,17 @@
 //
-//  Assets.cpp
+//  AssetManager.cpp
 //  SaplingEngine, Seedbank Asset Manager
 //
 
-#include "Assets.hpp"
+#include "AssetManager.hpp"
 
 
-Assets::Assets() {
+AssetManager::AssetManager() {
     m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
 
 }
 
-void Assets::addTexture(const std::string& name, const std::string& path, const glm::i32 numFrames) {
+void AssetManager::addTexture(const std::string& name, const std::string& path, const glm::i32 numFrames) {
     auto tex = std::make_shared<Sprout::Texture>();
     
     if (!tex->loadFromFile(ASSETS_PATH + path, numFrames)) 
@@ -21,7 +21,7 @@ void Assets::addTexture(const std::string& name, const std::string& path, const 
     m_textures[name] = tex;
 }
 
-auto Assets::getTexture(const std::string& name) -> std::shared_ptr<Sprout::Texture> {
+auto AssetManager::getTexture(const std::string& name) -> std::shared_ptr<Sprout::Texture> {
     auto it = m_textures.find(name);
     if (it == m_textures.end()) {
         throw std::runtime_error("Texture not found: " + name);

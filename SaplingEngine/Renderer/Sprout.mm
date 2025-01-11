@@ -9,39 +9,49 @@
 #define SOKOL_GLCORE
 #define SOKOL_NO_ENTRY
 #include "Sprout.hpp"
+#include "quad.h"
 
 #include <algorithm>
 
-namespace Sprout {
+namespace Sprout 
+{
     
     Window::Window(int width, int height, const char* title)
         :   m_width(width), 
             m_height(height), 
             m_title(title)
-    {    
+        {    
             instance = this;
-    }
+        }
     
-    Window::~Window() {
+    Window::~Window()
+    {
         delete instance;
     }
     
-    void Window::init_cb() {
+    void Window::init_cb()
+    {
         instance->Init();
     }
-    void Window::frame_cb() {
+    
+    void Window::frame_cb()
+    {
         instance->Frame();
     }
-    void Window::cleanup_cb() {
+    
+    void Window::cleanup_cb()
+    {
         instance->Cleanup();
     }
-    void Window::event_cb(const sapp_event* e) {
+    
+    void Window::event_cb(const sapp_event* e)
+    {
         instance->Event(e);
     }
     
     
-    void Window::Init(){      
-        
+    void Window::Init()
+    {
         draw_frame.view_projection = glm::ortho(
             -0.5f * (m_width),
             0.5f * (m_width),
@@ -53,14 +63,14 @@ namespace Sprout {
         
         draw_frame.camera_xform = glm::mat4(1.0f);
         
-        sg_desc desc = {
+        sg_desc desc = 
+        {
             .environment = sglue_environment()
         };
         
         sg_setup(&desc);
         
         // vertex buffer 
-        
         sg_buffer_desc vbuf_desc = {
             .size = sizeof(draw_frame.quads),
             .usage = SG_USAGE_DYNAMIC,
@@ -143,11 +153,13 @@ namespace Sprout {
         bake_atlas();
     }
     
-    bool sortByZ(const Quad& a, const Quad& b) {
+    bool sortByZ(const Quad& a, const Quad& b)
+    {
         return a.vertices[0].pos.z < b.vertices[0].pos.z;
     }
     
-    void Window::Frame() {
+    void Window::Frame()
+    {
         // reset draw frame
         draw_frame.num_quads = 0;
         std::fill(draw_frame.quads.begin(), draw_frame.quads.end(), Quad{});
@@ -158,7 +170,8 @@ namespace Sprout {
         m_delta_time = std::chrono::duration<double>(now - m_last_frame_time).count();
         m_last_frame_time = now;
         
-        if (m_update_frame_callback) {
+        if (m_update_frame_callback) 
+        {
             m_update_frame_callback(m_delta_time);
         }
         
@@ -180,11 +193,13 @@ namespace Sprout {
         sg_commit();
     }
     
-    void Window::Cleanup() {
+    void Window::Cleanup()
+    {
         sg_shutdown();
     }
     
-    void Window::Event(const sapp_event* e) {
+    void Window::Event(const sapp_event* e)
+    {
         
         if (m_event_callback) 
         {
@@ -219,7 +234,8 @@ namespace Sprout {
     
     Sprout::Window* Window::instance = nullptr;
     
-    void Window::Run() {
+    void Window::Run()
+    {
         sapp_run(sokol_main());
     }
 

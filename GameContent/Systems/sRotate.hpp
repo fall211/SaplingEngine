@@ -9,7 +9,7 @@
 #include "Entity.hpp"
 #include "cRotate.hpp"
 
-namespace Systems
+namespace System
 {
     
     inline void Rotate(EntityList& entities, double dt)

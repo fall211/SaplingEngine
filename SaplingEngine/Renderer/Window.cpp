@@ -7,7 +7,7 @@
 //  related to windowing but not part of sokol implementation.
 //  For the sokol window setup, see Sprout.mm
 
-#include "Core/Debug.hpp"
+#include "Debug.hpp"
 #include "Sprout.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -20,10 +20,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 
-namespace Sprout {
+namespace Sprout
+{
 
-    void Window::bake_atlas() {
-        
+    void Window::bake_atlas()
+    {
         m_atlas.width = 256;
         m_atlas.height = 256;
         
@@ -43,20 +44,24 @@ namespace Sprout {
         stbrp_node* nodes = (stbrp_node*)malloc(sizeof(stbrp_node) * m_atlas.width);
         stbrp_init_target(&context, m_atlas.width, m_atlas.height, nodes, m_atlas.width);
         
-        for (auto& tex : m_textures) {
+        for (auto& tex : m_textures)
+        {
             stbrp_rect rect;
             rect.id = 0;
             rect.w = tex->getWidth();
             rect.h = tex->getHeight();
             
-            if (!stbrp_pack_rects(&context, &rect, 1)) {
+            if (!stbrp_pack_rects(&context, &rect, 1))
+            {
                 Debug::log("Failed to pack rect");
                 continue;
             }
             
             // copy data to atlas
-            for (int y = 0; y < tex->getHeight(); y++) {
-                for (int x = 0; x < tex->getWidth(); x++) {
+            for (int y = 0; y < tex->getHeight(); y++)
+            {
+                for (int x = 0; x < tex->getWidth(); x++)
+                {
                     int src_index = (y * tex->getWidth() + x) * 4;
                     int dst_index = ((rect.y + y) * m_atlas.width + (rect.x + x)) * 4;
                     
@@ -100,18 +105,21 @@ namespace Sprout {
         free(nodes);
     }
     
-    void Window::addTexture(const std::shared_ptr<Texture> tex) {
+    void Window::addTexture(const std::shared_ptr<Texture> tex)
+    {
         m_textures.push_back(tex);
     }
     
-    void Window::SetUpdateFrameCallback(UpdateFrameCallback callback) {
+    void Window::SetUpdateFrameCallback(UpdateFrameCallback callback)
+    {
         m_update_frame_callback = std::move(callback);
         if (m_update_frame_callback) {
             Debug::log("frame update callback is set");
         }
     }
     
-    void Window::SetEventCallback(EventCallback callback) {
+    void Window::SetEventCallback(EventCallback callback)
+    {
         m_event_callback = std::move(callback);
     }
     
@@ -159,7 +167,13 @@ namespace Sprout {
         draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override);
     }
     
-    void Window::draw_rect_projected(glm::mat4 projection, glm::vec2 size, glm::f32 layer, glm::vec4 uv, glm::vec4 color_override, glm::vec4 color)
+    void Window::draw_rect_projected(
+        glm::mat4 projection,
+        glm::vec2 size,
+        glm::f32 layer,
+        glm::vec4 uv,
+        glm::vec4 color_override,
+        glm::vec4 color)
     {
         auto bottom_left = glm::vec4(0.0f, 0.0f, layer, 1.0f);
         auto bottom_right = glm::vec4(size.x, 0.0f, layer, 1.0f);
@@ -176,7 +190,6 @@ namespace Sprout {
         };
         std::array<glm::vec4, 4> color_overrides = {color_override, color_override, color_override, color_override};
         
-        
         draw_quad_projected(projection, positions, colors, uvs, color_overrides) ;
         
     }
@@ -188,20 +201,20 @@ namespace Sprout {
         std::array<glm::vec2, 4> uvs,
         std::array<glm::vec4, 4> color_overrides)
     {
-        if (draw_frame.num_quads > MAX_QUADS) {
+        if (draw_frame.num_quads > MAX_QUADS)
+        {
             Debug::log("Too many quads");
             return;
         }
         
-        for (int i = 0; i < 4; i++) {
-            
+        for (int i = 0; i < 4; i++)
+        {
             Vertex& vertex = draw_frame.quads[draw_frame.num_quads].vertices[i];
             
             vertex.pos = projection * positions[i];
             vertex.color = colors[i];
             vertex.uv = uvs[i];
             vertex.color_override = color_overrides[i];
-
         }
         
         draw_frame.num_quads++;
@@ -232,4 +245,4 @@ namespace Sprout {
         draw_frame.camera_xform = xform;
     }
     
-} // namespace Sprout
+}

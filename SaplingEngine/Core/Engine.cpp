@@ -11,7 +11,7 @@
 Engine::Engine()
 {
     m_scenes = sceneMap();    
-    m_assets = std::make_shared<Assets>();
+    m_assetManager = std::make_shared<AssetManager>();
 
     Debug::log("init completed");
 }
@@ -73,21 +73,21 @@ auto Engine::getCurrentScene() -> std::shared_ptr<Scene>&
 
 auto Engine::addTexture(const std::string& name, const std::string& path, glm::i32 numFrames) -> void
 {
-    if (!m_assets)
+    if (!m_assetManager)
     {
         Debug::log("ERR: Engine asset manager not initialized");
         return;
     }
-    m_assets->addTexture(name, path, numFrames);
+    m_assetManager->addTexture(name, path, numFrames);
 }
 
-auto Engine::getAssets() const -> std::shared_ptr<Assets> 
+auto Engine::getAssets() const -> std::shared_ptr<AssetManager> 
 { 
-    return m_assets; 
+    return m_assetManager; 
 }
 
-void Engine::setAssets(const std::shared_ptr<Assets>& newAssets)
+void Engine::setAssets(const std::shared_ptr<AssetManager>& newAssetManager)
 {
-    m_assets = newAssets; 
+    m_assetManager = newAssetManager; 
 }
 

@@ -9,7 +9,14 @@
 
 class Debug {
     public:
-        static void log(const std::string& message) {
+    
+        /*
+            * Logs a message to the console
+            * @param message The message to print.
+        */
+        template<typename T>
+        static void log(const T& message) 
+        {
             std::cout << message << std::endl;
         }
 };

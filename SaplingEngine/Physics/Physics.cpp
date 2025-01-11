@@ -7,11 +7,8 @@
 #include "glm/geometric.hpp"
 
 
-auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2 {
-    /**
-    Detects the overlap of the bounding boxes of the two entities e0 and e1.
-    Return: The overlap vector.
-    **/
+auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
+{
     if (e0->getId() == e1->getId()) return {0, 0}; // ignore self collision
 
     const glm::vec2 dr = e0->getComponent<Comp::Transform>().position - e1->getComponent<Comp::Transform>().position;
@@ -21,21 +18,21 @@ auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shar
     const float xOverlap = e0->getComponent<Comp::BBox>().w / 2.0f + e1->getComponent<Comp::BBox>().w / 2.0f - dx;
     const float yOverlap = e0->getComponent<Comp::BBox>().h / 2.0f + e1->getComponent<Comp::BBox>().h / 2.0f - dy;
 
-    if (xOverlap > 0 && yOverlap > 0) {
+    if (xOverlap > 0 && yOverlap > 0) 
+    {
         return {xOverlap, yOverlap};
     }
     return {0, 0};
 }
 
-auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2 {
+auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
+{
     /**
     Detects the overlap of the bounding circles of the two entities e0 and e1.
     Return: The overlap vector.
     **/
     
-    if (e0->getId() == e1->getId()) {
-        return {0, 0};
-    }
+    if (e0->getId() == e1->getId()) return {0, 0}; // ignore self collision
     
     const glm::vec2 pos0 = e0->getComponent<Comp::Transform>().position;
     const glm::vec2 pos1 = e1->getComponent<Comp::Transform>().position;
@@ -43,7 +40,8 @@ auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<E
     const float rsum = e0->getComponent<Comp::BCircle>().radius + e1->getComponent<Comp::BCircle>().radius;
     const float dist2 = glm::distance(pos0, pos1);
     
-    if (dist2 <= rsum * rsum) {
+    if (dist2 <= rsum * rsum) 
+    {
         const float dist = std::sqrt(dist2);
         glm::vec2 overlap = (pos0 - pos1) * ((rsum - dist) / dist);
         return overlap;
@@ -51,11 +49,8 @@ auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<E
     return {0, 0};
 }
 
-auto bBoxCircleCollision(const std::shared_ptr<Entity>& eBox, const std::shared_ptr<Entity>& eCircle) -> glm::vec2 {
-    /**
-    Detects the overlap of the bounding box of eBox and the bounding circle of eCircle.
-    Return: The overlap vector.
-    **/
+auto bBoxCircleCollision(const std::shared_ptr<Entity>& eBox, const std::shared_ptr<Entity>& eCircle) -> glm::vec2
+{
     
     const glm::vec2 circlePos = eCircle->getComponent<Comp::Transform>().position;
     const float circleR = eCircle->getComponent<Comp::BCircle>().radius;
@@ -87,13 +82,17 @@ auto bBoxCircleCollision(const std::shared_ptr<Entity>& eBox, const std::shared_
     float distY = circlePos.y - testY;
     float distance = sqrt((distX*distX) + (distY*distY));
     
-    if (distance <= circleR) {
+    if (distance <= circleR)
+    {
         float overlap = circleR - distance;
         glm::vec2 overlapVector(distX, distY);
-        if (distance != 0) {
+        if (distance != 0) 
+        {
             overlapVector = glm::normalize(overlapVector);
             overlapVector *= overlap;
-        } else {
+        } 
+        else 
+        {
             overlapVector = glm::vec2(circleR, 0);
         }
         return overlapVector;

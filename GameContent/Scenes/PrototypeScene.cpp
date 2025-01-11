@@ -18,7 +18,7 @@ void PrototypeScene::init()
 
 void PrototypeScene::update()
 {
-    Systems::Rotate(m_entityManager->getEntities(), m_engine.deltaTime());
+    System::Rotate(m_entityManager->getEntities(), m_engine.deltaTime());
     
     auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<Comp::Sprite>();
     sRender(entitiesWithSprite);

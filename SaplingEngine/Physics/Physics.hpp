@@ -3,22 +3,43 @@
 //  SaplingEngine, Twig Physics
 //
 
-#ifndef Physics_hpp
-#define Physics_hpp
+#pragma once
 
 #include "glm/glm.hpp"
+
+#include <memory>
+#include "Entity.hpp"
+#include "Component.hpp"
+
 class Entity;
 
-#include "SaplingEngine.hpp"
 
-class Physics2D {
-public:
-
-    static auto bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2;
+class Physics2D 
+{
+    public:
     
-    static auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2;
-    
-    static auto bBoxCircleCollision(const std::shared_ptr<Entity>& eBox, const std::shared_ptr<Entity>& eCircle) -> glm::vec2;
+        /*
+            * Detects the overlap of the bounding boxes of the two entities e0 and e1.
+            * @param e0 The first entity
+            * @param e1 The second entity
+            * @return The overlap vector
+        */
+        static auto bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2;
+        
+        /*
+            * Detects the overlap of the bounding circles of the two entities e0 and e1.
+            * @param e0 The first entity
+            * @param e1 The second entity
+            * @return The overlap vector
+        */
+        static auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2;
+        
+        /*
+            * Detects the overlap of the bounding box of eBox and the bounding circle of eCircle.
+            * @param eBox The entity with the bounding box
+            * @param eCircle The entity with the bounding circle
+            * @return The overlap vector
+        */
+        static auto bBoxCircleCollision(const std::shared_ptr<Entity>& eBox, const std::shared_ptr<Entity>& eCircle) -> glm::vec2;
 };
 
-#endif /* Physics_hpp */

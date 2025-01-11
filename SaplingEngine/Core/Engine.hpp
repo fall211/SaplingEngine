@@ -7,14 +7,14 @@
 
 #include "Renderer/Sprout.hpp"
 #include "Canopy/Scene.hpp"
-#include "Seedbank/Assets.hpp"
+#include "Seedbank/AssetManager.hpp"
 
 #include <memory>
 #include <string>
 
 
 class Scene;
-class Assets;
+class AssetManager;
 
 using namespace std::chrono;
 
@@ -30,7 +30,7 @@ class Engine {
 
     size_t m_currentFrame = 0;
     
-    std::shared_ptr<Assets> m_assets;
+    std::shared_ptr<AssetManager> m_assetManager;
 
 public:
 
@@ -93,8 +93,8 @@ public:
     auto getCurrentScene() -> std::shared_ptr<Scene>&;
 
     auto addTexture(const std::string& name, const std::string& path, glm::i32 numFrames = 1) -> void;
-    auto getAssets() const -> std::shared_ptr<Assets>;
-    void setAssets(const std::shared_ptr<Assets>& newAssets);
+    auto getAssets() const -> std::shared_ptr<AssetManager>;
+    void setAssets(const std::shared_ptr<AssetManager>& newAssetManager);
     
 };
 

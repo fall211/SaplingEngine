@@ -15,7 +15,7 @@
 #include "Core/Debug.hpp"
 #include "Core/Canopy/Scene.hpp"
 #include "Core/Input/Input.hpp"
-#include "Core/Seedbank/Assets.hpp"
+#include "Core/Seedbank/AssetManager.hpp"
 
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECS/Entities/Entity.hpp"

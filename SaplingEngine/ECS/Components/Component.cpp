@@ -8,9 +8,10 @@
 namespace Comp
 {
 
-    
     Transform::Transform(const glm::vec2& positionin, const glm::vec2& velocityin)
-        : position(positionin), velocity(velocityin) {}
+        :   position(positionin), 
+            velocity(velocityin) 
+        {}
     
     Lifetime::Lifetime(const float lifetimein) : lifetime(lifetimein) {}
     
@@ -19,19 +20,21 @@ namespace Comp
     BCircle::BCircle(const float radiusIn) : radius(radiusIn) {}
     
     Sprite::Sprite(const std::shared_ptr<Sprout::Texture>& texin)
-    :   texture(texin) ,
-        frameSize(texin->getWidth() / numFrames)
-    {}
+        :   texture(texin) ,
+            frameSize(texin->getWidth() / numFrames)
+        {}
     
     Sprite::Sprite(const std::shared_ptr<Sprout::Texture>& texin, const float animSpeed) 
-    :   texture(texin), 
-        type(Type::Animated), 
-        numFrames(texin->getNumFrames()), 
-        frameSize(texin->getWidth() / numFrames),
-        animationSpeed((size_t)(60.0f / animSpeed)) 
-    {}
+        :   texture(texin), 
+            type(Type::Animated), 
+            numFrames(texin->getNumFrames()), 
+            frameSize(texin->getWidth() / numFrames),
+            animationSpeed((size_t)(60.0f / animSpeed)) 
+        {}
     
-    
-    PlayerControls::PlayerControls(const float speedIn, const int jumpStrIn) : moveSpeed(speedIn), jumpStr(jumpStrIn){}
+    PlayerControls::PlayerControls(const float speedIn, const int jumpStrIn)
+        :   moveSpeed(speedIn),
+            jumpStr(jumpStrIn)
+        {}
 
 }
