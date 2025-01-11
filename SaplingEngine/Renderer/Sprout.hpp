@@ -19,7 +19,7 @@
 #include "sokol/sokol_glue.h"
 
 #include "quad.h"
-#include "../Core/Debug.hpp"
+#include "Debug.hpp"
 
 #include "Texture.hpp"
 
@@ -86,7 +86,7 @@ public:
         std::shared_ptr<Sprout::Texture> texture,
         glm::vec2 position, 
         glm::f32 layer,
-        glm::vec4 rotation = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+        glm::f32 rotation = 0.0f,
         glm::i32 frameNumber = 1,
         glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
         glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
@@ -98,7 +98,7 @@ public:
     // screen to world
     static glm::vec2 screenToWorld(glm::vec2 screenPos);
     
-    // move camera
+    // camera
     void translateCamera(glm::f32 deltaX, glm::f32 deltaY);
     void setCameraPosition(glm::vec2 position);
     
@@ -116,7 +116,7 @@ private:
     void bake_atlas();
 
     std::chrono::time_point<std::chrono::system_clock> m_init_time = std::chrono::system_clock::now();
-    std::chrono::time_point<std::chrono::system_clock> m_last_frame_time;
+    std::chrono::time_point<std::chrono::system_clock> m_last_frame_time = std::chrono::system_clock::now();
     double m_delta_time = 0.0;
 
     static void init_cb();

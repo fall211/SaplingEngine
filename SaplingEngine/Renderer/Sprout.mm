@@ -4,6 +4,7 @@
 //
 
 
+#include <chrono>
 #define SOKOL_IMPL
 #define SOKOL_GLCORE
 #define SOKOL_NO_ENTRY
@@ -151,13 +152,17 @@ namespace Sprout {
         draw_frame.num_quads = 0;
         std::fill(draw_frame.quads.begin(), draw_frame.quads.end(), Quad{});
         
-        
+        // delta time calculation (not smoothed like sapp_frame_duration())
+        // should be running at constant 60 fps, but just in case
+        auto now = std::chrono::system_clock::now();
+        m_delta_time = std::chrono::duration<double>(now - m_last_frame_time).count();
+        m_last_frame_time = now;
         
         if (m_update_frame_callback) {
-            m_update_frame_callback(sapp_frame_duration());
+            m_update_frame_callback(m_delta_time);
         }
         
-        
+        // sort quads by z so we have layers (z buffer alternative to keep transparency)
         std::sort(draw_frame.quads.begin(), draw_frame.quads.begin() + draw_frame.num_quads, sortByZ);
         
         m_state.bind.images[IMG_tex0] = m_atlas.img;

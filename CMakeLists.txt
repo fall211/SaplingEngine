@@ -6,35 +6,24 @@ set(CMAKE_CXX_STANDARD 17)
 # Add executable
 add_executable(Sapling)
 
-# Add source files
-target_sources(Sapling PRIVATE
-    SaplingEngine/main.cpp
-    SaplingEngine/Core/Engine.cpp
-    SaplingEngine/Core/Canopy/Scene.cpp
-    SaplingEngine/Core/Input/Input.cpp
-    SaplingEngine/Core/Seedbank/Assets.cpp
-    SaplingEngine/ECS/Components/Component.cpp
-    SaplingEngine/ECS/Entities/Entity.cpp
-    SaplingEngine/ECS/Entities/EntityManager.cpp
-    SaplingEngine/Physics/Physics.cpp
-    SaplingEngine/Renderer/Sprout.mm
-    SaplingEngine/Renderer/Texture.cpp
-    SaplingEngine/Renderer/Window.cpp
+file(GLOB_RECURSE ENGINE_SOURCES 
+    "${CMAKE_SOURCE_DIR}/SaplingEngine/main.cpp"
+    "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.cpp"
+    "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.hpp"
+    "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.mm"
 )
+target_sources(Sapling PRIVATE ${ENGINE_SOURCES})
 
-# Add header files
-target_sources(Sapling PRIVATE
-    SaplingEngine/Core/Canopy/Scene.hpp
-    SaplingEngine/Core/Engine.hpp
-    SaplingEngine/Core/Input/Input.hpp
-    SaplingEngine/Core/Seedbank/Assets.hpp
-    SaplingEngine/ECS/Components/Component.hpp
-    SaplingEngine/ECS/Entities/Entity.hpp
-    SaplingEngine/ECS/Entities/EntityManager.hpp
-    SaplingEngine/Physics/Physics.hpp
-    SaplingEngine/Renderer/Sprout.hpp
-    SaplingEngine/Renderer/quad.h
+file(GLOB_RECURSE GAME_CONTENT_SOURCES 
+    "${CMAKE_SOURCE_DIR}/GameContent/**/*.cpp"
+    "${CMAKE_SOURCE_DIR}/GameContent/**/*.hpp"
+    "${CMAKE_SOURCE_DIR}/GameContent/**/*.mm"
 )
+target_sources(Sapling PRIVATE ${GAME_CONTENT_SOURCES})
+
+
+
+
 set_source_files_properties(Sprout.mm PROPERTIES LANGUAGE CXX)
 target_link_libraries(Sapling "-framework Cocoa -framework QuartzCore -framework Metal")
 target_link_libraries(Sapling "-framework OpenGL")
@@ -47,7 +36,20 @@ target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SYSTEMS_PATH="${CMAKE_
 # Add include directories
 target_include_directories(Sapling PUBLIC
     ${CMAKE_SOURCE_DIR}/SaplingEngine
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/Core
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/Core/Canopy
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/Core/Input
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/Core/Seedbank
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/ECS
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/ECS/Components
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/ECS/Entities
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/Physics
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/Renderer
     /opt/homebrew/include
     ${CMAKE_SOURCE_DIR}/thirdparty
     ${CMAKE_SOURCE_DIR}/thirdparty/stb
+    ${CMAKE_SOURCE_DIR}/GameContent/Scenes
+    ${CMAKE_SOURCE_DIR}/GameContent/Systems
+    ${CMAKE_SOURCE_DIR}/GameContent/Components
+    ${CMAKE_SOURCE_DIR}/GameContent/Prefabs
 )

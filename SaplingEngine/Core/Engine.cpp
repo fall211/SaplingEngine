@@ -10,22 +10,13 @@
 
 Engine::Engine()
 {
-    m_scenes = sceneMap();
-    
+    m_scenes = sceneMap();    
     m_assets = std::make_shared<Assets>();
-    m_assets->addTexture("test", "Sprites/test.png");
-    m_assets->addTexture("player", "Sprites/player.png");
-    m_assets->addTexture("playerSheet", "Sprites/playerSheet.png", 2);
-    m_assets->addTexture("obstacle", "Sprites/obstacle.png");
-    
-    newScene<GameScene>("game");
-    changeScene("game");
-
 
     Debug::log("init completed");
 }
 
-void Engine::main()
+void Engine::run()
 {
     m_window.SetUpdateFrameCallback([this](double dt) { this -> update(dt);});
     
@@ -36,7 +27,15 @@ void Engine::update(double dt)
 {
     m_deltaTime = dt;
     
+    if (!m_currentScene)
+    {
+        Debug::log("ERR: No scene set");
+        return;
+    }
+    
+    m_currentScene->preUpdate();
     m_currentScene->update();
+    m_currentScene->postUpdate();
     m_currentFrame++;
 }
 
@@ -70,6 +69,16 @@ auto Engine::getScene(const std::string& name) -> std::shared_ptr<Scene>
 auto Engine::getCurrentScene() -> std::shared_ptr<Scene>&
 {
     return m_currentScene;
+}
+
+auto Engine::addTexture(const std::string& name, const std::string& path, glm::i32 numFrames) -> void
+{
+    if (!m_assets)
+    {
+        Debug::log("ERR: Engine asset manager not initialized");
+        return;
+    }
+    m_assets->addTexture(name, path, numFrames);
 }
 
 auto Engine::getAssets() const -> std::shared_ptr<Assets> 

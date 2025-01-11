@@ -40,16 +40,42 @@ protected:
 public:
     explicit Scene(Engine& engine);
     virtual ~Scene()= default;
+    
+    /*
+        * Called when the scene is first created.
+        * Override this function to initialize the scene
+    */
     virtual void init() = 0;
+    
+    /*
+        * Called every frame.
+        * Override this function to update the scene
+    */
     virtual void update() = 0;
+    
+    /*
+        * Called every frame to render entities
+        * Override this function to implement custom rendering, by default it renders all entities with a sprite component (static and animated)
+        * @param entities The list of entities to render
+    */
     virtual void sRender(EntityList& entities);
     
     void enable();
     void disable();
+    
+    /*
+        * Called before each update loop, reserved for updates that are necessary for all scenes
+    */
+    void preUpdate();
+    
+    /*
+        * Called after each update loop, reserved for updates that are necessary for all scenes
+    */
+    void postUpdate();
 };
 
 
-class GameScene final : public Scene {
+class TestScene final : public Scene {
     void sSpawnPlayer() const;
     void sPlayerGravity(const std::shared_ptr<Entity>& player) ;
     void sPlayerController(const std::shared_ptr<Entity>& player) const;
@@ -67,7 +93,7 @@ class GameScene final : public Scene {
     void sMoveCamera();
     
 public:
-    explicit GameScene(Engine& engine);
+    explicit TestScene(Engine& engine);
     void init() override;
     void update() override;
 };

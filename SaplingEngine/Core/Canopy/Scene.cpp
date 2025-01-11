@@ -13,6 +13,16 @@ Scene::Scene(Engine& engine) : m_engine(engine)
     m_input = std::make_shared<Input>();
 }
 
+void Scene::preUpdate()
+{
+    m_entityManager->update();
+}
+
+void Scene::postUpdate()
+{
+    m_input->clean();
+}
+
 void Scene::enable() {
     // set the window's event callback to our input system
     m_engine.getWindow().SetEventCallback([this](const sapp_event* e) { m_input->update(e); });
@@ -49,12 +59,12 @@ void Scene::sRender(EntityList& entities)
     }
 }
 
-GameScene::GameScene(Engine& engine) : Scene(engine)
+TestScene::TestScene(Engine& engine) : Scene(engine)
 {
     init();
 }
 
-void GameScene::init()
+void TestScene::init()
 {
     /// Setup input actions
     m_input->makeAxis("moveX", SAPP_KEYCODE_D, SAPP_KEYCODE_A);
@@ -72,11 +82,10 @@ void GameScene::init()
 }
 
 
-void GameScene::update()
+void TestScene::update()
 {
     //  Updates
     sSceneTime();
-    m_entityManager->update();
 
     //  Systems
     sObstacleSpawner();
@@ -92,12 +101,9 @@ void GameScene::update()
     auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<CSprite>();
     sRender(entitiesWithSprite);
     sDeleteOffScreen(m_entityManager->getEntities("obstacle"));
-    
-    // clean input to avoid double inputs
-    m_input->clean();
 }
 
-void GameScene::sSpawnPlayer() const
+void TestScene::sSpawnPlayer() const
 {
     const auto e = m_entityManager->addEntity({"player", "dynamic", "cameraTarget"});
     e->addComponent<CTransform>(glm::vec2(-500, 100), glm::vec2(0, 0));
@@ -107,7 +113,7 @@ void GameScene::sSpawnPlayer() const
     e->addComponent<CBBox>(64, 64);
 }
 
-void GameScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
+void TestScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
 {
     const float GRAVITY = 900.0f;
     auto& transform = player->getComponent<CTransform>();
@@ -121,7 +127,7 @@ void GameScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
     transform.velocity.y += GRAVITY * m_engine.deltaTime();
 }
 
-void GameScene::sPlayerController(const std::shared_ptr<Entity>& player) const
+void TestScene::sPlayerController(const std::shared_ptr<Entity>& player) const
 {
     const auto& controls = player->getComponent<CPlayerControls>();
     auto& transform = player->getComponent<CTransform>();
@@ -130,7 +136,7 @@ void GameScene::sPlayerController(const std::shared_ptr<Entity>& player) const
     }
 }
 
-void GameScene::sMove(const EntityList& entities)
+void TestScene::sMove(const EntityList& entities)
 {
     for (const auto& e : entities)
     {
@@ -142,7 +148,7 @@ void GameScene::sMove(const EntityList& entities)
     }
 }
 
-void GameScene::sSpawnSquare()
+void TestScene::sSpawnSquare()
 {
     const auto e = m_entityManager->addEntity({"square", "dynamic"});
     e->addComponent<CTransform>(glm::vec2(0, 0), glm::vec2(0, 0));
@@ -150,7 +156,7 @@ void GameScene::sSpawnSquare()
     e->addComponent<CBBox>(64, 64);
 }
 
-void GameScene::sMoveSquare(const std::shared_ptr<Entity>& square) const 
+void TestScene::sMoveSquare(const std::shared_ptr<Entity>& square) const 
 {
     auto& transform = square->getComponent<CTransform>();
     transform.position = m_input->getMouseWorldPosition();
@@ -169,7 +175,7 @@ void GameScene::sMoveSquare(const std::shared_ptr<Entity>& square) const
     }
 }
 
-void GameScene::sMoveCamera()
+void TestScene::sMoveCamera()
 {
     float deltaX = m_input->getAxis("moveX") * -200.0f * m_engine.deltaTime();
     float deltaY = m_input->getAxis("moveY") * -200.0f * m_engine.deltaTime();
@@ -187,12 +193,12 @@ void GameScene::sMoveCamera()
     
 }
 
-void GameScene::sSceneTime()
+void TestScene::sSceneTime()
 {
     m_obstacleSpawnTimer += m_engine.deltaTime();
 }
 
-void GameScene::sObstacleSpawner()
+void TestScene::sObstacleSpawner()
 {    
     if (m_obstacleSpawnTimer < 1) return;
     m_obstacleSpawnTimer = 0;
@@ -208,7 +214,7 @@ void GameScene::sObstacleSpawner()
     e->addComponent<CBBox>(64, 64);
 }
 
-void GameScene::sDeleteOffScreen(const EntityList& entities)
+void TestScene::sDeleteOffScreen(const EntityList& entities)
 {
     for (const auto& e : entities)
     {
@@ -219,7 +225,7 @@ void GameScene::sDeleteOffScreen(const EntityList& entities)
     }
 }
 
-void GameScene::sCollisionHandler(const std::shared_ptr<Entity>& player, const EntityList& obstacles)
+void TestScene::sCollisionHandler(const std::shared_ptr<Entity>& player, const EntityList& obstacles)
 {
     for (const auto& e : obstacles)
     {

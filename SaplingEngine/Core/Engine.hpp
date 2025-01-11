@@ -6,8 +6,8 @@
 #pragma once
 
 #include "Renderer/Sprout.hpp"
-#include "Core/Canopy/Scene.hpp"
-#include "Core/Seedbank/Assets.hpp"
+#include "Canopy/Scene.hpp"
+#include "Seedbank/Assets.hpp"
 
 #include <memory>
 #include <string>
@@ -23,7 +23,6 @@ using sceneMap = std::unordered_map<std::string, std::shared_ptr<Scene>>;
 class Engine {
     Sprout::Window m_window = Sprout::Window(640 * 2, 360 * 2, "Sapling Engine");
     float m_deltaTime = 0.0f;
-    float m_simTime = 0.0f;
 
     sceneMap m_scenes;
     std::shared_ptr<Scene> m_currentScene = nullptr;
@@ -39,9 +38,9 @@ public:
     ~Engine() = default;
     
     /**
-     * The main loop of the engine. Started as soon as the program starts.
+     * The main loop of the game. Nothing after this function gets called.
      */
-    void main();
+    void run();
     
     /**
      * The main update function of the game, called each frame. Must be set as callback to the window.
@@ -60,12 +59,6 @@ public:
      * @return delta time
      */
     auto deltaTime() const -> float { return m_deltaTime; }
-
-    /**
-     * \brief Total time the simulation has been running.
-     * \return total time of the simlation
-     */
-    auto simTime() const -> float { return m_simTime; }
 
     /**
      * Gets the Sprout window.
@@ -99,6 +92,7 @@ public:
     auto getScene(const std::string& name) -> std::shared_ptr<Scene>;
     auto getCurrentScene() -> std::shared_ptr<Scene>&;
 
+    auto addTexture(const std::string& name, const std::string& path, glm::i32 numFrames = 1) -> void;
     auto getAssets() const -> std::shared_ptr<Assets>;
     void setAssets(const std::shared_ptr<Assets>& newAssets);
     

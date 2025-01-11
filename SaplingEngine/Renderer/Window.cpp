@@ -122,7 +122,7 @@ namespace Sprout {
         const std::shared_ptr<Sprout::Texture> texture,
         const glm::vec2 position, 
         const glm::f32 layer,
-        const glm::vec4 rotation,
+        const glm::f32 rotation,
         const glm::i32 frameNum,
         const glm::vec4 color_override,
         const glm::vec3 scale)
@@ -136,7 +136,7 @@ namespace Sprout {
         xform0 = glm::scale(xform0, scale);
         
         // rotate
-        xform0 = glm::rotate(xform0, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        xform0 = glm::rotate(xform0, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
         
         glm::vec2 size = texture->getSize();                
         glm::vec2 frame_size = texture->getFrameSize();
@@ -209,24 +209,15 @@ namespace Sprout {
     
     glm::vec2 Window::screenToWorld(glm::vec2 screen_pos) 
     {
-        // Get the inverse of the view-projection matrix
         glm::mat4 inv_proj = glm::inverse(Window::instance->draw_frame.view_projection * Window::instance->draw_frame.camera_xform);
     
-        // Convert screen coordinates to normalized device coordinates (NDC)
-        // Screen coordinates (0, 0) is at the top-left, (width, height) is at the bottom-right
-        float ndc_x = (screen_pos.x) / Window::instance->getWidth() - 1.0f;
-        float ndc_y = 1.0f - (screen_pos.y) / Window::instance->getHeight();
+        // normalize screen pos
+        float normal_x = (screen_pos.x) / Window::instance->getWidth() - 1.0f;
+        float normal_y = 1.0f - (screen_pos.y) / Window::instance->getHeight();
+        glm::vec4 ndc_pos = glm::vec4(normal_x, normal_y, 0.0f, 1.0f);
     
-        // Create a 4D vector in NDC space
-        glm::vec4 ndc_pos = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
-    
-        // Transform the NDC coordinates to world coordinates using the inverse projection matrix
-        glm::vec4 world_pos_homogeneous = inv_proj * ndc_pos;
-    
-        // Perform perspective divide to get the 2D world coordinates
-        glm::vec2 world_pos = glm::vec2(world_pos_homogeneous.x, world_pos_homogeneous.y);
-    
-        return world_pos;
+        glm::vec4 world_pos = inv_proj * ndc_pos;
+        return glm::vec2(world_pos.x, world_pos.y);
     }
 
     void Window::translateCamera(glm::f32 deltaX, glm::f32 deltaY)

@@ -7,8 +7,18 @@ CompileFlags:
     -Wextra, 
     -Werror, 
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine/Core,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine/ECS,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine/ECS/Components,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine/ECS/Entities,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine/Physics,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine/Renderer,
     -I/opt/homebrew/include,
-    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Components,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Prefabs,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Systems,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Scenes
     ]
 
 Diagnostics:

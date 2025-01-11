@@ -21,7 +21,7 @@ class CTransform final : public Component{
     public:
         glm::vec2 position = glm::vec2(0, 0);
         glm::vec2 velocity = glm::vec2(0, 0);
-        glm::vec4 rotation = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        glm::f32 rotation = 0.0f;
 
         CTransform(const glm::vec2& positionin, const glm::vec2& velocityin);
 };

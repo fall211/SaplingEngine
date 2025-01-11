@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "Entity.hpp"
-#include "Core/Canopy/Scene.hpp"
+#include "Canopy/Scene.hpp"
 
 class Entity;
 
