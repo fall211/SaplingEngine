@@ -37,22 +37,9 @@ void Input::clean()
 
 void Input::update(const sapp_event * event){
     
-    m_mousePosition = glm::vec2(event->mouse_x, event->mouse_y);
+    m_mousePosition = glm::vec2(event->mouse_x, event->mouse_y);    
     
-    for (const auto& pair : m_keyMap){
-        const std::shared_ptr<Key> key = pair.second;
-        key->justPressed = false;
-        key->justReleased = false;
-    }
-    
-    for (auto& key : m_mouseKeys){
-        key.justPressed = false;
-        key.justReleased = false;
-    }
-    
-    //if (event->type == SAPP_EVENTTYPE_QUIT_REQUESTED) sapp_request_quit();
-    
-    if (event->type == SAPP_EVENTTYPE_KEY_DOWN || event->type == SAPP_EVENTTYPE_KEY_UP) {
+    if ((event->type == SAPP_EVENTTYPE_KEY_DOWN || event->type == SAPP_EVENTTYPE_KEY_UP) && !event->key_repeat) {
 
         // check if there is a key for this code in m_keyMap
         if (m_keyMap.count(event->key_code) == 0) return;
@@ -62,9 +49,11 @@ void Input::update(const sapp_event * event){
         if (event->type == SAPP_EVENTTYPE_KEY_DOWN){
             key->justPressed = true;
             key->pressed = true;
+
         } else {
             key->justReleased = true;
             key->pressed = false;
+            
         }
 
     }
@@ -114,14 +103,18 @@ auto Input::isAction(const std::string& name) -> bool{
 
 auto Input::isActionDown(const std::string& name) -> bool{
     for (const auto& key : m_actionsMap[name]){
-        if (getKeyDown(key)) return true;
+        if (getKeyDown(key)) {
+            return true;
+        }
     }
     return false;
 }
 
 auto Input::isActionUp(const std::string& name) -> bool{
     for (const auto& key : m_actionsMap[name]){
-        if (getKeyUp(key)) return true;
+        if (getKeyUp(key)) {
+            return true;
+        }
     }
     return false;
 }
@@ -174,5 +167,9 @@ auto Input::getMouse(MouseButton button) -> bool {
 
 auto Input::getMousePosition() -> glm::vec2 {
     return m_mousePosition;
+}
+
+auto Input::getMouseWorldPosition() -> glm::vec2 {
+    return Sprout::Window::screenToWorld(m_mousePosition);
 }
 

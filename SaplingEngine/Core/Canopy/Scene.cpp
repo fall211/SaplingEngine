@@ -49,15 +49,18 @@ void Scene::sRender(EntityList& entities)
     }
 }
 
-GameScene::GameScene(Engine& engine) : Scene(engine){
+GameScene::GameScene(Engine& engine) : Scene(engine)
+{
     init();
 }
 
-void GameScene::init(){
+void GameScene::init()
+{
     /// Setup input actions
     m_input->makeAxis("moveX", SAPP_KEYCODE_D, SAPP_KEYCODE_A);
     m_input->makeAxis("moveY", SAPP_KEYCODE_S, SAPP_KEYCODE_W);
-    m_input->makeAction("jump", {SAPP_KEYCODE_SPACE, 57});
+    m_input->makeAction("jump", {SAPP_KEYCODE_SPACE});
+    m_input->makeAction("lockCamera", {SAPP_KEYCODE_F});
 
     
     /// Initial systems to run one time
@@ -69,7 +72,8 @@ void GameScene::init(){
 }
 
 
-void GameScene::update(){
+void GameScene::update()
+{
     //  Updates
     sSceneTime();
     m_entityManager->update();
@@ -80,7 +84,7 @@ void GameScene::update(){
     sPlayerGravity(m_entityManager->getEntities("player").front());
     sPlayerController(m_entityManager->getEntities("player").front());
     sMoveSquare(m_entityManager->getEntities("square").front());
-    
+    sMoveCamera();
     
     //  Systems (ordered)
     sMove(m_entityManager->getEntities("dynamic"));
@@ -93,8 +97,9 @@ void GameScene::update(){
     m_input->clean();
 }
 
-void GameScene::sSpawnPlayer() const {
-    const auto e = m_entityManager->addEntity({"player", "dynamic"});
+void GameScene::sSpawnPlayer() const
+{
+    const auto e = m_entityManager->addEntity({"player", "dynamic", "cameraTarget"});
     e->addComponent<CTransform>(glm::vec2(-500, 100), glm::vec2(0, 0));
     e->addComponent<CSprite>(m_engine.getAssets()->getTexture("playerSheet"), 4);
     e->getComponent<CSprite>().setLayer(CSprite::Layer::Foreground);
@@ -102,7 +107,8 @@ void GameScene::sSpawnPlayer() const {
     e->addComponent<CBBox>(64, 64);
 }
 
-void GameScene::sPlayerGravity(const std::shared_ptr<Entity>& player) {
+void GameScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
+{
     const float GRAVITY = 900.0f;
     auto& transform = player->getComponent<CTransform>();
     auto& controls = player->getComponent<CPlayerControls>();
@@ -115,7 +121,8 @@ void GameScene::sPlayerGravity(const std::shared_ptr<Entity>& player) {
     transform.velocity.y += GRAVITY * m_engine.deltaTime();
 }
 
-void GameScene::sPlayerController(const std::shared_ptr<Entity>& player) const {
+void GameScene::sPlayerController(const std::shared_ptr<Entity>& player) const
+{
     const auto& controls = player->getComponent<CPlayerControls>();
     auto& transform = player->getComponent<CTransform>();
     if (m_input->isAction("jump") && controls.grounded) {
@@ -123,25 +130,30 @@ void GameScene::sPlayerController(const std::shared_ptr<Entity>& player) const {
     }
 }
 
-void GameScene::sMove(const EntityList& entities) {
-    for (const auto& e : entities){
-        if (e->hasComponent<CTransform>()){
+void GameScene::sMove(const EntityList& entities)
+{
+    for (const auto& e : entities)
+    {
+        if (e->hasComponent<CTransform>())
+        {
             auto& transform = e->getComponent<CTransform>();
             transform.position += transform.velocity * m_engine.deltaTime();
         }
     }
 }
 
-void GameScene::sSpawnSquare(){
+void GameScene::sSpawnSquare()
+{
     const auto e = m_entityManager->addEntity({"square", "dynamic"});
     e->addComponent<CTransform>(glm::vec2(0, 0), glm::vec2(0, 0));
     e->addComponent<CSprite>(m_engine.getAssets()->getTexture("test"));
     e->addComponent<CBBox>(64, 64);
 }
 
-void GameScene::sMoveSquare(const std::shared_ptr<Entity>& square) const {
+void GameScene::sMoveSquare(const std::shared_ptr<Entity>& square) const 
+{
     auto& transform = square->getComponent<CTransform>();
-    transform.position = m_input->getMousePosition() - glm::vec2(720, 360);
+    transform.position = m_input->getMouseWorldPosition();
     
     if (m_input->getMouseUp(Input::MouseButton::LEFT))
     {
@@ -155,14 +167,33 @@ void GameScene::sMoveSquare(const std::shared_ptr<Entity>& square) const {
             Debug::log(debugLayer);
         }
     }
+}
+
+void GameScene::sMoveCamera()
+{
+    float deltaX = m_input->getAxis("moveX") * -200.0f * m_engine.deltaTime();
+    float deltaY = m_input->getAxis("moveY") * -200.0f * m_engine.deltaTime();
+    
+    
+    m_engine.getWindow().translateCamera(deltaX, deltaY);
+    
+    if (m_input->isActionUp("lockCamera"))
+    {
+        auto& target = m_entityManager->getEntities("cameraTarget").front()->getComponent<CTransform>();
+        m_engine.getWindow().setCameraPosition({target.position.x, target.position.y});
+        
+        Debug::log("camera moved");
+    }
     
 }
 
-void GameScene::sSceneTime(){
+void GameScene::sSceneTime()
+{
     m_obstacleSpawnTimer += m_engine.deltaTime();
 }
 
-void GameScene::sObstacleSpawner(){    
+void GameScene::sObstacleSpawner()
+{    
     if (m_obstacleSpawnTimer < 1) return;
     m_obstacleSpawnTimer = 0;
     // Generate random position
@@ -177,18 +208,25 @@ void GameScene::sObstacleSpawner(){
     e->addComponent<CBBox>(64, 64);
 }
 
-void GameScene::sDeleteOffScreen(const EntityList& entities){
-    for (const auto& e : entities){
-        if (e->getComponent<CTransform>().position.x < -640){
+void GameScene::sDeleteOffScreen(const EntityList& entities)
+{
+    for (const auto& e : entities)
+    {
+        if (e->getComponent<CTransform>().position.x < -640)
+        {
             e->destroy();
         }
     }
 }
 
-void GameScene::sCollisionHandler(const std::shared_ptr<Entity>& player, const EntityList& obstacles) {
-    for (const auto& e : obstacles) {
-        if (e->hasComponent<CBBox>()) { // ignore entities with no bounding box
-            if (const glm::vec2 collision = Physics2D::bBoxCollision(player, e); collision != glm::vec2(0, 0)) {
+void GameScene::sCollisionHandler(const std::shared_ptr<Entity>& player, const EntityList& obstacles)
+{
+    for (const auto& e : obstacles)
+    {
+        if (e->hasComponent<CBBox>()) // ignore entities with no bounding box
+        { 
+            if (const glm::vec2 collision = Physics2D::bBoxCollision(player, e); collision != glm::vec2(0, 0))
+            {
                 e->destroy();
             }
         }

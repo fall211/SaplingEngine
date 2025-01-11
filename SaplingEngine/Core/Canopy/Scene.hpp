@@ -64,6 +64,8 @@ class GameScene final : public Scene {
     static void sDeleteOffScreen(const EntityList& entities);
     static void sCollisionHandler(const std::shared_ptr<Entity>& player, const EntityList& obstacles) ;
     
+    void sMoveCamera();
+    
 public:
     explicit GameScene(Engine& engine);
     void init() override;

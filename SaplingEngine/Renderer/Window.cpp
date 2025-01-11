@@ -11,6 +11,7 @@
 #include "Sprout.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <cmath>
 #include <memory>
 
 #define STB_RECT_PACK_IMPLEMENTATION
@@ -205,5 +206,39 @@ namespace Sprout {
         
         draw_frame.num_quads++;
     }
+    
+    glm::vec2 Window::screenToWorld(glm::vec2 screen_pos) 
+    {
+        // Get the inverse of the view-projection matrix
+        glm::mat4 inv_proj = glm::inverse(Window::instance->draw_frame.view_projection * Window::instance->draw_frame.camera_xform);
+    
+        // Convert screen coordinates to normalized device coordinates (NDC)
+        // Screen coordinates (0, 0) is at the top-left, (width, height) is at the bottom-right
+        float ndc_x = (screen_pos.x) / Window::instance->getWidth() - 1.0f;
+        float ndc_y = 1.0f - (screen_pos.y) / Window::instance->getHeight();
+    
+        // Create a 4D vector in NDC space
+        glm::vec4 ndc_pos = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
+    
+        // Transform the NDC coordinates to world coordinates using the inverse projection matrix
+        glm::vec4 world_pos_homogeneous = inv_proj * ndc_pos;
+    
+        // Perform perspective divide to get the 2D world coordinates
+        glm::vec2 world_pos = glm::vec2(world_pos_homogeneous.x, world_pos_homogeneous.y);
+    
+        return world_pos;
+    }
 
+    void Window::translateCamera(glm::f32 deltaX, glm::f32 deltaY)
+    {
+        glm::mat4 xform = glm::translate(glm::mat4(1.0f), glm::vec3(deltaX, deltaY, 0.0f));
+        draw_frame.camera_xform = xform * draw_frame.camera_xform;
+    }
+    
+    void Window::setCameraPosition(glm::vec2 position)
+    {
+        glm::mat4 xform = glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f));
+        draw_frame.camera_xform = xform;
+    }
+    
 } // namespace Sprout

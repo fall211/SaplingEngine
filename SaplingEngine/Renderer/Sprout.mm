@@ -41,6 +41,17 @@ namespace Sprout {
     
     void Window::Init(){      
         
+        draw_frame.view_projection = glm::ortho(
+            -0.5f * (m_width),
+            0.5f * (m_width),
+            0.5f * (m_height),
+            -0.5f * (m_height),
+            1.0f,
+            -1.0f
+        );
+        
+        draw_frame.camera_xform = glm::mat4(1.0f);
+        
         sg_desc desc = {
             .environment = sglue_environment()
         };
@@ -139,16 +150,6 @@ namespace Sprout {
         // reset draw frame
         draw_frame.num_quads = 0;
         std::fill(draw_frame.quads.begin(), draw_frame.quads.end(), Quad{});
-        
-        draw_frame.view_projection = glm::ortho(
-            -0.5f * (m_width),
-            0.5f * (m_width),
-            0.5f * (m_height),
-            -0.5f * (m_height),
-            1.0f,
-            -1.0f
-        );
-        draw_frame.camera_xform = glm::mat4(1.0f);
         
         
         

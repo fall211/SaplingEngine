@@ -61,7 +61,6 @@ struct DrawFrame {
 };
 
 
-
 class Window {
 public: 
     Window(int width, int height, const char* title);
@@ -96,6 +95,13 @@ public:
     // TODO: draw text
     void draw_text();
     
+    // screen to world
+    static glm::vec2 screenToWorld(glm::vec2 screenPos);
+    
+    // move camera
+    void translateCamera(glm::f32 deltaX, glm::f32 deltaY);
+    void setCameraPosition(glm::vec2 position);
+    
 private:
     int m_width = 0;
     int m_height = 0;
@@ -123,6 +129,8 @@ private:
     void Cleanup();
     void Event(const sapp_event* e);
     
+    int getWidth() const { return m_width; }
+    int getHeight() const { return m_height; }
     
     // drawing things onto the screen
     void draw_test();

@@ -71,6 +71,7 @@ public:
     auto getMouse(Input::MouseButton button) -> bool;
     
     auto getMousePosition() -> glm::vec2;
+    auto getMouseWorldPosition() -> glm::vec2;
     
     Input();
 
