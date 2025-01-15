@@ -8,16 +8,25 @@
 
 #include "Renderer/Texture.hpp"
 #include "glm/glm.hpp"
+#include <cstddef>
 #include <memory>
+class Entity;
 
 namespace Comp
 {
+    typedef const std::shared_ptr<Entity>& Inst;
     
     class Component{
+    protected:
+        Inst inst;
+        
     public:
         bool has = false;
-        Component()= default;
-        virtual ~Component()= default;
+        Component(Inst inst) : inst(inst) {};
+        ~Component()= default;
+        
+        virtual void OnAddToEntity() {}
+        virtual void OnRemoveFromEntity() {}
     };
     
     /*
@@ -33,14 +42,14 @@ namespace Comp
             glm::vec2 velocity = glm::vec2(0, 0);
             glm::f32 rotation = 0.0f;
     
-            Transform(const glm::vec2& positionin, const glm::vec2& velocityin);
+            Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);
     };
     
     class Lifetime final : public Component 
     {
         public:
             float lifetime = 1.0f;
-            explicit Lifetime(float lifetimein);
+            explicit Lifetime(Inst inst, float lifetimein);
     };
     
     /*
@@ -53,7 +62,7 @@ namespace Comp
         public:
             float w = 1.0f;
             float h = 1.0f;
-            BBox(float win, float hin);
+            BBox(Inst inst, float win, float hin);
     };
     
     /*
@@ -64,7 +73,7 @@ namespace Comp
     {
         public: 
             float radius = 1.0f;
-            BCircle(float radiusIn);
+            BCircle(Inst inst, float radiusIn);
     };
         
     
@@ -83,8 +92,8 @@ namespace Comp
     {
         public:
             std::shared_ptr<Sprout::Texture> texture;
-            explicit Sprite(const std::shared_ptr<Sprout::Texture>& texin);
-            explicit Sprite(const std::shared_ptr<Sprout::Texture>& texin, float animSpeed);
+            explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin);
+            explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin, float animSpeed);
             
             enum class Layer {
                 Background,
@@ -119,7 +128,7 @@ namespace Comp
             float moveSpeed = 0.0f;
             int jumpStr;
             bool grounded = true;
-            PlayerControls(float speedIn, int jumpStrIn);
+            PlayerControls(Inst inst, float speedIn, int jumpStrIn);
     };
 
 }

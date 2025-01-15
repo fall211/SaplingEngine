@@ -3,12 +3,12 @@
 //  SaplingEngine
 //
 
+#include "Debug.hpp"
 #include "Engine.hpp"
 #include <memory>
 
 #include "PrototypeScene.hpp"
 #include "TestScene.hpp"
-
 
 auto main() -> int 
 {
@@ -17,10 +17,10 @@ auto main() -> int
     const auto engine = std::make_shared<Engine>();
 
     // then we add the textures and other assets we want to use
-    engine->addTexture("test", "Sprites/test.png");
-    engine->addTexture("player", "Sprites/player.png");
-    engine->addTexture("playerSheet", "Sprites/playerSheet.png", 2);
-    engine->addTexture("obstacle", "Sprites/obstacle.png");
+    AssetManager::addTexture("test", "Sprites/test.png");
+    AssetManager::addTexture("player", "Sprites/player.png");
+    AssetManager::addTexture("playerSheet", "Sprites/playerSheet.png", 2);
+    AssetManager::addTexture("obstacle", "Sprites/obstacle.png");
 
     // then we create the scenes our game uses
     engine->newScene<TestScene>("game");

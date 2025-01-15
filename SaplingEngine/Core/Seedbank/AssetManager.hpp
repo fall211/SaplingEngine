@@ -17,10 +17,23 @@
 #endif
 
 class AssetManager {
-    std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures;
+    std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
+    
+    static AssetManager* Instance;
+
+    AssetManager() = default;
+    ~AssetManager() = default;
 
 public:
-    AssetManager();
+
+
+    static AssetManager* getInstance()
+    {
+        if (Instance == nullptr) {
+            Instance = new AssetManager();
+        }
+        return Instance;
+    }
 
     /*
         * Adds a texture to the asset manager
@@ -28,17 +41,16 @@ public:
         * @param path The path to the texture
         * @param numFrames The number of frames in the texture (if animated)
     */
-    void addTexture(const std::string& name, 
+    static void addTexture(const std::string& name, 
         const std::string& path,
         glm::i32 numFrames = 1
     );
-    
+
     /*
         * Gets the texture with the given name
         * @param name The name of the texture
         * @return The texture with the given name
     */
-    auto getTexture(const std::string& name) -> std::shared_ptr<Sprout::Texture>;
+    static auto getTexture(const std::string& name) -> std::shared_ptr<Sprout::Texture>;
 };
-
 

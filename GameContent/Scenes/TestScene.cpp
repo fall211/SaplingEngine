@@ -5,6 +5,7 @@
 
 
 #include "TestScene.hpp"
+#include "Seedbank/AssetManager.hpp"
 
 
 TestScene::TestScene(Engine& engine) : Scene(engine)
@@ -55,7 +56,7 @@ void TestScene::sSpawnPlayer() const
 {
     const auto e = m_entityManager->addEntity({"player", "dynamic", "cameraTarget"});
     e->addComponent<Comp::Transform>(glm::vec2(-500, 100), glm::vec2(0, 0));
-    e->addComponent<Comp::Sprite>(m_engine.getAssets()->getTexture("playerSheet"), 4);
+    e->addComponent<Comp::Sprite>(AssetManager::getTexture("playerSheet"), 4);
     e->getComponent<Comp::Sprite>().setLayer(Comp::Sprite::Layer::Foreground);
     e->addComponent<Comp::PlayerControls>(0.0f, 400.0f);
     e->addComponent<Comp::BBox>(64, 64);
@@ -100,7 +101,7 @@ void TestScene::sSpawnSquare()
 {
     const auto e = m_entityManager->addEntity({"square", "dynamic"});
     e->addComponent<Comp::Transform>(glm::vec2(0, 0), glm::vec2(0, 0));
-    e->addComponent<Comp::Sprite>(m_engine.getAssets()->getTexture("test"));
+    e->addComponent<Comp::Sprite>(AssetManager::getTexture("test"));
     e->addComponent<Comp::BBox>(64, 64);
 }
 
@@ -158,7 +159,7 @@ void TestScene::sObstacleSpawner()
     
     const auto e = m_entityManager->addEntity({"obstacle", "dynamic"});
     e->addComponent<Comp::Transform>(glm::vec2(640, randomY), glm::vec2(-100, 0));
-    e->addComponent<Comp::Sprite>(m_engine.getAssets()->getTexture("obstacle"));
+    e->addComponent<Comp::Sprite>(AssetManager::getTexture("obstacle"));
     e->addComponent<Comp::BBox>(64, 64);
 }
 

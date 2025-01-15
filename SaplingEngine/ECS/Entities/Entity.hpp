@@ -11,25 +11,44 @@
 #include <typeindex>
 #include <memory>
 #include <vector>
+#include <functional>
+#include <any>
+#include <iostream>
+#include <algorithm>
+#include <type_traits>
+#include <utility>
+#include <memory>
 
 #include "Component.hpp"
+#include "Debug.hpp"
 
 class Component;
-
+class EntityManager;
 
 typedef std::vector<std::string> TagList;
+typedef const std::shared_ptr<Entity>& Inst;
 
-
-class Entity
+class Entity : public std::enable_shared_from_this<Entity>
 {
     private:
         TagList m_tags;
         size_t m_id = 0;
+        std::shared_ptr<EntityManager> m_owner;
         bool m_active = true;
         std::unordered_map<std::type_index, std::shared_ptr<Comp::Component>> m_components;
+        
+        // events
+        std::unordered_map<std::string, std::vector<std::function<void(Inst)>>> m_eventCallbacks;
     
+        template <typename... Args>
+        static auto UnpackArgs(std::vector<std::any>& args)
+        {
+            return std::make_tuple(std::any_cast<Args>(args.at(0))...);
+        }
+        
+        // only the EntityManager can create entities
         friend class EntityManager;
-        Entity(TagList  tags, size_t id);
+        Entity(TagList tags, size_t id, std::shared_ptr<EntityManager> owner);
         
         /*
             * Adds a tag to the entity, only accessible by the EntityManager
@@ -42,8 +61,21 @@ class Entity
             * @param tag The tag to remove
         */
         void removeTag(const std::string& tag);
-    
+
+        
     public:
+    
+        /* 
+            * Requests the addition of a tag to the entity through the entity manager.
+            * @param tag The tag to add
+        */
+        void requestAddTag(const std::string& tag);
+        
+        /* 
+            * Requests the removal of a tag from the entity through the entity manager.
+            * @param tag The tag to remove
+        */
+        void requestRemoveTag(const std::string& tag);
     
         /*
             * Gets the id of the entity
@@ -56,6 +88,13 @@ class Entity
             * @return The tags of the entity
         */
         auto getTags() -> const TagList&;
+        
+        /*
+            * Checks if the entity has a tag
+            * @param tag The tag to check for
+            * @return True if the entity has the tag
+        */
+        auto hasTag(const std::string& tag) -> bool;
         
         /*
             * Checks if the entity is active
@@ -77,8 +116,9 @@ class Entity
         */
         template <typename T, typename... Args>
         auto addComponent(Args&&... args) -> T& {
-            std::shared_ptr<T> component = std::make_shared<T>(std::forward<Args>(args)...);
+            std::shared_ptr<T> component = std::make_shared<T>(shared_from_this(), std::forward<Args>(args)...);
             m_components[typeid(T)] = std::move(component);
+            m_components[typeid(T)]->OnAddToEntity();
             return *static_cast<T*>(m_components[typeid(T)].get());
         }
     
@@ -88,6 +128,7 @@ class Entity
         */
         template <typename T>
         void removeComponent() {
+            m_components[typeid(T)]->OnRemoveFromEntity();
             m_components.erase(typeid(T));
         }
     
@@ -111,6 +152,57 @@ class Entity
         auto hasComponent() const -> bool {
             return m_components.find(typeid(T)) != m_components.end();
         }
+        
+        // events
+        
+        /*
+            * Listens for an event on the entity
+            * @param event The event to listen for
+            * @param callback The callback to call when the event is received
+        */
+        void ListenForEvent(const std::string& event, const std::function<void(Inst)>& callback)
+        {
+            if (m_eventCallbacks.find(event) == m_eventCallbacks.end())
+            {
+                m_eventCallbacks[event] = std::vector<std::function<void(Inst)>>();
+            }
+            m_eventCallbacks[event].push_back(callback);
+        }
+        
+        /*
+            * Removes an event callback from the entity
+            * @param event The event to remove the callback from
+            * @param callback The callback to remove
+        */
+        void RemoveEventCallback(const std::string& event, const std::function<void(Inst)>& callback)
+        {
+            if (m_eventCallbacks.find(event) != m_eventCallbacks.end())
+            {
+                auto& callbacks = m_eventCallbacks[event];
+                callbacks.erase(std::remove_if(callbacks.begin(), callbacks.end(), 
+                    [&callback](const auto& cb) { return cb.template target<void(Inst)>() == callback.template target<void(Inst)>(); }), 
+                    callbacks.end());
+            }
+        }
 
+        /*
+            * Pushes an event to the entity
+            * @param event The event to push
+            * @param args The arguments to pass to the event
+        */
+        template <typename... Args>
+        void PushEvent(const std::string& event, Args... args)
+        {
+            if (m_eventCallbacks.find(event) != m_eventCallbacks.end())
+            {
+                Debug::log("event: \'" + event + "\' Received on entity: " + std::to_string(m_id));
+
+                auto& callbacks = m_eventCallbacks[event];
+                std::vector<std::any> argsVec{ args... };
+                for (const auto& callback : callbacks)
+                {
+                    callback(shared_from_this());
+                }
+            }
+        }
 };
-

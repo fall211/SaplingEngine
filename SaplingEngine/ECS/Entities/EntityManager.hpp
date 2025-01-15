@@ -10,16 +10,13 @@
 #include <memory>
 #include <vector>
 
-#include "Entity.hpp"
-#include "Canopy/Scene.hpp"
-
 class Entity;
 
 typedef std::vector<std::shared_ptr<Entity>> EntityList;
 typedef std::map<std::string, EntityList> EntityMap;
 typedef std::vector<std::string> TagList;
 
-class EntityManager 
+class EntityManager : public std::enable_shared_from_this<EntityManager>
 {
     private:
         EntityList m_entities;
@@ -34,6 +31,9 @@ class EntityManager
             * Adds new entities to the manager and deletes destroyed entities.
         */
         void update();
+        
+        template <typename T, typename... Args>
+        auto instantiatePrefab(Args... args) -> std::shared_ptr<Entity>;
         
         /*
             * Adds a new entity to the manager with the given tags.
@@ -61,15 +61,7 @@ class EntityManager
             * @return The list of entities with the given component
         */
         template <typename T>
-        auto getEntitiesByComponent() -> EntityList {
-            EntityList entities;
-            for (const auto& e : m_entities){
-                if (e && e->hasComponent<T>()){
-                    entities.push_back(e);
-                }
-            }
-            return entities;
-        }
+        auto getEntitiesByComponent() -> EntityList;
         
         /*
             * Adds a tag to the given entity
@@ -92,3 +84,4 @@ class EntityManager
         void destroyEntity(const std::shared_ptr<Entity>& entity);
 };
 
+#include "EntityManagerT.hpp"

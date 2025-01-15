@@ -29,8 +29,6 @@ class Engine {
     
 
     size_t m_currentFrame = 0;
-    
-    std::shared_ptr<AssetManager> m_assetManager;
 
 public:
 
@@ -92,9 +90,7 @@ public:
     auto getScene(const std::string& name) -> std::shared_ptr<Scene>;
     auto getCurrentScene() -> std::shared_ptr<Scene>&;
 
-    auto addTexture(const std::string& name, const std::string& path, glm::i32 numFrames = 1) -> void;
-    auto getAssets() const -> std::shared_ptr<AssetManager>;
-    void setAssets(const std::shared_ptr<AssetManager>& newAssetManager);
+
     
 };
 

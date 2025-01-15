@@ -44,7 +44,7 @@ void EntityManager::update()
 
 auto EntityManager::addEntity(const TagList& tags) -> std::shared_ptr<Entity>
 {
-    auto entity = std::shared_ptr<Entity>(new Entity(tags, m_idCounter++));
+    auto entity = std::shared_ptr<Entity>(new Entity(tags, m_idCounter++, shared_from_this()));
     m_entitiesToAdd.push_back(entity);
     return entity;
 }

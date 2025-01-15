@@ -7,8 +7,8 @@
 
 #include "Canopy/Scene.hpp"
 #include "Engine.hpp"
-#include "sRotate.hpp"
-#include "cRotate.hpp"
+#include "GameComponents.hpp"
+#include "player.hpp"
 
 class PrototypeScene : public Scene 
 {
@@ -23,4 +23,5 @@ class PrototypeScene : public Scene
             void update() override;
     
             void sSpawn();
+            void sMove(const EntityList& entities);
 };

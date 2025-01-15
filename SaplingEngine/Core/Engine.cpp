@@ -5,13 +5,14 @@
 
 
 #include "Engine.hpp"
+#include "Seedbank/AssetManager.hpp"
 #include <memory>
 
 
 Engine::Engine()
 {
-    m_scenes = sceneMap();    
-    m_assetManager = std::make_shared<AssetManager>();
+    m_scenes = sceneMap();
+    AssetManager::getInstance();
 
     Debug::log("init completed");
 }
@@ -71,23 +72,4 @@ auto Engine::getCurrentScene() -> std::shared_ptr<Scene>&
     return m_currentScene;
 }
 
-auto Engine::addTexture(const std::string& name, const std::string& path, glm::i32 numFrames) -> void
-{
-    if (!m_assetManager)
-    {
-        Debug::log("ERR: Engine asset manager not initialized");
-        return;
-    }
-    m_assetManager->addTexture(name, path, numFrames);
-}
-
-auto Engine::getAssets() const -> std::shared_ptr<AssetManager> 
-{ 
-    return m_assetManager; 
-}
-
-void Engine::setAssets(const std::shared_ptr<AssetManager>& newAssetManager)
-{
-    m_assetManager = newAssetManager; 
-}
 
