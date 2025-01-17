@@ -8,6 +8,7 @@
 #include "Seedbank/AssetManager.hpp"
 #include "GameComponents.hpp"
 #include "cLowestY.hpp"
+#include "cPlayerController.hpp"
 
 namespace Prefab
 {
@@ -20,10 +21,14 @@ namespace Prefab
     void Player::init(Inst inst)
     {
         inst->addComponent<Comp::Transform>(glm::vec2(0, 0), glm::vec2(0, 0));
-        inst->addComponent<Comp::Sprite>(AssetManager::getTexture("test"));
-        inst->addComponent<Comp::BBox>(64, 64);
+        inst->addComponent<Comp::Sprite>(AssetManager::getTexture("player"));
+        auto& bbox = inst->addComponent<Comp::BBox>(64, 64);
+        bbox.isStatic = false;
         inst->addComponent<Comp::Gravity>();
         inst->addComponent<Comp::LowestY>();
+        inst->addComponent<Comp::PlayerController>();
+        inst->addComponent<Comp::Moves>();
+        inst->addComponent<Comp::CoyoteTime>();
         
     }
         

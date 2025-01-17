@@ -15,7 +15,7 @@ namespace Comp
     {
         public:
             float gravity;
-            explicit Gravity(const std::shared_ptr<Entity>& inst, float grav = 98.0f) 
+            explicit Gravity(const std::shared_ptr<Entity>& inst, float grav = 9.8f * 60) 
             :   Component(inst), 
                 gravity(grav) 
             {}

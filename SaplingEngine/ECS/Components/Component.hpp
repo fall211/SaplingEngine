@@ -10,6 +10,7 @@
 #include "glm/glm.hpp"
 #include <cstddef>
 #include <memory>
+
 class Entity;
 
 namespace Comp
@@ -45,12 +46,6 @@ namespace Comp
             Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);
     };
     
-    class Lifetime final : public Component 
-    {
-        public:
-            float lifetime = 1.0f;
-            explicit Lifetime(Inst inst, float lifetimein);
-    };
     
     /*
         * A bounding box component for collision detection.
@@ -62,6 +57,8 @@ namespace Comp
         public:
             float w = 1.0f;
             float h = 1.0f;
+            bool isTrigger = false;
+            bool isStatic = true;
             BBox(Inst inst, float win, float hin);
     };
     

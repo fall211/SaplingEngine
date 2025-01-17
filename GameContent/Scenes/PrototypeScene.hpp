@@ -6,9 +6,11 @@
 #pragma once
 
 #include "Canopy/Scene.hpp"
+#include "Physics.hpp"
 #include "Engine.hpp"
 #include "GameComponents.hpp"
 #include "player.hpp"
+
 
 class PrototypeScene : public Scene 
 {
@@ -24,4 +26,6 @@ class PrototypeScene : public Scene
     
             void sSpawn();
             void sMove(const EntityList& entities);
+            
+            void sResolveCollisions(const EntityList& entities);
 };

@@ -14,11 +14,6 @@ namespace Comp
             velocity(velocityin) 
         {}
     
-    Lifetime::Lifetime(Inst inst, const float lifetimein) 
-    :   Component(inst),
-        lifetime(lifetimein) 
-    {}
-    
     BBox::BBox(Inst inst, const float win, const float hin) 
     :   Component(inst),
         w(win), 
