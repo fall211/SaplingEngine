@@ -89,6 +89,22 @@ namespace Sprout
         glm::mat4 camera_xform;
     };
     
+    /*
+        * Pre-defined pivots for use with Sprout::getPivotOffset.
+    */
+    enum class Pivot {
+        BOTTOM_LEFT,
+        BOTTOM_CENTER,
+        BOTTOM_RIGHT,
+        CENTER_LEFT,
+        CENTER,
+        CENTER_RIGHT,
+        TOP_LEFT,
+        TOP_CENTER,
+        TOP_RIGHT
+    };
+    
+    glm::vec2 getPivotOffset(Pivot pivot);
     
     class Window
     {
@@ -144,7 +160,8 @@ namespace Sprout
                 glm::f32 rotation = 0.0f,
                 glm::i32 frameNumber = 1,
                 glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
-                glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
+                glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
+                Pivot pivot = Pivot::CENTER
             );
             
             // TODO: draw text
@@ -208,8 +225,8 @@ namespace Sprout
                 glm::vec2 size, 
                 glm::f32 layer,
                 glm::vec4 uv,
-                glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
-                glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
+                glm::vec4 color_override,
+                Pivot pivot
             );
             
             void draw_quad_projected(

@@ -58,7 +58,7 @@ void TestScene::sSpawnPlayer() const
     e->addComponent<Comp::Transform>(glm::vec2(-500, 100), glm::vec2(0, 0));
     e->addComponent<Comp::Sprite>(AssetManager::getTexture("playerSheet"), 4);
     e->getComponent<Comp::Sprite>().setLayer(Comp::Sprite::Layer::Foreground);
-    e->addComponent<Comp::PlayerControls>(0.0f, 400.0f);
+    e->addComponent<Comp::SimplePlayerControls>(0.0f, 400.0f);
     e->addComponent<Comp::BBox>(64, 64);
 }
 
@@ -66,7 +66,7 @@ void TestScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
 {
     const float GRAVITY = 900.0f;
     auto& transform = player->getComponent<Comp::Transform>();
-    auto& controls = player->getComponent<Comp::PlayerControls>();
+    auto& controls = player->getComponent<Comp::SimplePlayerControls>();
     if (transform.position.y >= 200){
         transform.velocity.y = 0;
         controls.grounded = true;
@@ -78,7 +78,7 @@ void TestScene::sPlayerGravity(const std::shared_ptr<Entity>& player)
 
 void TestScene::sPlayerController(const std::shared_ptr<Entity>& player) const
 {
-    const auto& controls = player->getComponent<Comp::PlayerControls>();
+    const auto& controls = player->getComponent<Comp::SimplePlayerControls>();
     auto& transform = player->getComponent<Comp::Transform>();
     if (m_input->isAction("jump") && controls.grounded) {
         transform.velocity.y -= static_cast<float>(controls.jumpStr);

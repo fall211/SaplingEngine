@@ -133,7 +133,8 @@ namespace Sprout
         const glm::f32 rotation,
         const glm::i32 frameNum,
         const glm::vec4 color_override,
-        const glm::vec3 scale)
+        const glm::vec3 scale,
+        const Pivot pivot)
     {   
         glm::mat4 xform0 = glm::mat4(1.0f);
         
@@ -164,7 +165,7 @@ namespace Sprout
         }
         
         // draw
-        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override);
+        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override, pivot);
     }
     
     void Window::draw_rect_projected(
@@ -173,14 +174,19 @@ namespace Sprout
         glm::f32 layer,
         glm::vec4 uv,
         glm::vec4 color_override,
-        glm::vec4 color)
+        Pivot pivot)
     {
-        auto bottom_left = glm::vec4(0.0f, 0.0f, layer, 1.0f);
-        auto bottom_right = glm::vec4(size.x, 0.0f, layer, 1.0f);
-        auto top_left = glm::vec4(0.0f, size.y, layer, 1.0f);
-        auto top_right = glm::vec4(size.x, size.y, layer, 1.0f);
+        
+        glm::vec2 pivot_offset = getPivotOffset(pivot) * size;
+
+        glm::vec4 bottom_left = glm::vec4(0.0f - pivot_offset.x, 0.0f - pivot_offset.y, layer, 1.0f);
+        glm::vec4 bottom_right = glm::vec4(size.x - pivot_offset.x, 0.0f - pivot_offset.y, layer, 1.0f);
+        glm::vec4 top_left = glm::vec4(0.0f - pivot_offset.x, size.y - pivot_offset.y, layer, 1.0f);
+        glm::vec4 top_right = glm::vec4(size.x - pivot_offset.x, size.y - pivot_offset.y, layer, 1.0f);
+                
         
         std::array<glm::vec4, 4> positions = {bottom_left, top_left, top_right, bottom_right};
+        glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         std::array<glm::vec4, 4> colors = {color, color, color, color};
         std::array<glm::vec2, 4> uvs = {
             glm::vec2(uv.x, uv.y),

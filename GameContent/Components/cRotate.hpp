@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "Component.hpp"
 #include "Entity.hpp"
 #include "Debug.hpp"
@@ -16,7 +18,7 @@ namespace Comp
     {
         public:
             float rotationSpeed = 0.0f;
-            explicit Rotate(const std::shared_ptr<Entity>& inst, float speed) : Component(inst), rotationSpeed(speed) {}
+            explicit Rotate(Inst inst, float speed) : Component(std::move(inst)), rotationSpeed(speed) {}
             
             void OnAddToEntity() override
             {
@@ -27,14 +29,14 @@ namespace Comp
                 // inst->PushEvent("speedUp");                
             }
             
-            static void SpeedUp(Inst inst)
+            static void SpeedUp(const Inst& inst)
             {
                 if (inst->hasComponent<Rotate>())
                 {
                     inst->getComponent<Rotate>().rotationSpeed *= 2;
                 }
             }
-            static void SpeedDown(Inst inst)
+            static void SpeedDown(const Inst& inst)
             {
                 if (inst->hasComponent<Rotate>())
                 {

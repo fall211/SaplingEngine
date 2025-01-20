@@ -4,26 +4,65 @@
 //
 
 #include "Physics.hpp"
+#include "Sprout.hpp"
 #include "glm/geometric.hpp"
 
 
 auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
 {
-    if (e0->getId() == e1->getId()) return {0, 0}; // ignore self collision
+    if (e0->getId() == e1->getId()) return {0, 0}; // Ignore self-collision
 
-    const glm::vec2 dr = e0->getComponent<Comp::Transform>().position - e1->getComponent<Comp::Transform>().position;
+    // Get transform and bounding box components
+    const auto& t0 = e0->getComponent<Comp::Transform>();
+    const auto& t1 = e1->getComponent<Comp::Transform>();
+    const auto& b0 = e0->getComponent<Comp::BBox>();
+    const auto& b1 = e1->getComponent<Comp::BBox>();
+
+    // Get the pivot offsets for each entity's bounding box
+    const glm::vec2 scaledSize0 = glm::vec2(b0.w, b0.h) * glm::abs(glm::vec2(t0.scale.x, t0.scale.y));
+    const glm::vec2 scaledSize1 = glm::vec2(b1.w, b1.h) * glm::abs(glm::vec2(t1.scale.x, t1.scale.y));
+
+    const glm::vec2 pivotOffset0 = scaledSize0 * Sprout::getPivotOffset(t0.pivot);
+    const glm::vec2 pivotOffset1 = scaledSize1 * Sprout::getPivotOffset(t1.pivot);
+    
+    // Adjust positions based on pivot offsets
+    const glm::vec2 pos0 = t0.position - pivotOffset0 + (scaledSize0 / 2.0f);
+    const glm::vec2 pos1 = t1.position - pivotOffset1 + (scaledSize1 / 2.0f);
+
+    // Calculate the distance between the adjusted bounding boxes
+    const glm::vec2 dr = pos0 - pos1;
     const float dx = fabs(dr.x);
     const float dy = fabs(dr.y);
 
-    const float xOverlap = e0->getComponent<Comp::BBox>().w / 2.0f + e1->getComponent<Comp::BBox>().w / 2.0f - dx;
-    const float yOverlap = e0->getComponent<Comp::BBox>().h / 2.0f + e1->getComponent<Comp::BBox>().h / 2.0f - dy;
+    // Calculate overlap in x and y directions using scaled sizes
+    const float xOverlap = scaledSize0.x / 2.0f + scaledSize1.x / 2.0f - dx;
+    const float yOverlap = scaledSize0.y / 2.0f + scaledSize1.y / 2.0f - dy;
 
+    // Check for collision
     if (xOverlap > 0 && yOverlap > 0) 
     {
         return {xOverlap, yOverlap};
     }
     return {0, 0};
 }
+
+// auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
+// {
+//     if (e0->getId() == e1->getId()) return {0, 0}; // ignore self collision
+
+//     const glm::vec2 dr = e0->getComponent<Comp::Transform>().position - e1->getComponent<Comp::Transform>().position;
+//     const float dx = fabs(dr.x);
+//     const float dy = fabs(dr.y);
+
+//     const float xOverlap = e0->getComponent<Comp::BBox>().w / 2.0f + e1->getComponent<Comp::BBox>().w / 2.0f - dx;
+//     const float yOverlap = e0->getComponent<Comp::BBox>().h / 2.0f + e1->getComponent<Comp::BBox>().h / 2.0f - dy;
+
+//     if (xOverlap > 0 && yOverlap > 0) 
+//     {
+//         return {xOverlap, yOverlap};
+//     }
+//     return {0, 0};
+// }
 
 auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
 {

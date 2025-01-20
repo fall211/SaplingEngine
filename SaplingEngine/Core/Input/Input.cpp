@@ -84,14 +84,26 @@ void Input::update(const sapp_event * event)
 
 auto Input::getKey(const int key) -> bool
 {
+    if (m_keyMap.count(key) == 0)
+    {
+        throw std::out_of_range("tried to get invalid key: " + std::to_string(key));
+    }
     return m_keyMap[key]->pressed;
 }
 auto Input::getKeyDown(const int key) -> bool
 {
+    if (m_keyMap.count(key) == 0)
+    {
+        throw std::out_of_range("tried to get invalid key: " + std::to_string(key));
+    }
     return m_keyMap[key]->justPressed;
 }
 auto Input::getKeyUp(const int key) -> bool
 {
+    if (m_keyMap.count(key) == 0)
+    {
+        throw std::out_of_range("tried to get invalid key: " + std::to_string(key));
+    }
     return m_keyMap[key]->justReleased;
 }
 
@@ -164,8 +176,13 @@ void Input::makeAxis(const std::string& name, const int positiveKey, const int n
 
 }
 
-auto Input::getAxis(const std::string& name) -> int
+auto Input::getAxis(const std::string& name) -> float
 {
+    // check if axis exists
+    if (m_axisMap.count(name) == 0)
+    {
+        throw std::out_of_range("tried to get invalid axis: " + name);
+    }
     const std::shared_ptr<InputAxis> axis = m_axisMap[name];
     const int pos = getKey(axis->postiveKey) ? 1 : 0;
     const int neg = getKey(axis->negativeKey) ? 1 : 0;
@@ -176,7 +193,7 @@ auto Input::getMouseKey(MouseButton button) -> Key&
 {
     if (button >= m_mouseKeys.size())
     {
-        throw std::out_of_range("tried to get invalid button");
+        throw std::out_of_range("tried to get invalid button: " + std::to_string(static_cast<int>(button)));
     }
     return m_mouseKeys[button];
 }

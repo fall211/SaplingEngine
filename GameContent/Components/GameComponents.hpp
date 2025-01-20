@@ -13,6 +13,3 @@
 
 #include "cPlayerController.hpp"
 #include "cGravity.hpp"
-#include "cLowestY.hpp"
-#include "cMoves.hpp"
-#include "cCoyoteTime.hpp"

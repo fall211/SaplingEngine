@@ -26,7 +26,7 @@ class Component;
 class EntityManager;
 
 typedef std::vector<std::string> TagList;
-typedef const std::shared_ptr<Entity>& Inst;
+typedef std::shared_ptr<Entity> Inst;
 
 class Entity : public std::enable_shared_from_this<Entity>
 {
@@ -195,11 +195,9 @@ class Entity : public std::enable_shared_from_this<Entity>
         {
             if (m_eventCallbacks.find(event) != m_eventCallbacks.end())
             {
-                Debug::log("event: \'" + event + "\' Received on entity: " + std::to_string(m_id));
-
                 auto& callbacks = m_eventCallbacks[event];
                 std::vector<std::any> argsVec{ args... };
-                for (const auto& callback : callbacks)
+                for (auto& callback : callbacks)
                 {
                     callback(shared_from_this());
                 }

@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "PrototypeScene.hpp"
+#include "Seedbank/AssetManager.hpp"
 #include "TestScene.hpp"
 
 auto main() -> int 
@@ -21,6 +22,9 @@ auto main() -> int
     AssetManager::addTexture("player", "Sprites/player.png");
     AssetManager::addTexture("playerSheet", "Sprites/playerSheet.png", 2);
     AssetManager::addTexture("obstacle", "Sprites/obstacle.png");
+    
+    AssetManager::addTexture("player_idle", "Sprites/player_idle.png", 10);
+    AssetManager::addTexture("player_run", "Sprites/player_run.png", 8);
 
     // then we create the scenes our game uses
     engine->newScene<TestScene>("game");

@@ -104,7 +104,7 @@ class Input
             * @param name The name of the axis
             * @return The value of the axis (-1, 0, 1)
         */
-        auto getAxis(const std::string& name) -> int;
+        auto getAxis(const std::string& name) -> float;
         
         enum MouseButton 
         {

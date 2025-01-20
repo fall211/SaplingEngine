@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "Component.hpp"
 #include "Entity.hpp"
 #include "Debug.hpp"
@@ -15,20 +17,20 @@ namespace Comp
     {
         public:
             float gravity;
-            explicit Gravity(const std::shared_ptr<Entity>& inst, float grav = 9.8f * 60) 
-            :   Component(inst), 
+            explicit Gravity(Inst inst, float grav = 9.8f) 
+            :   Component(std::move(inst)), 
                 gravity(grav) 
             {}
             
             void OnAddToEntity() override
             {
-                inst->requestAddTag("gravityAffected");
+                inst->requestAddTag("gravityaffected");
             }
             
             
             void OnRemoveFromEntity() override
             {
-                inst->requestRemoveTag("gravityAffected");
+                inst->requestRemoveTag("gravityaffected");
             }
     };
 }

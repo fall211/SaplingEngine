@@ -8,9 +8,17 @@
 #include "Canopy/Scene.hpp"
 #include "Physics.hpp"
 #include "Engine.hpp"
-#include "GameComponents.hpp"
 #include "player.hpp"
 
+#include "Component.hpp"
+#include "Debug.hpp"
+#include "EntityManager.hpp"
+
+#include "GameComponents.hpp"
+#include "GameSystems.hpp"
+
+#include "glm/geometric.hpp"
+#include <string>
 
 class PrototypeScene : public Scene 
 {
@@ -25,7 +33,6 @@ class PrototypeScene : public Scene
             void update() override;
     
             void sSpawn();
-            void sMove(const EntityList& entities);
             
             void sResolveCollisions(const EntityList& entities);
 };

@@ -7,15 +7,17 @@
 
 
 #include "Renderer/Texture.hpp"
+#include "Sprout.hpp"
 #include "glm/glm.hpp"
 #include <cstddef>
 #include <memory>
+#include <utility>
 
 class Entity;
 
 namespace Comp
 {
-    typedef const std::shared_ptr<Entity>& Inst;
+    typedef std::shared_ptr<Entity> Inst;
     
     class Component{
     protected:
@@ -23,7 +25,7 @@ namespace Comp
         
     public:
         bool has = false;
-        Component(Inst inst) : inst(inst) {};
+        Component(Inst inst) : inst(std::move(inst)) {};
         ~Component()= default;
         
         virtual void OnAddToEntity() {}
@@ -42,6 +44,8 @@ namespace Comp
             glm::vec2 position = glm::vec2(0, 0);
             glm::vec2 velocity = glm::vec2(0, 0);
             glm::f32 rotation = 0.0f;
+            glm::vec3 scale = glm::vec3(1, 1, 1);
+            Sprout::Pivot pivot = Sprout::Pivot::CENTER;
     
             Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);
     };
@@ -102,6 +106,8 @@ namespace Comp
             
             void setLayer(Layer layerIn) { layer = layerIn; }
             
+            void flipX(bool flip);
+            
             enum class Type {
                 Static,
                 Animated
@@ -115,17 +121,19 @@ namespace Comp
             size_t currentFrame = 0;
             size_t frameSize;
             size_t animationSpeed = 60;
+            glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+            bool flip_X = false;
     };
     
     class FollowMouse final : public Component {};
     
-    class PlayerControls final : public Component 
+    class SimplePlayerControls final : public Component 
     {
         public:
             float moveSpeed = 0.0f;
             int jumpStr;
             bool grounded = true;
-            PlayerControls(Inst inst, float speedIn, int jumpStrIn);
+            SimplePlayerControls(Inst inst, float speedIn, int jumpStrIn);
     };
 
 }
