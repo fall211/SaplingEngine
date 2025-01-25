@@ -12,6 +12,11 @@ Scene::Scene(Engine& engine) : m_engine(engine)
     m_input = std::make_shared<Input>();
 }
 
+auto Scene::getInput() -> std::shared_ptr<Input>
+{
+    return m_input;
+}
+
 void Scene::preUpdate()
 {
     m_entityManager->update();

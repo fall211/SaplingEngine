@@ -27,11 +27,12 @@ auto main() -> int
     AssetManager::addTexture("player_run", "Sprites/player_run.png", 8);
 
     // then we create the scenes our game uses
-    engine->newScene<TestScene>("game");
-    engine->changeScene("game");
-    
+    engine->newScene<TestScene>("game");    
     engine->newScene<PrototypeScene>("prototype");
+    
+
     engine->changeScene("prototype");
+    // engine->changeScene("game");
     
     // finally we run the engine, note that the engine will run until the window is closed
     // and nothing after this line will be executed until then

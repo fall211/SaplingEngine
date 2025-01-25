@@ -20,6 +20,7 @@ void PrototypeScene::init()
     m_input->makeAxis("horizontal", SAPP_KEYCODE_D, SAPP_KEYCODE_A);
     m_input->makeAxis("vertical", SAPP_KEYCODE_S, SAPP_KEYCODE_W);
     m_input->makeAction("dash", {SAPP_KEYCODE_LEFT_SHIFT});
+    m_input->makeAction("changeScene", {SAPP_KEYCODE_C});
     
     sSpawn();
 }

@@ -85,7 +85,7 @@ public:
     {
         makeScene(name, std::make_shared<SceneType>(*this));
     }
-    
+        
     void changeScene(const std::string& name);
     auto getScene(const std::string& name) -> std::shared_ptr<Scene>;
     auto getCurrentScene() -> std::shared_ptr<Scene>&;

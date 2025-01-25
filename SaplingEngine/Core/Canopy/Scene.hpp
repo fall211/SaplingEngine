@@ -81,6 +81,9 @@ class Scene
             * Called after each update loop, reserved for updates that are necessary for all scenes
         */
         void postUpdate();
+        
+        
+        auto getInput() -> std::shared_ptr<Input>;
 };
 
 

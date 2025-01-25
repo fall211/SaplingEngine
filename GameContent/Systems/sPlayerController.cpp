@@ -7,6 +7,7 @@
 
 #include "sPlayerController.hpp"
 #include "Debug.hpp"
+#include "glm/geometric.hpp"
 
 
 namespace System::PlayerController
@@ -28,6 +29,7 @@ namespace System::PlayerController
         HandleDirection(player, dt);
         HandleDash(player);
         HandleGravity(player, dt);
+        controller.flipSpriteX();
         ApplyMovement(player);
         
     }
@@ -44,7 +46,7 @@ namespace System::PlayerController
         
         // dash
         controller.frameInput.dashDown = input->isActionDown("dash");
-        controller.frameInput.dashDirection = glm::normalize(glm::vec2(input->getAxis("horizontal"), input->getAxis("vertical")));
+        controller.frameInput.dashDirection = glm::vec2(input->getAxis("horizontal"), input->getAxis("vertical"));
         
         
         if (controller.frameInput.jumpDown)
@@ -96,7 +98,6 @@ namespace System::PlayerController
         
         if (!controller.grounded && groundHit)
         {
-            controller.airDashUsed = false;
             controller.grounded = true;
             controller.coyoteUsable = true;
             controller.bufferedJumpUsable = true;
@@ -154,10 +155,13 @@ namespace System::PlayerController
             auto deceleration = controller.grounded ? controller.groundDeceleration : controller.airDeceleration;
             controller.frameVelocity.x = moveTowards(controller.frameVelocity.x, 0, deceleration * dt);
         }
+        else if (controller.IsDashing())
+        {
+            controller.frameVelocity.x = controller.frameVelocity.x;
+        }
         else
         {
             controller.frameVelocity.x = moveTowards(controller.frameVelocity.x, controller.frameInput.move.x * controller.maxSpeed, controller.acceleration * dt);
-            controller.flipSpriteX();
         }
     }
     
@@ -170,6 +174,7 @@ namespace System::PlayerController
         
         if (controller.frameInput.dashDown && controller.frameInput.dashDirection != glm::vec2(0, 0) && controller.CanUseDash())
         {
+            controller.frameInput.dashDirection = glm::normalize(controller.frameInput.dashDirection);
             player->PushEvent("Dash");
         }
     }
@@ -179,27 +184,31 @@ namespace System::PlayerController
         if (!player->hasComponent<Comp::PlayerController>()
         ) return;
         
+        auto moveTowards = [](float current, float target, float maxDelta) -> float {
+            if (std::abs(target - current) <= maxDelta) {
+                return target;
+            }
+            return current + glm::sign(target - current) * maxDelta;
+        };
+        
         auto& controller = player->getComponent<Comp::PlayerController>();
 
         if (controller.grounded && controller.frameVelocity.y >= 0.0f)
         {
             controller.frameVelocity.y = controller.groundingForce;
         }
+        else if (controller.IsDashing())
+        {
+            controller.frameVelocity.y = controller.frameVelocity.y;
+        }
         else
         {
             auto inAirGravity = controller.fallAcceleration;
-            if ((controller.endedJumpEarly || controller.airDashUsed) && controller.frameVelocity.y <= 0)
+            if (controller.endedJumpEarly  && controller.frameVelocity.y <= 0)
             {
                 inAirGravity *= controller.jumpEndEarlyGravityModifier;
             }
             
-            auto moveTowards = [](float current, float target, float maxDelta) -> float {
-                if (std::abs(target - current) <= maxDelta) {
-                    return target;
-                }
-                return current + glm::sign(target - current) * maxDelta;
-            };
-                        
             controller.frameVelocity.y = moveTowards(controller.frameVelocity.y, controller.maxFallSpeed, inAirGravity * dt);
         }
     }

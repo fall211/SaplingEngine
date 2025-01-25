@@ -27,13 +27,14 @@ namespace Comp
             float airDeceleration = 750.0f;
             float groundingForce = 15.0f;
             float jumpPower = 500.0f;
-            float maxFallSpeed = 400.0f;
-            float fallAcceleration = 1000.0f;
+            float maxFallSpeed = 800.0f;
+            float fallAcceleration = 2000.0f;
             float jumpEndEarlyGravityModifier = 3.0f;
             float coyoteTime = 0.15f;
             float jumpBufferTime = 0.15f;
             float dashSpeed = 1200.0f;
-            float dashTime = 1.0f;
+            float dashTime = 0.15f;
+            float dashCooldown = 1.0f;
             
             // frame
             struct FrameInput
@@ -75,7 +76,12 @@ namespace Comp
             
             bool CanUseDash() const
             {
-                return _time > timeDashWasPressed + dashTime;
+                return _time > timeDashWasPressed + dashCooldown;
+            }
+            
+            bool IsDashing() const
+            {
+                return _time < timeDashWasPressed + dashTime;
             }
             
             void flipSpriteX()
@@ -129,9 +135,9 @@ namespace Comp
                 {
                     auto& controller = inst->getComponent<PlayerController>();
                     
-                    controller.airDashUsed = !controller.grounded;
                     controller.timeDashWasPressed = controller._time;
                     controller.frameVelocity = controller.frameInput.dashDirection * controller.dashSpeed;
+                    controller.endedJumpEarly = true;
                 }
             }
     

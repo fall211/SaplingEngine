@@ -20,12 +20,11 @@ namespace Prefab
     class Player
     {
         private:            
-            void init(Inst inst);
+            void init(const Inst& inst);
             
         public:
-            Player(Inst inst);
+            Player(const Inst& inst);
             
-            static void speedUpRotation(Inst inst);
         
     };
     
