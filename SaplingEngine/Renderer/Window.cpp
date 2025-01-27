@@ -103,6 +103,8 @@ namespace Sprout
         // free data
         free(atlas_data);
         free(nodes);
+        
+        Debug::log("Atlas baked");
     }
     
     void Window::addTexture(const std::shared_ptr<Texture> tex)

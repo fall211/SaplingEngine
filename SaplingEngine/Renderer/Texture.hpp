@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <glm/glm.hpp>
 
@@ -26,6 +27,7 @@ namespace Sprout
             */
             auto loadFromFile(const std::string& path, glm::i32 numFrames = 1) -> bool;
             
+
             /*
                 * Gets the pixel data of the texture
                 * @return The pixel data of the texture
@@ -78,6 +80,23 @@ namespace Sprout
                 * Registers the texture with the renderer (adds it to the atlas)
             */
             auto registerTexture() -> void;
+            
+            /*
+                * Loads a tileset from a file
+                * @param path The path to the tileset file
+                * @return A vector of textures representing the tiles in the tileset
+            */
+            static auto loadTileset(const std::string& path) -> std::vector<std::shared_ptr<Texture>>;
+            
+            /*
+                * Loads a texture from memory
+                * @param data The pixel data of the texture
+                * @param width The width of the texture
+                * @param height The height of the texture
+                * @param numFrames The number of frames in the texture (if animated)
+                * @return True if the texture was loaded successfully
+            */
+            auto loadFromMemory(unsigned char* data, glm::i32 width, glm::i32 height, glm::i32 numFrames = 1) -> bool;
             
         private:
             glm::i32 m_width, m_height;

@@ -18,6 +18,7 @@
 
 class AssetManager {
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>> m_tilesets = std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>>();
     
     static AssetManager* Instance;
 
@@ -52,5 +53,19 @@ public:
         * @return The texture with the given name
     */
     static auto getTexture(const std::string& name) -> std::shared_ptr<Sprout::Texture>;
+    
+    /*
+        * Adds a tileset to the asset manager
+        * @param name The name of the tileset
+        * @param path The path to the tileset
+    */
+    static void addTileSet(const std::string& name, const std::string& path);
+    
+    /*
+        * Gets the tileset with the given name
+        * @param name The name of the tileset
+        * @return Pointer to the tileset with the given name
+    */
+    static auto getTileSet(const std::string& name) -> std::vector<std::shared_ptr<Sprout::Texture>>&;
 };
 

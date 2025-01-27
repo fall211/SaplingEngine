@@ -35,7 +35,6 @@ class Scene
 {
     protected:
         std::shared_ptr<EntityManager> m_entityManager; // the scene's entity manager
-        std::shared_ptr<Input> m_input; // the scene's input manager
         Engine& m_engine; // the engine that the scene is running on
     
     
@@ -83,7 +82,6 @@ class Scene
         void postUpdate();
         
         
-        auto getInput() -> std::shared_ptr<Input>;
 };
 
 

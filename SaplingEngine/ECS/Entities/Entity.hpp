@@ -38,12 +38,16 @@ class Entity : public std::enable_shared_from_this<Entity>
         std::unordered_map<std::type_index, std::shared_ptr<Comp::Component>> m_components;
         
         // events
-        std::unordered_map<std::string, std::vector<std::function<void(Inst)>>> m_eventCallbacks;
+        std::unordered_map<std::string, std::vector<std::function<void(const std::vector<std::any>&)>>> m_eventCallbacks;
     
-        template <typename... Args>
-        static auto UnpackArgs(std::vector<std::any>& args)
+        template<size_t I = 0, typename... Tp>
+        static void UnpackArgs(std::tuple<Tp...>& tup, const std::vector<std::any>& args)
         {
-            return std::make_tuple(std::any_cast<Args>(args.at(0))...);
+            if constexpr (I < sizeof...(Tp))
+            {
+                std::get<I>(tup) = std::any_cast<std::tuple_element_t<I, std::tuple<Tp...>>>(args[I]);
+                UnpackArgs<I + 1, Tp...>(tup, args);
+            }
         }
         
         // only the EntityManager can create entities
@@ -160,13 +164,16 @@ class Entity : public std::enable_shared_from_this<Entity>
             * @param event The event to listen for
             * @param callback The callback to call when the event is received
         */
-        void ListenForEvent(const std::string& event, const std::function<void(Inst)>& callback)
+        template<typename... Args>
+        void ListenForEvent(const std::string& event, std::function<void(Args...)> callback)
         {
-            if (m_eventCallbacks.find(event) == m_eventCallbacks.end())
-            {
-                m_eventCallbacks[event] = std::vector<std::function<void(Inst)>>();
-            }
-            m_eventCallbacks[event].push_back(callback);
+            auto wrapper = [callback](const std::vector<std::any>& args) {
+                std::tuple<std::decay_t<Args>...> tuple_args;
+                UnpackArgs(tuple_args, args);
+                std::apply(callback, tuple_args);
+            };
+    
+            m_eventCallbacks[event].push_back(wrapper);
         }
         
         /*
@@ -174,13 +181,14 @@ class Entity : public std::enable_shared_from_this<Entity>
             * @param event The event to remove the callback from
             * @param callback The callback to remove
         */
-        void RemoveEventCallback(const std::string& event, const std::function<void(Inst)>& callback)
+        template <typename... Args>
+        void RemoveEventCallback(const std::string& event, const std::function<void(Inst, Args...)>& callback)
         {
             if (m_eventCallbacks.find(event) != m_eventCallbacks.end())
             {
                 auto& callbacks = m_eventCallbacks[event];
                 callbacks.erase(std::remove_if(callbacks.begin(), callbacks.end(), 
-                    [&callback](const auto& cb) { return cb.template target<void(Inst)>() == callback.template target<void(Inst)>(); }), 
+                    [&callback](const auto& cb) { return cb.template target<void(Inst, Args...)>() == callback.template target<void(Inst, Args...)>(); }), 
                     callbacks.end());
             }
         }
@@ -190,16 +198,15 @@ class Entity : public std::enable_shared_from_this<Entity>
             * @param event The event to push
             * @param args The arguments to pass to the event
         */
-        template <typename... Args>
-        void PushEvent(const std::string& event, Args... args)
+        template<typename... Args>
+        void PushEvent(const std::string& event, Args&&... args)
         {
             if (m_eventCallbacks.find(event) != m_eventCallbacks.end())
             {
-                auto& callbacks = m_eventCallbacks[event];
-                std::vector<std::any> argsVec{ args... };
-                for (auto& callback : callbacks)
+                std::vector<std::any> arg_vector{std::forward<Args>(args)...};
+                for (const auto& callback : m_eventCallbacks[event])
                 {
-                    callback(shared_from_this());
+                    callback(arg_vector);
                 }
             }
         }

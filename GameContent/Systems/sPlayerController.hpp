@@ -21,11 +21,11 @@ namespace System::PlayerController
     
     // void PlayerController(const std::shared_ptr<Entity>& player, EntityList& entities, const std::shared_ptr<Input>& input);
     
-    void Update(const std::shared_ptr<Entity>& player, EntityList& entities, const std::shared_ptr<Input>& input, float dt);
+    void Update(const std::shared_ptr<Entity>& player, EntityList& entities, float dt);
     
     void CheckCollision(const std::shared_ptr<Entity>& player, EntityList& entities);
     
-    void GatherInput(const std::shared_ptr<Entity>& player, const std::shared_ptr<Input>& input);
+    void GatherInput(const std::shared_ptr<Entity>& player);
     
     void HandleJump(const std::shared_ptr<Entity>& player);
     

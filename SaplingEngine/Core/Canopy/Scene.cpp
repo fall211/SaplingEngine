@@ -9,13 +9,8 @@
 Scene::Scene(Engine& engine) : m_engine(engine)
 {
     m_entityManager = std::make_shared<EntityManager>();
-    m_input = std::make_shared<Input>();
 }
 
-auto Scene::getInput() -> std::shared_ptr<Input>
-{
-    return m_input;
-}
 
 void Scene::preUpdate()
 {
@@ -24,13 +19,13 @@ void Scene::preUpdate()
 
 void Scene::postUpdate()
 {
-    m_input->clean();
+    Input::clean();
 }
 
 void Scene::enable()
 {
     // set the window's event callback to our input system
-    m_engine.getWindow().SetEventCallback([this](const sapp_event* e) { m_input->update(e); });
+    m_engine.getWindow().SetEventCallback([this](const sapp_event* e) { Input::update(e); });
 }
 
 void Scene::disable()

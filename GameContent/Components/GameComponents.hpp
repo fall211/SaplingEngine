@@ -8,8 +8,7 @@
 
 // all game component headers for easy inclusion
 
-#include "cRotate.hpp"
-
+#include "cMap.hpp"
 
 #include "cPlayerController.hpp"
 #include "cGravity.hpp"

@@ -4,6 +4,7 @@
 //
 
 
+#include "Debug.hpp"
 #include <chrono>
 #define SOKOL_IMPL
 #define SOKOL_GLCORE

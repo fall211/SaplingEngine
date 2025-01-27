@@ -8,7 +8,9 @@
 #include "Canopy/Scene.hpp"
 #include "Physics.hpp"
 #include "Engine.hpp"
-#include "player.hpp"
+
+// prefabs
+#include "GamePrefabs.hpp"
 
 #include "Component.hpp"
 #include "Debug.hpp"
@@ -35,4 +37,5 @@ class PrototypeScene : public Scene
             void sSpawn();
             
             void sResolveCollisions(const EntityList& entities);
+            void sMoveCamera(const std::shared_ptr<Entity>& player);
 };

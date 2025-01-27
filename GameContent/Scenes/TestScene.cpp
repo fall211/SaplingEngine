@@ -15,11 +15,6 @@ TestScene::TestScene(Engine& engine) : Scene(engine)
 
 void TestScene::init()
 {
-    /// Setup input actions
-    m_input->makeAxis("moveX", SAPP_KEYCODE_D, SAPP_KEYCODE_A);
-    m_input->makeAxis("moveY", SAPP_KEYCODE_S, SAPP_KEYCODE_W);
-    m_input->makeAction("jump", {SAPP_KEYCODE_SPACE});
-    m_input->makeAction("lockCamera", {SAPP_KEYCODE_F});
 
     
     /// Initial systems to run one time
@@ -80,7 +75,7 @@ void TestScene::sPlayerController(const std::shared_ptr<Entity>& player) const
 {
     const auto& controls = player->getComponent<Comp::SimplePlayerControls>();
     auto& transform = player->getComponent<Comp::Transform>();
-    if (m_input->isAction("jump") && controls.grounded) {
+    if (Input::isAction("jump") && controls.grounded) {
         transform.velocity.y -= static_cast<float>(controls.jumpStr);
     }
 }
@@ -108,9 +103,9 @@ void TestScene::sSpawnSquare()
 void TestScene::sMoveSquare(const std::shared_ptr<Entity>& square) const 
 {
     auto& transform = square->getComponent<Comp::Transform>();
-    transform.position = m_input->getMouseWorldPosition();
+    transform.position = Input::getMouseWorldPosition();
     
-    if (m_input->getMouseUp(Input::MouseButton::LEFT))
+    if (Input::getMouseUp(Input::MouseButton::LEFT))
     {
         if (square->hasComponent<Comp::Sprite>())
         {
@@ -126,13 +121,13 @@ void TestScene::sMoveSquare(const std::shared_ptr<Entity>& square) const
 
 void TestScene::sMoveCamera()
 {
-    float deltaX = m_input->getAxis("moveX") * -200.0f * m_engine.deltaTime();
-    float deltaY = m_input->getAxis("moveY") * -200.0f * m_engine.deltaTime();
+    float deltaX = Input::getAxis("moveX") * -200.0f * m_engine.deltaTime();
+    float deltaY = Input::getAxis("moveY") * -200.0f * m_engine.deltaTime();
     
     
     m_engine.getWindow().translateCamera(deltaX, deltaY);
     
-    if (m_input->isActionUp("lockCamera"))
+    if (Input::isActionUp("lockCamera"))
     {
         auto& target = m_entityManager->getEntities("cameraTarget").front()->getComponent<Comp::Transform>();
         m_engine.getWindow().setCameraPosition({target.position.x, target.position.y});

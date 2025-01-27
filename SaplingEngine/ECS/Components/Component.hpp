@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <memory>
 #include <utility>
+#include <vector>
 
 class Entity;
 
@@ -48,6 +49,7 @@ namespace Comp
             Sprout::Pivot pivot = Sprout::Pivot::CENTER;
     
             Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);
+            Transform(Inst inst, const glm::vec2& positionin);
     };
     
     
@@ -59,11 +61,16 @@ namespace Comp
     class BBox final : public Component
     {
         public:
-            float w = 1.0f;
-            float h = 1.0f;
+            float h;
+            float w;
             bool isTrigger = false;
             bool isStatic = true;
+            bool interactWithTriggers = false;
+            std::vector<BBox*> collidingWith = {};
+            
             BBox(Inst inst, float win, float hin);
+            void OnAddToEntity() override;
+            void OnRemoveFromEntity() override;
     };
     
     /*
@@ -74,7 +81,10 @@ namespace Comp
     {
         public: 
             float radius = 1.0f;
+            
             BCircle(Inst inst, float radiusIn);
+            void OnAddToEntity() override;
+            void OnRemoveFromEntity() override;
     };
         
     
@@ -95,6 +105,9 @@ namespace Comp
             std::shared_ptr<Sprout::Texture> texture;
             explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin);
             explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin, float animSpeed);
+            void OnAddToEntity() override;
+            void OnRemoveFromEntity() override;
+            
             
             enum class Layer {
                 Background,
@@ -136,4 +149,19 @@ namespace Comp
             SimplePlayerControls(Inst inst, float speedIn, int jumpStrIn);
     };
 
+    
+    class TransformHierarchy final : public Component
+    {
+        public:
+            Inst parent = nullptr;
+            std::vector<Inst> children = {};
+            
+            TransformHierarchy(Inst inst);
+            
+            void setParent(Inst parentIn);
+            void removeParent();
+            
+            void addChild(const Inst& child);
+            void removeChild(const Inst& child);
+    };
 }

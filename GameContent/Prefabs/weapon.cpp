@@ -4,36 +4,35 @@
 //
 
 
-#include "player.hpp"
+#include "weapon.hpp"
 #include "Component.hpp"
+#include "Debug.hpp"
+#include "cGravity.hpp"
 
-#include <utility>
 
 
 namespace Prefab
 {
 
-    Player::Player(const Inst& inst)
+    Weapon::Weapon(const Inst& inst)
     {
         init(inst);
     }
     
-    void Player::init(const Inst& inst)
+    void Weapon::init(const Inst& inst)
     {
         auto& transform = inst->addComponent<Comp::Transform>(glm::vec2(0, 0), glm::vec2(0, 0));
         transform.pivot = Sprout::Pivot::CENTER;
         transform.scale = glm::vec3(3, 3, 1);
-        auto& sprite = inst->addComponent<Comp::Sprite>(AssetManager::getTexture("player_run"), 8);
-        sprite.setLayer(Comp::Sprite::Layer::Foreground);
+        auto& sprite = inst->addComponent<Comp::Sprite>(AssetManager::getTexture("weapon_basic"));
+        sprite.setLayer(Comp::Sprite::Layer::Midground);
         auto& collider = inst->addComponent<Comp::BBox>(24, 24);
         collider.isStatic = false;
-        collider.interactWithTriggers = true;
+        collider.isTrigger = true;
         
         inst->addComponent<Comp::TransformHierarchy>();
-
-        // movement
-        inst->addComponent<Comp::PlayerController>();
-        
+        inst->addComponent<Comp::Gravity>();
+        inst->requestAddTag("dynamic");
     }
 }
 

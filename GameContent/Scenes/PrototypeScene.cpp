@@ -4,8 +4,10 @@
 //
 
 #include "PrototypeScene.hpp"
-#include "cPlayerController.hpp"
-#include "sPlayerController.hpp"
+#include "Component.hpp"
+#include "Debug.hpp"
+#include <memory>
+
 
 
 
@@ -16,27 +18,20 @@ PrototypeScene::PrototypeScene(Engine& engine) : Scene(engine)
 
 void PrototypeScene::init()
 {
-    m_input->makeAction("jump", {SAPP_KEYCODE_SPACE});
-    m_input->makeAxis("horizontal", SAPP_KEYCODE_D, SAPP_KEYCODE_A);
-    m_input->makeAxis("vertical", SAPP_KEYCODE_S, SAPP_KEYCODE_W);
-    m_input->makeAction("dash", {SAPP_KEYCODE_LEFT_SHIFT});
-    m_input->makeAction("changeScene", {SAPP_KEYCODE_C});
+
     
     sSpawn();
 }
 
 void PrototypeScene::update()
 {
-    
-    
-    System::Gravity(m_entityManager->getEntities("gravityaffected"));
-    System::Move(m_entityManager->getEntities(), m_engine.deltaTime());
-    
-    System::PlayerController::Update(m_entityManager->getEntities("player").front(), m_entityManager->getEntities(), m_input, m_engine.deltaTime());
+    System::Gravity(m_entityManager->getEntities());
+    System::Move(m_entityManager->getEntities("dynamic"), m_engine.deltaTime());
+    System::PlayerController::Update(m_entityManager->getEntities("player").front(), m_entityManager->getEntities(), m_engine.deltaTime());
 
     sResolveCollisions(m_entityManager->getEntities());
     
-    
+    sMoveCamera(m_entityManager->getEntities("player").front());
     auto entitiesWithSprite = m_entityManager->getEntitiesByComponent<Comp::Sprite>();
     sRender(entitiesWithSprite);
 }
@@ -44,58 +39,72 @@ void PrototypeScene::update()
 void PrototypeScene::sSpawn()
 {
     auto player = m_entityManager->instantiatePrefab<Prefab::Player>();
-    
-    for (int i = 0; i < 20; i++)
-    {
-        auto obstacle = m_entityManager->addEntity({"static", "obstacle"});
-        int x = 64 * i - 620;
-        obstacle->addComponent<Comp::Transform>(glm::vec2(x, 300), glm::vec2(0, 0));
-        obstacle->addComponent<Comp::Sprite>(AssetManager::getTexture("test"));
-        obstacle->addComponent<Comp::BBox>(64, 64);    
-    }
-    for (int i = 0; i < 20; i++)
-    {
-        auto obstacle = m_entityManager->addEntity({"static", "obstacle"});
-        int x = 64 * i - 800;
-        obstacle->addComponent<Comp::Transform>(glm::vec2(x, 150), glm::vec2(0, 0));
-        obstacle->addComponent<Comp::Sprite>(AssetManager::getTexture("test"));
-        obstacle->addComponent<Comp::BBox>(64, 64);    
-    }
-    
-    // auto obstacle = m_entityManager->addEntity({"static", "obstacle"});
-    // obstacle->addComponent<Comp::Transform>(glm::vec2(-150, 150), glm::vec2(0, 0));
-    // obstacle->addComponent<Comp::BBox>(1000, 10);
-}
+    auto map = m_entityManager->instantiatePrefab<Prefab::Map>();
 
+    Prefab::Map::SpawnTiles(map, m_entityManager);
+    
+    m_entityManager->instantiatePrefab<Prefab::Weapon>();
+
+}
+void PrototypeScene::sMoveCamera(const std::shared_ptr<Entity>& player)
+{
+
+    if (player->hasComponent<Comp::Transform>())
+    {
+        size_t camera_y_offset = 100;
+        auto& transform = player->getComponent<Comp::Transform>();
+        m_engine.getWindow().setCameraPosition({transform.position.x, transform.position.y - camera_y_offset});
+    }
+}
 
 void PrototypeScene::sResolveCollisions(const EntityList& entities)
 {
     for (const auto& ent1 : entities)
     {
         if (!ent1->hasComponent<Comp::BBox>()) continue;
+        if (ent1->getComponent<Comp::BBox>().isStatic) continue;
         for (const auto& ent2: entities)
         {
             if (ent1->getId() == ent2->getId() || !ent2->hasComponent<Comp::BBox>()) continue;
-            
+
             glm::vec2 overlap = Physics2D::bBoxCollision(ent1, ent2);
+
+            auto& bbox1 = ent1->getComponent<Comp::BBox>();
+            auto& bbox2 = ent2->getComponent<Comp::BBox>();
             
             if (overlap.x != 0 || overlap.y != 0)
             {
                 auto& transform1 = ent1->getComponent<Comp::Transform>();
                 auto& transform2 = ent2->getComponent<Comp::Transform>();
-                
-                auto& bbox1 = ent1->getComponent<Comp::BBox>();
-                auto& bbox2 = ent2->getComponent<Comp::BBox>();
-                                
-                if (bbox1.isStatic) continue;
-                
+
+                if (bbox1.interactWithTriggers && bbox2.isTrigger)
+                {
+                    if (std::find(bbox1.collidingWith.begin(), bbox1.collidingWith.end(), &bbox2) == bbox1.collidingWith.end())
+                    {
+                        // not in the list, so we just entered the trigger
+                        bbox1.collidingWith.push_back(&bbox2);
+                        ent1->PushEvent("TriggerEnter", ent1, ent2);
+                    }
+                    else 
+                    {
+                        // we are still colliding with the trigger
+                        ent1->PushEvent("TriggerStay", ent1, ent2);
+                    }
+                    continue;
+                }
+                if (bbox2.interactWithTriggers && bbox1.isTrigger)
+                {
+                    // prevent double triggering
+                    continue;
+                }
+
                 if (overlap.x > overlap.y) // resolve collision on the y axis
                 {
                     if (bbox2.isStatic)
                     {
                         if (transform1.position.y < transform2.position.y) transform1.position.y -= overlap.y;
                         else transform1.position.y += overlap.y;
-                        
+
                         if (!ent1->hasComponent<Comp::PlayerController>())
                         transform1.velocity.y = 0;
                     }
@@ -122,7 +131,7 @@ void PrototypeScene::sResolveCollisions(const EntityList& entities)
                     {
                         if (transform1.position.x < transform2.position.x) transform1.position.x -= overlap.x;
                         else transform1.position.x += overlap.x;
-                        
+
                         if (!ent1->hasComponent<Comp::PlayerController>())
                         transform1.velocity.x = 0;
                     }
@@ -143,7 +152,14 @@ void PrototypeScene::sResolveCollisions(const EntityList& entities)
                     }
                 }        
             }
-
+            else if (!bbox1.collidingWith.empty())
+            {
+                if (std::find(bbox1.collidingWith.begin(), bbox1.collidingWith.end(), &bbox2) != bbox1.collidingWith.end())
+                {
+                    bbox1.collidingWith.erase(std::remove(bbox1.collidingWith.begin(), bbox1.collidingWith.end(), &bbox2), bbox1.collidingWith.end());
+                    ent1->PushEvent("TriggerExit", ent1, ent2);
+                }
+            }
         }
     }
 }

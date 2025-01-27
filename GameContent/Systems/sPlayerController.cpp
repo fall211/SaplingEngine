@@ -6,13 +6,14 @@
 
 
 #include "sPlayerController.hpp"
+#include "Component.hpp"
 #include "Debug.hpp"
 #include "glm/geometric.hpp"
 
 
 namespace System::PlayerController
 {    
-    void Update(const std::shared_ptr<Entity>& player, EntityList& entities, const std::shared_ptr<Input>& input, float dt)
+    void Update(const std::shared_ptr<Entity>& player, EntityList& entities, float dt)
     {
         if (!player->hasComponent<Comp::PlayerController>() || 
             !player->hasComponent<Comp::Transform>() ||
@@ -23,30 +24,29 @@ namespace System::PlayerController
         
         controller._time += dt;
         
-        GatherInput(player, input);
+        GatherInput(player);
         CheckCollision(player, entities);
         HandleJump(player);
         HandleDirection(player, dt);
         HandleDash(player);
         HandleGravity(player, dt);
-        controller.flipSpriteX();
         ApplyMovement(player);
         
     }
     
-    void GatherInput(const std::shared_ptr<Entity>& player, const std::shared_ptr<Input>& input)
+    void GatherInput(const std::shared_ptr<Entity>& player)
     {
         if (!player->hasComponent<Comp::PlayerController>()) return;
         
         auto& controller = player->getComponent<Comp::PlayerController>();
         
-        controller.frameInput.jumpDown = input->isActionDown("jump");
-        controller.frameInput.jumpHeld = input->isAction("jump");
-        controller.frameInput.move = glm::vec2(input->getAxis("horizontal"), input->getAxis("vertical"));
+        controller.frameInput.jumpDown = Input::isActionDown("jump");
+        controller.frameInput.jumpHeld = Input::isAction("jump");
+        controller.frameInput.move = glm::vec2(Input::getAxis("horizontal"), Input::getAxis("vertical"));
         
         // dash
-        controller.frameInput.dashDown = input->isActionDown("dash");
-        controller.frameInput.dashDirection = glm::vec2(input->getAxis("horizontal"), input->getAxis("vertical"));
+        controller.frameInput.dashDown = Input::isActionDown("dash") || Input::getMouseDown(Input::MouseButton::LEFT);
+        controller.frameInput.dashDirection = glm::vec2(Input::getAxis("horizontal"), Input::getAxis("vertical"));
         
         
         if (controller.frameInput.jumpDown)
@@ -83,7 +83,7 @@ namespace System::PlayerController
             
             if (overlap.x != 0 || overlap.y != 0)
             {
-                // figure out if the collision is on the ground or ceiling
+                if (other->getComponent<Comp::BBox>().isTrigger) continue;
                 if (transform.position.y < transform_other.position.y) groundHit = true;
                 else ceilingHit = true;
                 break;
@@ -130,7 +130,7 @@ namespace System::PlayerController
         
         if (controller.grounded || controller.CanUseCoyote())
         {
-            player->PushEvent("Jump");
+            player->PushEvent("Jump", player);
         }
         
         controller.jumpToConsume = false;
@@ -162,6 +162,7 @@ namespace System::PlayerController
         else
         {
             controller.frameVelocity.x = moveTowards(controller.frameVelocity.x, controller.frameInput.move.x * controller.maxSpeed, controller.acceleration * dt);
+            controller.flipSpriteX();
         }
     }
     
@@ -175,7 +176,7 @@ namespace System::PlayerController
         if (controller.frameInput.dashDown && controller.frameInput.dashDirection != glm::vec2(0, 0) && controller.CanUseDash())
         {
             controller.frameInput.dashDirection = glm::normalize(controller.frameInput.dashDirection);
-            player->PushEvent("Dash");
+            player->PushEvent("Dash", player);
         }
     }
     
