@@ -18,15 +18,15 @@ namespace Sprout
 {
     glm::vec2 getPivotOffset(Pivot pivot) {
         switch (pivot) {
-            case Pivot::BOTTOM_LEFT:   return glm::vec2(0.0f, 0.0f);
-            case Pivot::BOTTOM_CENTER: return glm::vec2(0.5f, 0.0f);
-            case Pivot::BOTTOM_RIGHT:  return glm::vec2(1.0f, 0.0f);
+            case Pivot::TOP_LEFT:   return glm::vec2(0.0f, 0.0f);
+            case Pivot::TOP_CENTER: return glm::vec2(0.5f, 0.0f);
+            case Pivot::TOP_RIGHT:  return glm::vec2(1.0f, 0.0f);
             case Pivot::CENTER_LEFT:   return glm::vec2(0.0f, 0.5f);
             case Pivot::CENTER:        return glm::vec2(0.5f, 0.5f);
             case Pivot::CENTER_RIGHT:  return glm::vec2(1.0f, 0.5f);
-            case Pivot::TOP_LEFT:      return glm::vec2(0.0f, 1.0f);
-            case Pivot::TOP_CENTER:    return glm::vec2(0.5f, 1.0f);
-            case Pivot::TOP_RIGHT:     return glm::vec2(1.0f, 1.0f);
+            case Pivot::BOTTOM_LEFT:      return glm::vec2(0.0f, 1.0f);
+            case Pivot::BOTTOM_CENTER:    return glm::vec2(0.5f, 1.0f);
+            case Pivot::BOTTOM_RIGHT:     return glm::vec2(1.0f, 1.0f);
             default:                   return glm::vec2(0.5f, 0.5f); // default to center
         }
     }

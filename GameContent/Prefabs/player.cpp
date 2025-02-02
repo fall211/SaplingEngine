@@ -24,7 +24,7 @@ namespace Prefab
         transform.pivot = Sprout::Pivot::CENTER;
         transform.scale = glm::vec3(3, 3, 1);
         auto& sprite = inst->addComponent<Comp::Sprite>(AssetManager::getTexture("player_run"), 8);
-        sprite.setLayer(Comp::Sprite::Layer::Foreground);
+        sprite.setLayer(Comp::Sprite::Layer::Player);
         auto& collider = inst->addComponent<Comp::BBox>(24, 24);
         collider.isStatic = false;
         collider.interactWithTriggers = true;

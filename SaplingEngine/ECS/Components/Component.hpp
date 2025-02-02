@@ -26,6 +26,7 @@ namespace Comp
         
     public:
         bool has = false;
+        bool enabled = true;
         Component(Inst inst) : inst(std::move(inst)) {};
         ~Component()= default;
         
@@ -112,6 +113,7 @@ namespace Comp
             enum class Layer {
                 Background,
                 Midground,
+                Player,
                 Foreground,
                 UserInterface,
                 Count

@@ -93,6 +93,19 @@ namespace Comp
                 x *= (frameInput.move.x < 0 ? -1 : 1);
 
                 transform.scale = glm::vec3(x, transform.scale.y, transform.scale.z);
+                if (inst->hasComponent<TransformHierarchy>())
+                {
+                    if (!inst->getComponent<TransformHierarchy>().children.empty())
+                    {
+                        for (auto& child : inst->getComponent<TransformHierarchy>().children)
+                        {
+                            auto& childTransform = child->getComponent<Comp::Transform>();
+                            float x = fabs(childTransform.scale.x);
+                            x *= (frameInput.move.x < 0 ? -1 : 1);
+                            childTransform.scale = glm::vec3(x, childTransform.scale.y, childTransform.scale.z);
+                        }
+                    }
+                }
             }
 
             explicit PlayerController(Inst inst) 
@@ -165,12 +178,13 @@ namespace Comp
                         if (otherTransform.parent == nullptr)
                         {
                             otherTransform.setParent(inst);
-                            Debug::log("Picked up object");
+                            other->PushEvent("Pickup", other);
                         }
                         else 
                         {
                             otherTransform.removeParent();
                             Debug::log("Dropped object");
+                            other->PushEvent("Drop", other);
                         }
                         
                     }
@@ -180,12 +194,10 @@ namespace Comp
             
             static void TriggerEnter(const Inst& inst, const Inst& other)
             {
-                Debug::log("TriggerEnter with other id: " + std::to_string(other->getId()));
             }
             
             static void TriggerExit(const Inst& inst, const Inst& other)
             {
-                Debug::log("TriggerExit with other id: " + std::to_string(other->getId()));
             }
             
         private:

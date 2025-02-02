@@ -8,6 +8,7 @@
 #include "Component.hpp"
 #include "Debug.hpp"
 #include "cGravity.hpp"
+#include "cPickup.hpp"
 
 
 
@@ -22,7 +23,7 @@ namespace Prefab
     void Weapon::init(const Inst& inst)
     {
         auto& transform = inst->addComponent<Comp::Transform>(glm::vec2(0, 0), glm::vec2(0, 0));
-        transform.pivot = Sprout::Pivot::CENTER;
+        transform.pivot = Sprout::Pivot::BOTTOM_LEFT;
         transform.scale = glm::vec3(3, 3, 1);
         auto& sprite = inst->addComponent<Comp::Sprite>(AssetManager::getTexture("weapon_basic"));
         sprite.setLayer(Comp::Sprite::Layer::Midground);
@@ -32,6 +33,7 @@ namespace Prefab
         
         inst->addComponent<Comp::TransformHierarchy>();
         inst->addComponent<Comp::Gravity>();
+        inst->addComponent<Comp::Pickup>();
         inst->requestAddTag("dynamic");
     }
 }
