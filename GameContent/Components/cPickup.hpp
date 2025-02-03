@@ -23,7 +23,7 @@ namespace Comp
             void OnAddToEntity() override
             {
                 inst->requestAddTag("pickup");
-                inst->ListenForEvent<Inst>("Pickup", E_Pickup);
+                inst->ListenForEvent<Inst, Inst>("Pickup", E_Pickup);
                 inst->ListenForEvent<Inst>("Drop", E_Drop);
             }
             
@@ -35,15 +35,24 @@ namespace Comp
                 inst->RemoveEventCallback("Drop", E_Drop);
             }
             
-            static void OnPickup(const Inst& inst)
+            static void OnPickup(const Inst& inst, const Inst& picker)
             {
+                if (inst->hasComponent<TransformHierarchy>() && picker->hasComponent<TransformHierarchy>())
+                {
+                    auto& transform = inst->getComponent<TransformHierarchy>();
+                    transform.setParent(picker);
+                }
+                if (inst->hasComponent<Transform>())
+                {
+                    inst->getComponent<Transform>().pivot = Sprout::Pivot::BOTTOM_LEFT;
+                }
                 if (inst->hasComponent<Sprite>())
                 {
                     inst->getComponent<Sprite>().setLayer(Sprite::Layer::Foreground);
                 }
                 if (inst->hasComponent<BBox>())
                 {
-                    inst->getComponent<BBox>().isStatic = true;
+                    inst->getComponent<BBox>().enabled = false;
                 }
                 if (inst->hasComponent<Gravity>())
                 {
@@ -53,13 +62,22 @@ namespace Comp
             
             static void OnDrop(const Inst& inst)
             {
+                if (inst->hasComponent<TransformHierarchy>())
+                {
+                    auto& transform = inst->getComponent<TransformHierarchy>();
+                    transform.removeParent();
+                }
+                if (inst->hasComponent<Transform>())
+                {
+                    inst->getComponent<Transform>().pivot = Sprout::Pivot::CENTER;
+                }
                 if (inst->hasComponent<Sprite>())
                 {
                     inst->getComponent<Sprite>().setLayer(Sprite::Layer::Midground);
                 }
                 if (inst->hasComponent<BBox>())
                 {
-                    inst->getComponent<BBox>().isStatic = false;
+                    inst->getComponent<BBox>().enabled = true;
                 }
                 if (!inst->hasComponent<Gravity>())
                 {
@@ -68,7 +86,7 @@ namespace Comp
             }
             
         private:
-            std::function<void(Inst)> E_Pickup = Pickup::OnPickup;
+            std::function<void(Inst, Inst)> E_Pickup = Pickup::OnPickup;
             std::function<void(Inst)> E_Drop = Pickup::OnDrop;
     };
     

@@ -157,6 +157,18 @@ class Entity : public std::enable_shared_from_this<Entity>
             return m_components.find(typeid(T)) != m_components.end();
         }
         
+        /*
+            * Checks if the entity has a component and if it is enabled
+            * @tparam T The type of the component
+            * @return True if the entity has the component
+        */
+        template <typename T>
+        auto hasComponentEnabled() const -> bool {
+            bool has = m_components.find(typeid(T)) != m_components.end();
+            bool hasEnabled = has && m_components.at(typeid(T))->enabled;
+            return hasEnabled;
+        }
+        
         // events
         
         /*

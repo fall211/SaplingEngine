@@ -22,6 +22,7 @@ auto AssetManager::getTexture(const std::string& name) -> std::shared_ptr<Sprout
     if (it == getInstance()->m_textures.end()) {
         throw std::runtime_error("Texture not found: " + name);
     }
+    
     return it->second;  // Return shared_ptr
 }
 

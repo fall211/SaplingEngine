@@ -27,6 +27,9 @@ auto main() -> int
     AssetManager::addTileSet("forest_tileset", "Sprites/tileset_forest.png");
     AssetManager::addTexture("weapon_basic", "Sprites/weapon_basic.png");
     AssetManager::addTexture("bubble_projectile", "Sprites/bubble_projectile.png");
+    AssetManager::addTexture("hiisi", "Sprites/hiisi.png", 2);
+    AssetManager::addTexture("fern", "Sprites/fern_1.png", 6);
+    AssetManager::addTexture("tree", "Sprites/tree_dark.png");
 
     // then we add input actions and axes
     Input::makeAction("jump", {SAPP_KEYCODE_SPACE});

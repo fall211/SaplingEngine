@@ -26,6 +26,7 @@ void PrototypeScene::init()
 void PrototypeScene::update()
 {
     System::Gravity(m_entityManager->getEntities());
+    System::EnemyAI(m_entityManager->getEntities("enemy"), m_entityManager->getEntities("player").front());
     System::Move(m_entityManager->getEntities("dynamic"), m_engine.deltaTime());
     System::PlayerController::Update(m_entityManager->getEntities("player").front(), m_entityManager->getEntities(), m_engine.deltaTime());
 
@@ -38,12 +39,14 @@ void PrototypeScene::update()
 
 void PrototypeScene::sSpawn()
 {
-    auto player = m_entityManager->instantiatePrefab<Prefab::Player>();
-    auto map = m_entityManager->instantiatePrefab<Prefab::Map>();
+    auto map = System::SpawnMap(std::string(ASSETS_PATH) + "map1.csv", *m_entityManager);
 
-    Prefab::Map::SpawnTiles(map, m_entityManager);
-    
+
+    auto player = m_entityManager->instantiatePrefab<Prefab::Player>();
     m_entityManager->instantiatePrefab<Prefab::Weapon>();
+
+
+    m_entityManager->instantiatePrefab<Prefab::Enemy>();
 
 }
 void PrototypeScene::sMoveCamera(const std::shared_ptr<Entity>& player)
@@ -51,7 +54,7 @@ void PrototypeScene::sMoveCamera(const std::shared_ptr<Entity>& player)
 
     if (player->hasComponent<Comp::Transform>())
     {
-        size_t camera_y_offset = 100;
+        size_t camera_y_offset = 15;
         auto& transform = player->getComponent<Comp::Transform>();
         m_engine.getWindow().setCameraPosition({transform.position.x, transform.position.y - camera_y_offset});
     }
@@ -61,11 +64,14 @@ void PrototypeScene::sResolveCollisions(const EntityList& entities)
 {
     for (const auto& ent1 : entities)
     {
-        if (!ent1->hasComponent<Comp::BBox>()) continue;
+        if (!ent1->hasComponentEnabled<Comp::BBox>()) continue;
         if (ent1->getComponent<Comp::BBox>().isStatic) continue;
         for (const auto& ent2: entities)
         {
-            if (ent1->getId() == ent2->getId() || !ent2->hasComponent<Comp::BBox>()) continue;
+            if (ent1->getId() == ent2->getId() 
+                || !ent2->hasComponentEnabled<Comp::BBox>()
+                || (ent1->getComponent<Comp::BBox>().isTrigger
+                && ent2->getComponent<Comp::BBox>().isTrigger)) continue;
 
             glm::vec2 overlap = Physics2D::bBoxCollision(ent1, ent2);
 

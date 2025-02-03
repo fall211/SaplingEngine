@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Component.hpp"
+#include "cPickup.hpp"
 #include "Entity.hpp"
 #include "Input/Input.hpp"
 #include "Debug.hpp"
@@ -23,18 +24,18 @@ namespace Comp
         
         
             // stats
-            float maxSpeed = 300.0f;
-            float acceleration = 3000.0f;
-            float groundDeceleration = 1500.0f;
-            float airDeceleration = 750.0f;
-            float groundingForce = 15.0f;
-            float jumpPower = 500.0f;
-            float maxFallSpeed = 800.0f;
-            float fallAcceleration = 2000.0f;
+            float maxSpeed = 100.0f;
+            float acceleration = 1000.0f;
+            float groundDeceleration = 500.0f;
+            float airDeceleration = 250.0f;
+            float groundingForce = 5.0f;
+            float jumpPower = 166.67f;
+            float maxFallSpeed = 266.67f;
+            float fallAcceleration = 666.67f;
             float jumpEndEarlyGravityModifier = 3.0f;
             float coyoteTime = 0.15f;
             float jumpBufferTime = 0.15f;
-            float dashSpeed = 800.0f;
+            float dashSpeed = 266.67f;
             float dashTime = 0.15f;
             float dashCooldown = 1.0f;
             
@@ -120,9 +121,6 @@ namespace Comp
                 inst->requestAddTag("dynamic");
                 inst->ListenForEvent<Inst>("Jump", E_Jump);
                 inst->ListenForEvent<Inst>("Dash", E_Dash);
-                inst->ListenForEvent<Inst, Inst>("TriggerStay", E_TriggerStay);
-                inst->ListenForEvent<Inst, Inst>("TriggerEnter", E_TriggerEnter);
-                inst->ListenForEvent<Inst, Inst>("TriggerExit", E_TriggerExit);
             }
             
             void OnRemoveFromEntity() override
@@ -133,10 +131,6 @@ namespace Comp
                 inst->requestRemoveTag("dynamic");
                 inst->RemoveEventCallback("Jump", E_Jump);
                 inst->RemoveEventCallback("Dash", E_Dash);
-                inst->RemoveEventCallback("TriggerStay", E_TriggerStay);
-                inst->RemoveEventCallback("TriggerEnter", E_TriggerEnter);
-                inst->RemoveEventCallback("TriggerExit", E_TriggerExit);
-                
             }
             
             static void Jump(const Inst& inst)
@@ -164,49 +158,12 @@ namespace Comp
                     controller.endedJumpEarly = true;
                 }
             }
-    
-            static void TriggerStay(const Inst& inst, const Inst& other)
-            {
-                
-                if (inst->hasComponent<TransformHierarchy>() && other->hasComponent<TransformHierarchy>())
-                {
-                    if (Input::isActionDown("pickup"))
-                    {
-                        auto& instTransform = inst->getComponent<TransformHierarchy>();
-                        auto& otherTransform = other->getComponent<TransformHierarchy>();
-                        
-                        if (otherTransform.parent == nullptr)
-                        {
-                            otherTransform.setParent(inst);
-                            other->PushEvent("Pickup", other);
-                        }
-                        else 
-                        {
-                            otherTransform.removeParent();
-                            Debug::log("Dropped object");
-                            other->PushEvent("Drop", other);
-                        }
-                        
-                    }
 
-                }
-            }
-            
-            static void TriggerEnter(const Inst& inst, const Inst& other)
-            {
-            }
-            
-            static void TriggerExit(const Inst& inst, const Inst& other)
-            {
-            }
             
         private:
         
             //events
             std::function<void(Inst)> E_Jump = PlayerController::Jump;
             std::function<void(Inst)> E_Dash = PlayerController::Dash;
-            std::function<void(Inst, Inst)> E_TriggerStay = PlayerController::TriggerStay;
-            std::function<void(Inst, Inst)> E_TriggerEnter = PlayerController::TriggerEnter;
-            std::function<void(Inst, Inst)> E_TriggerExit = PlayerController::TriggerExit;
     };
 }

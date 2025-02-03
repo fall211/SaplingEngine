@@ -54,6 +54,11 @@ namespace System::PlayerController
             controller.jumpToConsume = true;
             controller.timeJumpWasPressed = controller._time;
         }
+        
+        if (Input::isActionDown("pickup"))
+        {
+            player->PushEvent("PickupInput", player);
+        }
     }
     
     void CheckCollision(const std::shared_ptr<Entity> &player, EntityList &entities)
@@ -154,6 +159,11 @@ namespace System::PlayerController
         {
             auto deceleration = controller.grounded ? controller.groundDeceleration : controller.airDeceleration;
             controller.frameVelocity.x = moveTowards(controller.frameVelocity.x, 0, deceleration * dt);
+            if (player->hasComponent<Comp::Sprite>())
+            {
+                auto& sprite = player->getComponent<Comp::Sprite>();
+                sprite.texture = AssetManager::getTexture("player_idle");
+            }
         }
         else if (controller.IsDashing())
         {
@@ -163,6 +173,11 @@ namespace System::PlayerController
         {
             controller.frameVelocity.x = moveTowards(controller.frameVelocity.x, controller.frameInput.move.x * controller.maxSpeed, controller.acceleration * dt);
             controller.flipSpriteX();
+            if (player->hasComponent<Comp::Sprite>())
+            {
+                auto& sprite = player->getComponent<Comp::Sprite>();
+                sprite.texture = AssetManager::getTexture("player_run");
+            }
         }
     }
     
