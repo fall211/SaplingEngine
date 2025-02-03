@@ -29,6 +29,7 @@ target_link_libraries(Sapling "-framework Cocoa -framework QuartzCore -framework
 target_link_libraries(Sapling "-framework OpenGL")
 	
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/")
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SPRITES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/Sprites/")
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC COMPONENTS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Components/")
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PREFABS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Prefabs/")
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SYSTEMS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Systems/")
