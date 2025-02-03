@@ -5,6 +5,7 @@
 
 
 #include "Debug.hpp"
+#include "glm/ext/matrix_transform.hpp"
 #include <chrono>
 #define SOKOL_IMPL
 #define SOKOL_GLCORE
@@ -81,6 +82,8 @@ namespace Sprout
         draw_frame.view_projection = glm::scale(draw_frame.view_projection, glm::vec3(1.0f / 640.0f * m_width, 1.0f / 360.0f * m_height, 1.0f));
         
         draw_frame.camera_xform = glm::mat4(1.0f);
+        //zoom 3x
+        draw_frame.camera_xform = glm::scale(draw_frame.camera_xform, glm::vec3(3.0f, 3.0f, 1.0f));
         
         sg_desc desc = 
         {
