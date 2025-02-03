@@ -249,7 +249,14 @@ namespace Sprout
     
     void Window::setCameraPosition(glm::vec2 position)
     {
-        glm::mat4 xform = glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f));
+        glm::vec3 scale = glm::vec3(
+            draw_frame.camera_xform[0][0],
+            draw_frame.camera_xform[1][1],
+            draw_frame.camera_xform[2][2]
+        );
+        glm::mat4 xform = glm::mat4(1.0f);
+        xform = glm::scale(xform, scale);
+        xform = glm::translate(xform, glm::vec3(-position, 0.0f));
         draw_frame.camera_xform = xform;
     }
     
