@@ -18,8 +18,6 @@
 #include "sokol/sokol_app.h"
 #include "sokol/sokol_glue.h"
 
-#include "Debug.hpp"
-
 #include "Texture.hpp"
 
 
@@ -187,6 +185,12 @@ namespace Sprout
             */
             void setCameraPosition(glm::vec2 position);
             
+            /*
+                * Gets the camera position.
+                * @return The camera position
+            */
+            glm::vec2 getCameraPosition();
+
         private:
             int m_width = 0;
             int m_height = 0;
@@ -219,6 +223,7 @@ namespace Sprout
             
             // drawing things onto the screen
             void draw_test();
+
             
             void draw_rect_projected(
                 glm::mat4 projection, 

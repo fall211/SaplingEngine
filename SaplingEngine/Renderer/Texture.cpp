@@ -5,7 +5,6 @@
 
 
 #include "Texture.hpp"
-#include "Debug.hpp"
 #include "Sprout.hpp"
 #include <cstddef>
 #include <memory>

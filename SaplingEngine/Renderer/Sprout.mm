@@ -4,7 +4,6 @@
 //
 
 
-#include "Debug.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include <chrono>
 #define SOKOL_IMPL
@@ -171,7 +170,6 @@ namespace Sprout
         };
         
         // bake images into atlas
-        Debug::log("baking atlas");
         bake_atlas();
     }
     

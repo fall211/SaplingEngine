@@ -18,11 +18,6 @@ void EntityManager::update()
     for (const auto& e : m_entitiesToAdd)
     {
         m_entities.push_back(e);
-        const auto& tags = e->getTags();
-        for (const auto& tag : tags)
-        {
-            m_entityMap[tag].push_back(e);
-        }
     }
     m_entitiesToAdd.clear();
 
@@ -46,6 +41,10 @@ auto EntityManager::addEntity(const TagList& tags) -> std::shared_ptr<Entity>
 {
     auto entity = std::shared_ptr<Entity>(new Entity(tags, m_idCounter++, shared_from_this()));
     m_entitiesToAdd.push_back(entity);
+    for (const auto& tag : tags)
+    {
+        m_entityMap[tag].push_back(entity);
+    }
     return entity;
 }
 

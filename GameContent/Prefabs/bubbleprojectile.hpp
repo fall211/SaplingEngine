@@ -10,23 +10,19 @@
 #include "Seedbank/AssetManager.hpp"
 
 #include "Component.hpp"
-#include "GameComponents.hpp"
-
+#include "cMathAnim.hpp"
+#include "cGravity.hpp"
+#include "cBubble.hpp"
+#include "cLifetime.hpp"
 #include <cstddef>
 #include <memory>
 
 namespace Prefab
 {
-    class Enemy
+    class BubbleProjectile
     {
-        private:            
-            void init(const Inst& inst);
-            
         public:
-            Enemy(const Inst& inst);    
-            void spawn(const Inst& inst);
-        
-            
+            BubbleProjectile(const Inst& inst, glm::vec2 position, glm::vec2 direction);                
         
     };
     

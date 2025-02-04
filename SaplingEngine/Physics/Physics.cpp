@@ -17,20 +17,16 @@ auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shar
     const auto& b0 = e0->getComponent<Comp::BBox>();
     const auto& b1 = e1->getComponent<Comp::BBox>();
 
-
     const glm::vec2 scaledSize0 = glm::vec2(b0.w, b0.h) * glm::abs(glm::vec2(t0.scale.x, t0.scale.y));
     const glm::vec2 scaledSize1 = glm::vec2(b1.w, b1.h) * glm::abs(glm::vec2(t1.scale.x, t1.scale.y));
 
-    const glm::vec2 pivotOffset0 = scaledSize0 * Sprout::getPivotOffset(t0.pivot);
-    const glm::vec2 pivotOffset1 = scaledSize1 * Sprout::getPivotOffset(t1.pivot);
+    const glm::vec2 pivotOffset0 = scaledSize0 * (Sprout::getPivotOffset(t0.pivot) - glm::vec2(0.5f));
+    const glm::vec2 pivotOffset1 = scaledSize1 * (Sprout::getPivotOffset(t1.pivot) - glm::vec2(0.5f));
 
-    const glm::vec2 scaleSign0 = glm::sign(glm::vec2(t0.scale.x, t0.scale.y));
-    const glm::vec2 scaleSign1 = glm::sign(glm::vec2(t1.scale.x, t1.scale.y));
+    const glm::vec2 pos0 = t0.position + pivotOffset0;
+    const glm::vec2 pos1 = t1.position + pivotOffset1;
 
-    const glm::vec2 pos0 = t0.position - (pivotOffset0 * scaleSign0) + ((scaledSize0 / 2.0f) * scaleSign0);
-    const glm::vec2 pos1 = t1.position - (pivotOffset1 * scaleSign1) + ((scaledSize1 / 2.0f) * scaleSign1);
-
-    const glm::vec2 dr = pos0 - pos1; 
+    const glm::vec2 dr = pos0 - pos1;
     const float dx = fabs(dr.x);
     const float dy = fabs(dr.y);
 

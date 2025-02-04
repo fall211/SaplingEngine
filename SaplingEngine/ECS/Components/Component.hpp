@@ -11,6 +11,7 @@
 #include "glm/glm.hpp"
 #include <cstddef>
 #include <memory>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -67,7 +68,8 @@ namespace Comp
             bool isTrigger = false;
             bool isStatic = true;
             bool interactWithTriggers = false;
-            std::vector<BBox*> collidingWith = {};
+            bool collisionEventsEnabled = false;
+            std::unordered_set<BBox*> collidingWith = {};
             
             BBox(Inst inst, float win, float hin);
             void OnAddToEntity() override;
@@ -109,6 +111,8 @@ namespace Comp
             void OnAddToEntity() override;
             void OnRemoveFromEntity() override;
             
+            glm::vec2 transformOffset = glm::vec2(0.0f, 0.0f);
+            glm::vec3 scaleOffset = glm::vec3(1.0f, 1.0f, 1.0f);
             
             enum class Layer {
                 Background,

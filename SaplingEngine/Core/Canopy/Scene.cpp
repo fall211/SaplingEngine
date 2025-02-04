@@ -54,7 +54,11 @@ void Scene::sRender(EntityList& entities)
                 // return;
             }
             glm::f32 layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
-            m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, layer, cTransform.rotation, (int)cSprite.currentFrame, cSprite.color_override, cTransform.scale, cTransform.pivot);
+            
+            glm::vec2 pos = cTransform.position + cSprite.transformOffset;
+            glm::vec3 scale = cTransform.scale * cSprite.scaleOffset;
+            
+            m_engine.getWindow().draw_sprite(cSprite.texture, pos, layer, cTransform.rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, cTransform.pivot);
         }
     }
 }

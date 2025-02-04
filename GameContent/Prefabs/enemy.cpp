@@ -30,11 +30,11 @@ namespace Prefab
         sprite.setLayer(Comp::Sprite::Layer::Midground);
         auto& collider = inst->addComponent<Comp::BBox>(24, 24);
         collider.isStatic = false;
-        collider.isTrigger = true;
         
         inst->addComponent<Comp::Gravity>();
         inst->addComponent<Comp::Health>(10);
         inst->addComponent<Comp::EnemyMovement>();
+        inst->addComponent<Comp::MathAnim>();
         inst->requestAddTag("dynamic");
         inst->requestAddTag("enemy");
     }

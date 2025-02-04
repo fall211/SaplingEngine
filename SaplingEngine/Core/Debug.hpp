@@ -6,6 +6,8 @@
 #pragma once
 
 #include <iostream>
+#include "Renderer/Sprout.hpp"
+#include "Seedbank/AssetManager.hpp"
 
 class Debug {
     public:
@@ -18,6 +20,11 @@ class Debug {
         static void log(const T& message) 
         {
             std::cout << message << std::endl;
+        }
+        static void draw_pos(glm::vec2 pos, glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
+        {
+            // draw a little dot at the position for debugging
+            Sprout::Window::instance->draw_sprite(AssetManager::getTexture("debugCircle"), pos, 1.0f, 0.0f, 1, color);
         }
 };
 

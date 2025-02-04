@@ -7,7 +7,6 @@
 //  related to windowing but not part of sokol implementation.
 //  For the sokol window setup, see Sprout.mm
 
-#include "Debug.hpp"
 #include "Sprout.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -25,8 +24,8 @@ namespace Sprout
 
     void Window::bake_atlas()
     {
-        m_atlas.width = 256;
-        m_atlas.height = 256;
+        m_atlas.width = 512;
+        m_atlas.height = 512;
         
         // data
         unsigned char* atlas_data = (unsigned char*)malloc(m_atlas.width * m_atlas.height * 4);
@@ -53,7 +52,7 @@ namespace Sprout
             
             if (!stbrp_pack_rects(&context, &rect, 1))
             {
-                Debug::log("Failed to pack rect");
+                throw std::runtime_error("Failed to pack rects");
                 continue;
             }
             
@@ -94,7 +93,6 @@ namespace Sprout
             }
         };
         
-        Debug::log("loading image");
         m_atlas.img = sg_make_image(&img_desc);
         
         // write image to png
@@ -104,7 +102,6 @@ namespace Sprout
         free(atlas_data);
         free(nodes);
         
-        Debug::log("Atlas baked");
     }
     
     void Window::addTexture(const std::shared_ptr<Texture> tex)
@@ -116,7 +113,6 @@ namespace Sprout
     {
         m_update_frame_callback = std::move(callback);
         if (m_update_frame_callback) {
-            Debug::log("frame update callback is set");
         }
     }
     
@@ -211,7 +207,7 @@ namespace Sprout
     {
         if (draw_frame.num_quads > MAX_QUADS)
         {
-            Debug::log("Too many quads");
+            //throw std::runtime_error("Too many quads");
             return;
         }
         
@@ -243,8 +239,10 @@ namespace Sprout
 
     void Window::translateCamera(glm::f32 deltaX, glm::f32 deltaY)
     {
-        glm::mat4 xform = glm::translate(glm::mat4(1.0f), glm::vec3(deltaX, deltaY, 0.0f));
-        draw_frame.camera_xform = xform * draw_frame.camera_xform;
+        draw_frame.camera_xform = glm::translate(
+            draw_frame.camera_xform, 
+            glm::vec3(-deltaX, -deltaY, 0.0f)
+        );
     }
     
     void Window::setCameraPosition(glm::vec2 position)
@@ -258,6 +256,19 @@ namespace Sprout
         xform = glm::scale(xform, scale);
         xform = glm::translate(xform, glm::vec3(-position, 0.0f));
         draw_frame.camera_xform = xform;
+    }
+    
+    glm::vec2 Window::getCameraPosition()
+    {
+        glm::vec2 scale = glm::vec2(
+            draw_frame.camera_xform[0][0],
+            draw_frame.camera_xform[1][1]
+        );
+        glm::vec2 position = glm::vec2(
+            -draw_frame.camera_xform[3][0],
+            -draw_frame.camera_xform[3][1]
+        );
+        return position / scale;
     }
     
 }

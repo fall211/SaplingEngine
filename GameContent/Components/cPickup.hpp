@@ -41,10 +41,12 @@ namespace Comp
                 {
                     auto& transform = inst->getComponent<TransformHierarchy>();
                     transform.setParent(picker);
+                    inst->requestAddTag("pickedup");
                 }
                 if (inst->hasComponent<Transform>())
                 {
                     inst->getComponent<Transform>().pivot = Sprout::Pivot::BOTTOM_LEFT;
+                    inst->getComponent<Transform>().velocity = glm::vec2(0, 0);
                 }
                 if (inst->hasComponent<Sprite>())
                 {
@@ -66,6 +68,7 @@ namespace Comp
                 {
                     auto& transform = inst->getComponent<TransformHierarchy>();
                     transform.removeParent();
+                    inst->requestRemoveTag("pickedup");
                 }
                 if (inst->hasComponent<Transform>())
                 {

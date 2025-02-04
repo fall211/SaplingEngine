@@ -9,7 +9,7 @@
 #include "Debug.hpp"
 #include "cGravity.hpp"
 #include "cPickup.hpp"
-
+#include "cWeapon.hpp"
 
 
 namespace Prefab
@@ -34,6 +34,7 @@ namespace Prefab
         inst->addComponent<Comp::Gravity>();
         inst->addComponent<Comp::Pickup>();
         inst->requestAddTag("dynamic");
+        inst->addComponent<Comp::Weapon>();
     }
 }
 

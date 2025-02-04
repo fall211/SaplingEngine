@@ -30,6 +30,7 @@ auto main() -> int
     AssetManager::addTexture("hiisi", "Sprites/hiisi.png", 2);
     AssetManager::addTexture("fern", "Sprites/fern_1.png", 6);
     AssetManager::addTexture("tree", "Sprites/tree_dark.png");
+    AssetManager::addTexture("debugCircle", "Sprites/debug.png");
 
     // then we add input actions and axes
     Input::makeAction("jump", {SAPP_KEYCODE_SPACE});
@@ -37,7 +38,8 @@ auto main() -> int
     Input::makeAxis("vertical", SAPP_KEYCODE_S, SAPP_KEYCODE_W);
     Input::makeAction("dash", {SAPP_KEYCODE_LEFT_SHIFT});
     Input::makeAction("changeScene", {SAPP_KEYCODE_C});
-    Input::makeAction("pickup", {SAPP_KEYCODE_F});
+    Input::makeAction("pickup", {SAPP_KEYCODE_E});
+    Input::makeAction("fire", {SAPP_KEYCODE_F});
     
     Input::makeAxis("moveX", SAPP_KEYCODE_LEFT, SAPP_KEYCODE_RIGHT);
     Input::makeAxis("moveY", SAPP_KEYCODE_UP, SAPP_KEYCODE_DOWN);

@@ -19,16 +19,26 @@ namespace System
             if (!e->hasComponent<Comp::Transform>()) continue;
             auto& transform = e->getComponent<Comp::Transform>();
             
-            transform.position += transform.velocity * dt;
-            
             if (e->hasComponent<Comp::TransformHierarchy>())
             {
                 auto& hierarchy = e->getComponent<Comp::TransformHierarchy>();
-                if (hierarchy.parent != nullptr)
+                if (!hierarchy.children.empty())
                 {
-                    auto& parentTransform = hierarchy.parent->getComponent<Comp::Transform>();
-                    transform.position = parentTransform.position;
+                    for (auto& child : hierarchy.children)
+                    {
+                        auto& childTransform = child->getComponent<Comp::Transform>();
+                        childTransform.position = transform.position; //todo: + childTransform.localPosition;
+                    }
                 }
+            }
+            
+            transform.position += transform.velocity * dt;
+            
+
+            
+            if (transform.position.y > 500 && !e->hasTag("player") && !e->hasTag("pickedup"))
+            {
+                e->destroy();
             }
         }
     }

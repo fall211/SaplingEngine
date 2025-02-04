@@ -10,12 +10,14 @@
 #include "Seedbank/AssetManager.hpp"
 #include "Entity.hpp"
 #include "Component.hpp"
+#include "cEnemySpawner.hpp"
+#include "cMapData.hpp"
 #include "Sprout.hpp"
-#include <MacTypes.h>
 #include <cstddef>
 #include <fstream>
 #include <memory>
 #include <sstream>
+#include <enemy.hpp>
 
 namespace System
 {
@@ -45,11 +47,13 @@ namespace System
         
         file.close();
         
+        int TILE_SIZE = 24;
+        
         auto mapEntity = entManager.addEntity({"map"});
         auto& mapTransform = mapEntity->addComponent<Comp::Transform>(glm::vec2(-240,0));
+        mapEntity->addComponent<Comp::MapData>(mapData, mapTransform.position, TILE_SIZE);
         mapEntity->addComponent<Comp::TransformHierarchy>();
         
-        int TILE_SIZE = 24;
         
         for (size_t y = 0; y < mapData.size(); y++)
         {
@@ -63,22 +67,22 @@ namespace System
                     int xPos = x * TILE_SIZE + mapTransform.position.x;
                     int yPos = y * TILE_SIZE + mapTransform.position.y;
                     auto& transform = tileEntity->addComponent<Comp::Transform>(glm::vec2(xPos, yPos));
-                    transform.pivot = Sprout::Pivot::TOP_CENTER;
+                    transform.pivot = Sprout::Pivot::CENTER;
                     tileEntity->addComponent<Comp::Sprite>(AssetManager::getTileSet("forest_tileset").at(tile));
                     tileEntity->addComponent<Comp::BBox>(24, 24);
                     tileEntity->addComponent<Comp::TransformHierarchy>().setParent(mapEntity);
                 }
                 else if (tile == 13)
                 {
-                    Debug::log("Spawned fern");
-                    auto tileEntity = entManager.addEntity({"fern"});
+                    auto tileEntity = entManager.addEntity({"fern", "spawner"});
                     
                     int xPos = x * TILE_SIZE + mapTransform.position.x;
                     int yPos = y * TILE_SIZE + mapTransform.position.y;
                     auto& transform = tileEntity->addComponent<Comp::Transform>(glm::vec2(xPos, yPos));
-                    transform.pivot = Sprout::Pivot::TOP_CENTER;
+                    transform.pivot = Sprout::Pivot::CENTER;
                     tileEntity->addComponent<Comp::Sprite>(AssetManager::getTexture("fern"), 5);
                     tileEntity->addComponent<Comp::TransformHierarchy>().setParent(mapEntity);
+                    tileEntity->addComponent<Comp::EnemySpawner<Prefab::Enemy>>();
                 }
             }
         }

@@ -24,20 +24,20 @@ namespace Comp
         
         
             // stats
-            float maxSpeed = 100.0f;
-            float acceleration = 1000.0f;
-            float groundDeceleration = 500.0f;
-            float airDeceleration = 250.0f;
+            float maxSpeed = 200.0f;
+            float acceleration = 2000.0f;
+            float groundDeceleration = 1000.0f;
+            float airDeceleration = 500.0f;
             float groundingForce = 5.0f;
-            float jumpPower = 166.67f;
-            float maxFallSpeed = 266.67f;
-            float fallAcceleration = 666.67f;
+            float jumpPower = 333.34f;
+            float maxFallSpeed = 533.34f;
+            float fallAcceleration = 1333.34f;
             float jumpEndEarlyGravityModifier = 3.0f;
             float coyoteTime = 0.15f;
             float jumpBufferTime = 0.15f;
-            float dashSpeed = 266.67f;
+            float dashSpeed = 533.34f;
             float dashTime = 0.15f;
-            float dashCooldown = 1.0f;
+            float dashCooldown = 0.2f;
             
             // frame
             struct FrameInput
@@ -66,6 +66,7 @@ namespace Comp
             // dash
             float timeDashWasPressed;
             bool airDashUsed;
+            bool hasDash;
             
             bool HasBufferedJump() const
             {
@@ -79,7 +80,7 @@ namespace Comp
             
             bool CanUseDash() const
             {
-                return _time > timeDashWasPressed + dashCooldown;
+                return hasDash && _time > timeDashWasPressed + dashCooldown;
             }
             
             bool IsDashing() const
@@ -156,6 +157,7 @@ namespace Comp
                     controller.timeDashWasPressed = controller._time;
                     controller.frameVelocity = controller.frameInput.dashDirection * controller.dashSpeed;
                     controller.endedJumpEarly = true;
+                    controller.hasDash = false;
                 }
             }
 
