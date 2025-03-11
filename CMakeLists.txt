@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(Sapling)
 
 file(GLOB_RECURSE ENGINE_SOURCES 
-    "${CMAKE_SOURCE_DIR}/SaplingEngine/main.cpp"
+    "${CMAKE_SOURCE_DIR}/GameContent/main.cpp"
     "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.cpp"
     "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.hpp"
     "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.mm"
