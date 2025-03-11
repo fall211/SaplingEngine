@@ -77,6 +77,12 @@ namespace Comp
         inst->requestRemoveTag("drawable");
     }
     
+    void Sprite::setColorOverride(const glm::vec4& color, const size_t frametime)
+    {
+        color_override = color;
+        colorOverrideFrametime = frametime;
+    }
+    
     SimplePlayerControls::SimplePlayerControls(Inst inst, const float speedIn, const int jumpStrIn)
         :   Component(std::move(inst)),
             moveSpeed(speedIn),
@@ -91,7 +97,6 @@ namespace Comp
     {
         if (parent != nullptr)
         {
-            // Remove this instance from the current parent's children
             auto& siblings = parent->getComponent<TransformHierarchy>().children;
             siblings.erase(std::remove(siblings.begin(), siblings.end(), inst), siblings.end());
         }
@@ -100,7 +105,6 @@ namespace Comp
     
         if (parent != nullptr)
         {
-            // Add this instance to the new parent's children
             parent->getComponent<TransformHierarchy>().children.push_back(inst);
         }    }
     
@@ -108,7 +112,6 @@ namespace Comp
     {
         if (parent != nullptr)
         {
-            // Remove this instance from the current parent's children
             auto& siblings = parent->getComponent<TransformHierarchy>().children;
             siblings.erase(std::remove(siblings.begin(), siblings.end(), inst), siblings.end());
             parent = nullptr;
@@ -119,7 +122,6 @@ namespace Comp
         auto& childHierarchy = child->getComponent<TransformHierarchy>();
         if (childHierarchy.parent != nullptr)
         {
-            // Remove the child from its current parent
             childHierarchy.removeParent();
         }
     

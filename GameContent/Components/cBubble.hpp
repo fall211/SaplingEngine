@@ -18,7 +18,7 @@ namespace Comp
         public:
             float initialVel = 100;
             float velDecay = 0.999;
-            float lifetime = 5;
+            float lifetime = 1.5;
             explicit Bubble(Inst inst) 
             :   Component(std::move(inst))
             {}
@@ -41,7 +41,8 @@ namespace Comp
                 {
                     if (other->hasComponent<Health>())
                     {
-                        other->getComponent<Health>().health -= 1;
+                        int damage = 1;
+                        other->PushEvent("TakeDamage", other, damage);
                     }
                     
                     if (!other->hasTag("player")) inst->destroy();

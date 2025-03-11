@@ -4,6 +4,7 @@
 //  
 
 #include "Scene.hpp"
+#include "Audio/AudioEngine.hpp"
 
 
 Scene::Scene(Engine& engine) : m_engine(engine)
@@ -15,6 +16,7 @@ Scene::Scene(Engine& engine) : m_engine(engine)
 void Scene::preUpdate()
 {
     m_entityManager->update();
+    AudioEngine::getInstance()->update();
 }
 
 void Scene::postUpdate()
@@ -50,8 +52,7 @@ void Scene::sRender(EntityList& entities)
                 {
                     cSprite.currentFrame = (cSprite.currentFrame + 1) % cSprite.numFrames;
                 }
-                // m_engine.getWindow().draw_sprite(cSprite.texture, cTransform.position, cTransform.rotation, (int)cSprite.currentFrame);
-                // return;
+
             }
             glm::f32 layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
             
@@ -59,6 +60,15 @@ void Scene::sRender(EntityList& entities)
             glm::vec3 scale = cTransform.scale * cSprite.scaleOffset;
             
             m_engine.getWindow().draw_sprite(cSprite.texture, pos, layer, cTransform.rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, cTransform.pivot);
+            
+            if (cSprite.colorOverrideFrametime > 0)
+            {
+                cSprite.colorOverrideFrametime--;
+                if (cSprite.colorOverrideFrametime == 0)
+                {
+                    cSprite.color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+                }
+            }
         }
     }
 }

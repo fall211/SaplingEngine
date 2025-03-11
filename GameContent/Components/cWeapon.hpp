@@ -20,7 +20,7 @@ namespace Comp
     {
         public:
             bool active = false;
-            float fireRate = 0.5f;
+            float fireRate = 0.1f;
             float _time = 0;
             float timeLastFired;
         
@@ -54,7 +54,7 @@ namespace Comp
             {
                 auto& weapon = inst->getComponent<Comp::Weapon>();
 
-                glm::vec2 direction = glm::normalize(inst->getComponent<Comp::Transform>().position - Input::getMouseWorldPosition());
+                glm::vec2 direction = glm::normalize(inst->getComponent<Comp::Transform>().position - Input::getMouseWorldPosition());                
 
                 weapon.timeLastFired = weapon._time;
                 em->instantiatePrefab<Prefab::BubbleProjectile>(inst->getComponent<Comp::Transform>().position, direction);

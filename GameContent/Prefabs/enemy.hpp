@@ -24,11 +24,49 @@ namespace Prefab
             
         public:
             Enemy(const Inst& inst);    
-            void spawn(const Inst& inst);
-        
-            
+            virtual void spawn(const Inst& inst) = 0;
         
     };
     
+    class ForestSpirit : public Enemy
+    {
+        private:
+            void init(const Inst& inst);
+            
+        public:
+            ForestSpirit(const Inst& inst);
+            void spawn(const Inst& inst) override;
+        
+    };
+    
+    class Hiisi : public Enemy
+    {
+        private:
+            void init(const Inst& inst);
+            
+        public:
+            Hiisi(const Inst& inst);
+            void spawn(const Inst& inst) override;
+    };
+    
+    class Serpent : public Enemy
+    {
+        private:
+            void init(const Inst& inst);
+            
+        public:
+            Serpent(const Inst& inst);
+            void spawn(const Inst& inst) override;
+    };
+    
+    class FrostWolf : public Enemy
+    {
+        private:
+            void init(const Inst& inst);
+            
+        public:
+            FrostWolf(const Inst& inst);
+            void spawn(const Inst& inst) override;
+    };
 }
 

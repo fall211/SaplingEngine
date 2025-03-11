@@ -41,5 +41,27 @@ class Physics2D
             * @return The overlap vector
         */
         static auto bBoxCircleCollision(const std::shared_ptr<Entity>& eBox, const std::shared_ptr<Entity>& eCircle) -> glm::vec2;
+        
+        
+        enum CollisionType
+        {
+            STATIC_STATIC,
+            DYNAMIC_DYNAMIC,
+            STATIC_DYNAMIC,
+            DYNAMIC_STATIC,
+            NONE
+        };
+        
+        struct CollisionData
+        {
+            glm::vec2 overlap = glm::vec2(0.0f);
+            glm::vec2 normal = glm::vec2(0.0f);
+            CollisionType type = NONE;
+            bool trigger = false;
+            bool triggerEvent = false;
+            
+        };
+        
+        static CollisionData collisionData(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1);
 };
 

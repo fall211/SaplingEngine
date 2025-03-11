@@ -11,6 +11,9 @@
 
 #include "Renderer/Texture.hpp"
 #include "glm/glm.hpp"
+#include "fmod.hpp"
+
+class AudioEngine;
 
 #ifndef ASSETS_PATH
 #define ASSETS_PATH "../GameContent/Assets/"
@@ -18,7 +21,10 @@
 
 class AssetManager {
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
+    
     std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>> m_tilesets = std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>>();
+    
+    std::unordered_map<std::string, FMOD::Sound*> m_sounds = std::unordered_map<std::string, FMOD::Sound*>();
     
     static AssetManager* Instance;
 
@@ -58,8 +64,10 @@ public:
         * Adds a tileset to the asset manager
         * @param name The name of the tileset
         * @param path The path to the tileset
+        * @param w The width of the tileset
+        * @param h The height of the tileset
     */
-    static void addTileSet(const std::string& name, const std::string& path);
+    static void addTileSet(const std::string& name, const std::string& path, size_t w, size_t h);
     
     /*
         * Gets the tileset with the given name
@@ -67,5 +75,19 @@ public:
         * @return Pointer to the tileset with the given name
     */
     static auto getTileSet(const std::string& name) -> std::vector<std::shared_ptr<Sprout::Texture>>&;
+    
+    /*
+        * Adds a sound to the asset manager
+        * @param name The name of the sound
+        * @param path The path to the sound
+    */
+    static void addSound(const std::string& name, const std::string& path, bool loop = false);
+    
+    /*
+        * Gets the sound with the given name
+        * @param name The name of the sound
+        * @return Pointer to the sound with the given name
+    */
+    static auto getSound(const std::string& name) -> FMOD::Sound*;
 };
 

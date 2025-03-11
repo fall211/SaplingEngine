@@ -34,6 +34,7 @@ namespace Prefab
         inst->addComponent<Comp::Gravity>();
         inst->addComponent<Comp::Pickup>();
         inst->requestAddTag("dynamic");
+        inst->requestAddTag("physicsenabled");
         inst->addComponent<Comp::Weapon>();
     }
 }

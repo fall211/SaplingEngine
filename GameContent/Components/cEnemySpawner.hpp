@@ -31,5 +31,10 @@ namespace Comp
             {
                 return entManager->instantiatePrefab<PrefabType>();
             }
+            
+            void OnAddToEntity() override
+            {
+                inst->requestAddTag("spawner");
+            }
     };
 }

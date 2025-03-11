@@ -6,6 +6,7 @@
 #include "Physics.hpp"
 #include "Sprout.hpp"
 #include "glm/geometric.hpp"
+#include <set>
 
 
 auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
@@ -39,24 +40,6 @@ auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shar
     }
     return {0, 0};
 }
-
-// auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
-// {
-//     if (e0->getId() == e1->getId()) return {0, 0}; // ignore self collision
-
-//     const glm::vec2 dr = e0->getComponent<Comp::Transform>().position - e1->getComponent<Comp::Transform>().position;
-//     const float dx = fabs(dr.x);
-//     const float dy = fabs(dr.y);
-
-//     const float xOverlap = e0->getComponent<Comp::BBox>().w / 2.0f + e1->getComponent<Comp::BBox>().w / 2.0f - dx;
-//     const float yOverlap = e0->getComponent<Comp::BBox>().h / 2.0f + e1->getComponent<Comp::BBox>().h / 2.0f - dy;
-
-//     if (xOverlap > 0 && yOverlap > 0) 
-//     {
-//         return {xOverlap, yOverlap};
-//     }
-//     return {0, 0};
-// }
 
 auto bCircleCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2
 {
@@ -132,4 +115,69 @@ auto bBoxCircleCollision(const std::shared_ptr<Entity>& eBox, const std::shared_
     }
     
     return {0, 0};
+}
+
+auto Physics2D::collisionData(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> CollisionData
+{
+    if (e0->getId() == e1->getId()) return CollisionData();
+
+    const auto& t0 = e0->getComponent<Comp::Transform>();
+    const auto& t1 = e1->getComponent<Comp::Transform>();
+    const auto& b0 = e0->getComponent<Comp::BBox>();
+    const auto& b1 = e1->getComponent<Comp::BBox>();
+
+    const glm::vec2 scaledSize0 = glm::vec2(b0.w, b0.h) * glm::abs(glm::vec2(t0.scale.x, t0.scale.y));
+    const glm::vec2 scaledSize1 = glm::vec2(b1.w, b1.h) * glm::abs(glm::vec2(t1.scale.x, t1.scale.y));
+
+    const glm::vec2 pivotOffset0 = scaledSize0 * (Sprout::getPivotOffset(t0.pivot) - glm::vec2(0.5f));
+    const glm::vec2 pivotOffset1 = scaledSize1 * (Sprout::getPivotOffset(t1.pivot) - glm::vec2(0.5f));
+
+    const glm::vec2 pos0 = t0.position + pivotOffset0;
+    const glm::vec2 pos1 = t1.position + pivotOffset1;
+
+    const glm::vec2 dr = pos0 - pos1;
+    const float dx = fabs(dr.x);
+    const float dy = fabs(dr.y);
+
+    const float xOverlap = scaledSize0.x / 2.0f + scaledSize1.x / 2.0f - dx;
+    const float yOverlap = scaledSize0.y / 2.0f + scaledSize1.y / 2.0f - dy;
+
+    if (xOverlap > 0 && yOverlap > 0) 
+    {
+        CollisionData data;
+        data.overlap = glm::vec2(xOverlap, yOverlap);
+        data.normal = glm::normalize(dr);
+        data.trigger = b0.isTrigger || b1.isTrigger;
+        
+        if (b0.isStatic)
+        {
+            if (b1.isStatic)
+            {
+               data.type = CollisionType::STATIC_STATIC;
+            }
+            else
+            {
+               data.type = CollisionType::STATIC_DYNAMIC;
+            }
+        } 
+        else 
+        {
+            if (b1.isStatic)
+            {
+                data.type = CollisionType::DYNAMIC_STATIC;
+            }
+            else
+            {
+                data.type = CollisionType::DYNAMIC_DYNAMIC;
+            }
+        }
+        
+        if (b0.interactWithTriggers && b1.isTrigger)
+        {
+            data.triggerEvent = true;
+        }
+        
+        return data;
+    }
+    return CollisionData();
 }

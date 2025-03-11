@@ -162,6 +162,17 @@ namespace Sprout
                 Pivot pivot = Pivot::CENTER
             );
             
+            /*
+                * Draws a rectangle.
+                * @param x The x position of the rectangle
+                * @param y The y position of the rectangle
+                * @param width The width of the rectangle
+                * @param height The height of the rectangle
+                * @param texture The texture of the rectangle
+                * @param color The color of the rectangle
+            */
+            void draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture> texture, glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            
             // TODO: draw text
             void draw_text();
             

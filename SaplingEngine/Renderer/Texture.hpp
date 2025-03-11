@@ -84,9 +84,11 @@ namespace Sprout
             /*
                 * Loads a tileset from a file
                 * @param path The path to the tileset file
+                * @param tileWidth The width of each tile in the tileset
+                * @param tileHeight The height of each tile in the tileset
                 * @return A vector of textures representing the tiles in the tileset
             */
-            static auto loadTileset(const std::string& path) -> std::vector<std::shared_ptr<Texture>>;
+            static auto loadTileset(const std::string& path, const size_t tileWidth, const size_t tileHeight) -> std::vector<std::shared_ptr<Texture>>;
             
             /*
                 * Loads a texture from memory

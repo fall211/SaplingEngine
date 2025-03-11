@@ -18,12 +18,10 @@
 
 namespace System::PlayerController
 {
+        
+    void Update(const std::shared_ptr<Entity>& player, float dt);
     
-    // void PlayerController(const std::shared_ptr<Entity>& player, EntityList& entities, const std::shared_ptr<Input>& input);
-    
-    void Update(const std::shared_ptr<Entity>& player, EntityList& entities, float dt);
-    
-    void CheckCollision(const std::shared_ptr<Entity>& player, EntityList& entities);
+    void CheckCollision(const std::shared_ptr<Entity>& player);
     
     void GatherInput(const std::shared_ptr<Entity>& player);
     

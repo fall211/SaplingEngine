@@ -15,7 +15,7 @@
 
 #include "cHealth.hpp"
 #include "cDamage.hpp"
-#include "cEnemyMovement.hpp"
+#include "cBrain.hpp"
 #include "cEnemySpawner.hpp"
 #include "cMathAnim.hpp"
 #include "cMapData.hpp"

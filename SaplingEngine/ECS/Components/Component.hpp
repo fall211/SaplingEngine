@@ -30,6 +30,7 @@ namespace Comp
         bool enabled = true;
         Component(Inst inst) : inst(std::move(inst)) {};
         ~Component()= default;
+        Inst getInst() const { return inst; }
         
         virtual void OnAddToEntity() {}
         virtual void OnRemoveFromEntity() {}
@@ -49,6 +50,7 @@ namespace Comp
             glm::f32 rotation = 0.0f;
             glm::vec3 scale = glm::vec3(1, 1, 1);
             Sprout::Pivot pivot = Sprout::Pivot::CENTER;
+            bool reset = false;
     
             Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);
             Transform(Inst inst, const glm::vec2& positionin);
@@ -127,6 +129,8 @@ namespace Comp
             
             void flipX(bool flip);
             
+            void setColorOverride(const glm::vec4& color, size_t frametime);
+            
             enum class Type {
                 Static,
                 Animated
@@ -141,6 +145,7 @@ namespace Comp
             size_t frameSize;
             size_t animationSpeed = 60;
             glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+            size_t colorOverrideFrametime = 0;
             bool flip_X = false;
     };
     

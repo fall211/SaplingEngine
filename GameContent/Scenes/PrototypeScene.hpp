@@ -22,6 +22,9 @@
 #include "glm/geometric.hpp"
 #include <string>
 
+// sound
+#include "Audio/AudioEngine.hpp"
+
 class PrototypeScene : public Scene 
 {
     private:
@@ -36,6 +39,5 @@ class PrototypeScene : public Scene
     
             void sSpawn();
             
-            void sResolveCollisions(const EntityList& dynamicEntities, const EntityList& entities);
             void sMoveCamera(const std::shared_ptr<Entity>& player);
 };

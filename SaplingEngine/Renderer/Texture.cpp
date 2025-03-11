@@ -100,23 +100,39 @@ namespace Sprout
         return true;
     }
     
-    std::vector<std::shared_ptr<Texture>> Texture::loadTileset(const std::string& path)
+    std::vector<std::shared_ptr<Texture>> Texture::loadTileset(const std::string& path, const size_t tileWidth, const size_t tileHeight)
     {
         int width, height, channels;
-        unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 4);
         if (!data)
         {
             throw std::runtime_error("Error loading tileset file: " + path);
         }
         
         std::vector<std::shared_ptr<Texture>> tiles;
-        size_t numTiles = height / width;
-        for (size_t i = 0; i < numTiles; i++)
+        size_t numTiles_x = width / tileWidth;
+        size_t numTiles_y = height / tileHeight;
+        
+        std::vector<unsigned char> tileData(tileWidth * tileHeight * 4);
+        
+        for (size_t y = 0; y < numTiles_y; y++)
         {
-            std::shared_ptr<Texture> tile = std::make_shared<Texture>();
-            tile->loadFromMemory(data + i * width * width * 4, width, width, 1);
-            tiles.push_back(tile);
+            for (size_t x = 0; x < numTiles_x; x++)
+            {
+                for (size_t row = 0; row < tileHeight; row++)
+                {
+                    size_t srcOffset = ((y * tileHeight + row) * width + x * tileWidth) * 4;
+                    size_t dstOffset = row * tileWidth * 4;
+                    memcpy(&tileData[dstOffset], &data[srcOffset], tileWidth * 4);
+                }
+                
+                std::shared_ptr<Texture> tile = std::make_shared<Texture>();
+                tile->loadFromMemory(tileData.data(), tileWidth, tileHeight, 4);
+                tiles.push_back(tile);
+            }
         }
+        
+        stbi_image_free(data);
         
         for (auto& tile : tiles)
         {

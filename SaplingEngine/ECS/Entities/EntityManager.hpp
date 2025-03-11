@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include "SpatialGrid.hpp"
 
 class Entity;
 
@@ -23,6 +24,7 @@ class EntityManager : public std::enable_shared_from_this<EntityManager>
         EntityList m_entitiesToAdd;
         EntityMap m_entityMap;
         size_t m_idCounter = 0;
+        SpatialGrid m_spatialGrid;
     
     public:
         EntityManager();
@@ -82,6 +84,38 @@ class EntityManager : public std::enable_shared_from_this<EntityManager>
             * @param entity The entity to destroy
         */
         void destroyEntity(const std::shared_ptr<Entity>& entity);
+        
+        /*
+            * Gets the spatial grid used by the entity manager
+            * @return The spatial grid
+        */
+        SpatialGrid& getSpatialGrid();
+        
+        
+        /*
+            * Gets all entities within a certain range of a given position
+            * @param center The center of the range
+            * @param range The range of the search
+            * @return The list of entities within the range
+        */
+        EntityList getEntitiesInRange(const glm::vec2 &center, float range);
+        
+        /*
+            * Gets all entities within a certain range of a given position
+            * @param tag The tag of the entities to get
+            * @param center The center of the range
+            * @param range The range of the search
+            * @return The list of entities within the range
+        */
+        EntityList getEntitiesInRange(const std::string& tag, const glm::vec2 &center, float range);
+        
+        /*
+            * Gets all entities within a certain range of a given position
+            * @param tag The tag of the entities to get
+            * @param entitiesInRange The list of entities within the range
+            * @return The list of entities within the range
+        */
+        EntityList getEntitiesInRange(const std::string& tag, EntityList& entitiesInRange);
 };
 
 #include "EntityManagerT.hpp"

@@ -4,6 +4,7 @@
 //
 
 #include "bubbleprojectile.hpp"
+#include "Debug.hpp"
 #include "cLifetime.hpp"
 
 
@@ -13,6 +14,10 @@ namespace Prefab
 
     BubbleProjectile::BubbleProjectile(const Inst& inst, glm::vec2 position, glm::vec2 direction)
     {
+        // add noise to the position
+        position.x += (rand() % 10) - 5;
+        position.y += (rand() % 10) - 5;
+        
         auto& transform = inst->addComponent<Comp::Transform>(position);
         transform.pivot = Sprout::Pivot::CENTER;
         
@@ -28,12 +33,14 @@ namespace Prefab
         auto& bubble = inst->addComponent<Comp::Bubble>();
         
         float dir = direction.x < 0 ? 1 : -1;
-        transform.velocity = glm::vec2(dir * bubble.initialVel, 0);
+        float dirY = (rand() % 25) - 12.5f;
+        transform.velocity = glm::vec2(dir * bubble.initialVel, dirY);
         
-        inst->addComponent<Comp::Lifetime>(bubble.lifetime);
+        inst->addComponent<Comp::Lifetime>(bubble.lifetime - (rand() % 10) / 10.0f);
         
         inst->requestAddTag("dynamic");
         inst->requestAddTag("projectile");
+        // Debug::log("BubbleProjectile created");
     }
     
 

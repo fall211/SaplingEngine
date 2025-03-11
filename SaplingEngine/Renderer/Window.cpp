@@ -24,84 +24,140 @@ namespace Sprout
 
     void Window::bake_atlas()
     {
-        m_atlas.width = 512;
-        m_atlas.height = 512;
-        
-        // data
-        unsigned char* atlas_data = (unsigned char*)malloc(m_atlas.width * m_atlas.height * 4);
-        
-        // clear atlas
-        memset((void*)atlas_data, 0, m_atlas.width * m_atlas.height * 4);
-        
-        // all textures are in m_textures (std::vector<Texture>)
-        // we need to rect_pack (stb) all textures into the atlas, 
-        // and save the uv coordinates in the texture object
-        // image data is unsigned char* and can be accessed with getPixels()
-        // image width and height can be accessed with getWidth() and getHeight()
-        
-        stbrp_context context;
-        stbrp_node* nodes = (stbrp_node*)malloc(sizeof(stbrp_node) * m_atlas.width);
-        stbrp_init_target(&context, m_atlas.width, m_atlas.height, nodes, m_atlas.width);
-        
-        for (auto& tex : m_textures)
-        {
-            stbrp_rect rect;
-            rect.id = 0;
-            rect.w = tex->getWidth();
-            rect.h = tex->getHeight();
+        const int PADDING = 2;
+            m_atlas.width = 512;
+            m_atlas.height = 512;
             
-            if (!stbrp_pack_rects(&context, &rect, 1))
-            {
-                throw std::runtime_error("Failed to pack rects");
-                continue;
-            }
+            unsigned char* atlas_data = (unsigned char*)malloc(m_atlas.width * m_atlas.height * 4);
+            memset((void*)atlas_data, 0, m_atlas.width * m_atlas.height * 4);
             
-            // copy data to atlas
-            for (int y = 0; y < tex->getHeight(); y++)
-            {
-                for (int x = 0; x < tex->getWidth(); x++)
-                {
-                    int src_index = (y * tex->getWidth() + x) * 4;
-                    int dst_index = ((rect.y + y) * m_atlas.width + (rect.x + x)) * 4;
-                    
-                    atlas_data[dst_index + 0] = tex->getPixels()[src_index + 0];
-                    atlas_data[dst_index + 1] = tex->getPixels()[src_index + 1];
-                    atlas_data[dst_index + 2] = tex->getPixels()[src_index + 2];
-                    atlas_data[dst_index + 3] = tex->getPixels()[src_index + 3];
+            stbrp_context context;
+            stbrp_node* nodes = (stbrp_node*)malloc(sizeof(stbrp_node) * m_atlas.width);
+            stbrp_init_target(&context, m_atlas.width, m_atlas.height, nodes, m_atlas.width);
+            
+            for (auto& tex : m_textures) {
+                stbrp_rect rect;
+                rect.id = 0;
+                rect.w = tex->getWidth() + (PADDING * 2);
+                rect.h = tex->getHeight() + (PADDING * 2);
+                
+                if (!stbrp_pack_rects(&context, &rect, 1)) {
+                    throw std::runtime_error("Failed to pack rects");
+                    continue;
                 }
+                
+                // copy texture data
+                for (int y = 0; y < tex->getHeight(); y++) {
+                    for (int x = 0; x < tex->getWidth(); x++) {
+                        int src_index = (y * tex->getWidth() + x) * 4;
+                        int dst_index = ((rect.y + PADDING + y) * m_atlas.width + (rect.x + PADDING + x)) * 4;
+                        
+                        atlas_data[dst_index + 0] = tex->getPixels()[src_index + 0];
+                        atlas_data[dst_index + 1] = tex->getPixels()[src_index + 1];
+                        atlas_data[dst_index + 2] = tex->getPixels()[src_index + 2];
+                        atlas_data[dst_index + 3] = tex->getPixels()[src_index + 3];
+                    }
+                }
+                
+                // extend edges into padding
+                int base_x = rect.x + PADDING;
+                int base_y = rect.y + PADDING;
+                int width = tex->getWidth();
+                int height = tex->getHeight();
+                
+                // horizontal edges
+                for (int x = 0; x < width; x++) {
+                    // T
+                    for (int p = 1; p <= PADDING; p++) {
+                        int src_index = ((base_y) * m_atlas.width + (base_x + x)) * 4;
+                        int dst_index = ((base_y - p) * m_atlas.width + (base_x + x)) * 4;
+                        memcpy(&atlas_data[dst_index], &atlas_data[src_index], 4);
+                    }
+                    
+                    // B
+                    for (int p = 1; p <= PADDING; p++) {
+                        int src_index = ((base_y + height - 1) * m_atlas.width + (base_x + x)) * 4;
+                        int dst_index = ((base_y + height - 1 + p) * m_atlas.width + (base_x + x)) * 4;
+                        memcpy(&atlas_data[dst_index], &atlas_data[src_index], 4);
+                    }
+                }
+                
+                // vertical edges
+                for (int y = 0; y < height; y++) {
+                    // L
+                    for (int p = 1; p <= PADDING; p++) {
+                        int src_index = ((base_y + y) * m_atlas.width + base_x) * 4;
+                        int dst_index = ((base_y + y) * m_atlas.width + (base_x - p)) * 4;
+                        memcpy(&atlas_data[dst_index], &atlas_data[src_index], 4);
+                    }
+                    
+                    // R
+                    for (int p = 1; p <= PADDING; p++) {
+                        int src_index = ((base_y + y) * m_atlas.width + (base_x + width - 1)) * 4;
+                        int dst_index = ((base_y + y) * m_atlas.width + (base_x + width - 1 + p)) * 4;
+                        memcpy(&atlas_data[dst_index], &atlas_data[src_index], 4);
+                    }
+                }
+                
+                // corners
+                for (int py = 1; py <= PADDING; py++) {
+                    for (int px = 1; px <= PADDING; px++) {
+                        // TL
+                        memcpy(
+                            &atlas_data[((base_y - py) * m_atlas.width + (base_x - px)) * 4],
+                            &atlas_data[(base_y * m_atlas.width + base_x) * 4],
+                            4
+                        );
+                        
+                        // TR
+                        memcpy(
+                            &atlas_data[((base_y - py) * m_atlas.width + (base_x + width - 1 + px)) * 4],
+                            &atlas_data[(base_y * m_atlas.width + (base_x + width - 1)) * 4],
+                            4
+                        );
+                        
+                        // BL
+                        memcpy(
+                            &atlas_data[((base_y + height - 1 + py) * m_atlas.width + (base_x - px)) * 4],
+                            &atlas_data[((base_y + height - 1) * m_atlas.width + base_x) * 4],
+                            4
+                        );
+                        
+                        // BR
+                        memcpy(
+                            &atlas_data[((base_y + height - 1 + py) * m_atlas.width + (base_x + width - 1 + px)) * 4],
+                            &atlas_data[((base_y + height - 1) * m_atlas.width + (base_x + width - 1)) * 4],
+                            4
+                        );
+                    }
+                }
+                
+                glm::vec4 uv = glm::vec4(
+                    (float)(rect.x + PADDING) / m_atlas.width,
+                    (float)(rect.y + PADDING) / m_atlas.height,
+                    (float)(rect.x + PADDING + tex->getWidth()) / m_atlas.width,
+                    (float)(rect.y + PADDING + tex->getHeight()) / m_atlas.height
+                );
+                tex->setAtlasUVs(uv);
             }
             
-            // save uv coordinates
-            glm::vec4 uv = glm::vec4(
-                (float)rect.x / m_atlas.width,
-                (float)rect.y / m_atlas.height,
-                (float)(rect.x + rect.w) / m_atlas.width,
-                (float)(rect.y + rect.h) / m_atlas.height
-            );
-            tex->setAtlasUVs(uv);    
-        }
-        
-        
-        // create image
-        sg_image_desc img_desc = {
-            .width = m_atlas.width,
-            .height = m_atlas.height,
-            .pixel_format = SG_PIXELFORMAT_RGBA8,
-            .data.subimage[0][0] = {
-                .ptr = atlas_data,
-                .size = (size_t)m_atlas.width * m_atlas.height * 4
-            }
-        };
-        
-        m_atlas.img = sg_make_image(&img_desc);
-        
-        // write image to png
-        stbi_write_png("atlas.png", m_atlas.width, m_atlas.height, 4, atlas_data, m_atlas.width * 4);
-        
-        // free data
-        free(atlas_data);
-        free(nodes);
-        
+            sg_image_desc img_desc = {
+                .width = m_atlas.width,
+                .height = m_atlas.height,
+                .pixel_format = SG_PIXELFORMAT_RGBA8,
+                .data.subimage[0][0] = {
+                    .ptr = atlas_data,
+                    .size = (size_t)m_atlas.width * m_atlas.height * 4
+                }
+            };
+            
+            m_atlas.img = sg_make_image(&img_desc);
+            
+            stbi_write_png("atlas.png", m_atlas.width, m_atlas.height, 4, atlas_data, m_atlas.width * 4);
+            
+            free(atlas_data);
+            free(nodes);
+
     }
     
     void Window::addTexture(const std::shared_ptr<Texture> tex)
@@ -166,6 +222,15 @@ namespace Sprout
         draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override, pivot);
     }
     
+    void Window::draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture> texture, glm::vec4 color)
+    {
+        // draw rectangle
+        auto xform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
+        glm::vec4 uv = texture->getAtlasUVs();
+
+        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER);
+    }
+    
     void Window::draw_rect_projected(
         glm::mat4 projection,
         glm::vec2 size,
@@ -194,8 +259,7 @@ namespace Sprout
         };
         std::array<glm::vec4, 4> color_overrides = {color_override, color_override, color_override, color_override};
         
-        draw_quad_projected(projection, positions, colors, uvs, color_overrides) ;
-        
+        draw_quad_projected(projection, positions, colors, uvs, color_overrides) ; 
     }
     
     void Window::draw_quad_projected(

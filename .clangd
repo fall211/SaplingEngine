@@ -15,6 +15,8 @@ CompileFlags:
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/SaplingEngine/Renderer,
     -I/opt/homebrew/include,
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty/fmod/core/inc,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty/fmod/studio/inc,
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Components,
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Prefabs,
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Systems,

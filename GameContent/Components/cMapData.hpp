@@ -19,6 +19,7 @@ namespace Comp
         public:
             glm::vec2 position;
             int TILE_SIZE;
+            int NUM_INDIVIDUAL_TILES = 91;
             std::vector<std::vector<std::string>> mapData;
             explicit MapData(Inst inst, std::vector<std::vector<std::string>> data, glm::vec2 pos, int tileSize = 24) 
             :   Component(std::move(inst)), 
@@ -27,19 +28,22 @@ namespace Comp
                 mapData(std::move(data))
             {}
             
-            int getTile(int worldX, int worldY) 
+            int getTile(int worldX, int worldY, bool ignoreObjects = true) 
             {
                 // change x and y to tile coordinates
                 size_t x = (worldX - position.x + TILE_SIZE/2) / TILE_SIZE;
                 size_t y = (worldY - position.y + TILE_SIZE/2) / TILE_SIZE;
                 
+                int tileId = std::stoi(mapData[y][x]);
 
-                if (x < 0 || y < 0 || y >= mapData.size() || x >= mapData[y].size())
+                
+                if (x < 0 || y < 0 || y >= mapData.size() || x >= mapData[y].size() || (ignoreObjects && tileId > NUM_INDIVIDUAL_TILES))
                 {
                     return -1;
                 }
                 
-                return std::stoi(mapData[y][x]);
+                return tileId;
+                
             }
     };
 }

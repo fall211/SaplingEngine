@@ -14,6 +14,7 @@
 #include <cfloat>
 #include <functional>
 #include <utility>
+#include "Audio/AudioEngine.hpp"
 
 namespace Comp
 {
@@ -29,7 +30,7 @@ namespace Comp
             float groundDeceleration = 1000.0f;
             float airDeceleration = 500.0f;
             float groundingForce = 5.0f;
-            float jumpPower = 333.34f;
+            float jumpPower = 400.0f;
             float maxFallSpeed = 533.34f;
             float fallAcceleration = 1333.34f;
             float jumpEndEarlyGravityModifier = 3.0f;
@@ -37,7 +38,7 @@ namespace Comp
             float jumpBufferTime = 0.15f;
             float dashSpeed = 533.34f;
             float dashTime = 0.15f;
-            float dashCooldown = 0.2f;
+            float dashCooldown = 0.3f;
             
             // frame
             struct FrameInput
@@ -48,6 +49,12 @@ namespace Comp
                 bool dashDown;
                 glm::vec2 dashDirection;
             } frameInput;
+            
+            struct CollisionState
+            {
+                bool groundHit;
+                bool ceilingHit;
+            } collisionState;
             
             glm::vec2 frameVelocity;
             float _time;
@@ -120,8 +127,11 @@ namespace Comp
                 inst->requestAddTag("playercontrolled");
                 inst->requestAddTag("player");
                 inst->requestAddTag("dynamic");
+                inst->requestAddTag("physicsenabled");
                 inst->ListenForEvent<Inst>("Jump", E_Jump);
                 inst->ListenForEvent<Inst>("Dash", E_Dash);
+                inst->ListenForEvent<Inst>("FloorCollision", E_FloorCollision);
+                inst->ListenForEvent<Inst>("CeilingCollision", E_CeilingCollision);
             }
             
             void OnRemoveFromEntity() override
@@ -130,8 +140,11 @@ namespace Comp
                 inst->requestRemoveTag("playercontrolled");
                 inst->requestRemoveTag("player");
                 inst->requestRemoveTag("dynamic");
+                inst->requestRemoveTag("physicsenabled");
                 inst->RemoveEventCallback("Jump", E_Jump);
                 inst->RemoveEventCallback("Dash", E_Dash);
+                inst->RemoveEventCallback("FloorCollision", E_FloorCollision);
+                inst->RemoveEventCallback("CeilingCollision", E_CeilingCollision);
             }
             
             static void Jump(const Inst& inst)
@@ -145,6 +158,7 @@ namespace Comp
                     controller.bufferedJumpUsable = false;
                     controller.coyoteUsable = false;
                     controller.frameVelocity.y = -controller.jumpPower;
+                    AudioEngine::getInstance()->playSound("jump");
                 }
             }
             
@@ -158,6 +172,27 @@ namespace Comp
                     controller.frameVelocity = controller.frameInput.dashDirection * controller.dashSpeed;
                     controller.endedJumpEarly = true;
                     controller.hasDash = false;
+                    AudioEngine::getInstance()->playSound("dash", 2);
+                }
+            }
+            
+            static void FloorCollision(const Inst& inst)
+            {
+                if (inst->hasComponent<PlayerController>())
+                {
+                    auto& controller = inst->getComponent<PlayerController>();
+                    
+                    controller.collisionState.groundHit = true;
+                }
+            }
+            
+            static void CeilingCollision(const Inst& inst)
+            {
+                if (inst->hasComponent<PlayerController>())
+                {
+                    auto& controller = inst->getComponent<PlayerController>();
+                    
+                    controller.collisionState.ceilingHit = true;
                 }
             }
 
@@ -167,5 +202,7 @@ namespace Comp
             //events
             std::function<void(Inst)> E_Jump = PlayerController::Jump;
             std::function<void(Inst)> E_Dash = PlayerController::Dash;
+            std::function<void(Inst)> E_FloorCollision = PlayerController::FloorCollision;
+            std::function<void(Inst)> E_CeilingCollision = PlayerController::CeilingCollision;
     };
 }

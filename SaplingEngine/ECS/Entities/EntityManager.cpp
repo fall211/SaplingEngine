@@ -10,6 +10,7 @@ EntityManager::EntityManager()
     m_entities = EntityList();
     m_entitiesToAdd = EntityList();
     m_entityMap = EntityMap();
+    m_spatialGrid = SpatialGrid(24.0f);
 };
 
 void EntityManager::update()
@@ -21,7 +22,7 @@ void EntityManager::update()
     }
     m_entitiesToAdd.clear();
 
-    // Collect all inactive entities
+    // collect all inactive entities
     std::vector<std::shared_ptr<Entity>> entitiesToDestroy;
     for (const auto& e: m_entities)
     {
@@ -49,7 +50,7 @@ auto EntityManager::addEntity(const TagList& tags) -> std::shared_ptr<Entity>
 }
 
 auto EntityManager::getEntities() -> EntityList&
-{
+{    
     return m_entities;
 }
 
@@ -78,7 +79,44 @@ void EntityManager::destroyEntity(const std::shared_ptr<Entity>& entity)
         auto& entityListWithTag = m_entityMap[tag];
         entityListWithTag.erase(std::remove(entityListWithTag.begin(), entityListWithTag.end(), entity), entityListWithTag.end());
     }
+    m_spatialGrid.removeEntity(entity);
 
     m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
 }
 
+SpatialGrid& EntityManager::getSpatialGrid()
+{
+    return m_spatialGrid;
+}
+
+auto EntityManager::getEntitiesInRange(const glm::vec2 &center, float range) -> EntityList
+{
+    return m_spatialGrid.getEntitiesInRange(center, range);
+}
+
+auto EntityManager::getEntitiesInRange(const std::string& tag, const glm::vec2 &center, float range) -> EntityList
+{
+    auto entitiesInRange = m_spatialGrid.getEntitiesInRange(center, range);
+    EntityList entitiesWithTagInRange;
+    for (const auto& entity : entitiesInRange)
+    {
+        if (entity->hasTag(tag))
+        {
+            entitiesWithTagInRange.push_back(entity);
+        }
+    }
+    return entitiesWithTagInRange;
+}
+
+auto EntityManager::getEntitiesInRange(const std::string& tag, EntityList& entitiesInRange) -> EntityList
+{
+    auto entitiesWithTagInRange = entitiesInRange;
+    for (const auto& entity : entitiesInRange)
+    {
+        if (!entity->hasTag(tag))
+        {
+            entitiesWithTagInRange.erase(std::remove(entitiesWithTagInRange.begin(), entitiesWithTagInRange.end(), entity), entitiesWithTagInRange.end());
+        }
+    }
+    return entitiesWithTagInRange;
+}

@@ -17,7 +17,7 @@
 
 namespace System::PlayerController
 {    
-    void Update(const std::shared_ptr<Entity>& player, EntityList& entities, float dt)
+    void Update(const std::shared_ptr<Entity>& player, float dt)
     {
         if (!player->hasComponent<Comp::PlayerController>() || 
             !player->hasComponent<Comp::Transform>() ||
@@ -29,7 +29,7 @@ namespace System::PlayerController
         controller._time += dt;
         
         GatherInput(player);
-        CheckCollision(player, entities);
+        CheckCollision(player);
         HandleJump(player);
         HandleDirection(player, dt);
         HandleDash(player);
@@ -39,9 +39,7 @@ namespace System::PlayerController
         // move player to 0,0 if they fall off the map
         if (player->getComponent<Comp::Transform>().position.y > 1000)
         {
-            glm::vec2 delta = glm::vec2(0, 0) - player->getComponent<Comp::Transform>().position;
-            player->getComponent<Comp::Transform>().position = glm::vec2(0, 0);
-            Sprout::Window::instance->translateCamera(delta.x, delta.y);
+            player->getComponent<Comp::Transform>().reset = true;
         }
     }
     
@@ -72,75 +70,39 @@ namespace System::PlayerController
         }
     }
     
-    void CheckCollision(const std::shared_ptr<Entity> &player, EntityList &entities)
+    void CheckCollision(const std::shared_ptr<Entity> &player)
         {
-            if (!player->hasComponent<Comp::PlayerController>() || 
-                !player->hasComponent<Comp::Transform>() ||
-                !player->hasComponent<Comp::BBox>()
-            ) return;
+            if (!player->hasComponent<Comp::PlayerController>()) return;
 
             auto& controller = player->getComponent<Comp::PlayerController>();
-            auto& transform = player->getComponent<Comp::Transform>();
-
-            bool groundHit = false;
-            bool ceilingHit = false;
-
-            std::shared_ptr<Entity> closestEntity = nullptr;
-            int smallestXDiff = INT_MAX;
             
-            for (auto& other : entities)
-            {
-                if (other->getId() == player->getId()) continue;
-
-                if (!other->hasComponent<Comp::BBox>() || 
-                    !other->hasComponent<Comp::Transform>() ||
-                    other->getComponent<Comp::BBox>().isTrigger
-                ) continue;
-                
-                glm::vec2 overlap = Physics2D::bBoxCollision(player, other);
-                if (overlap.x != 0 || overlap.y != 0)
-                {                    
-                    auto xDiff = abs(transform.position.x - other->getComponent<Comp::Transform>().position.x);
-                    if (xDiff < smallestXDiff)
-                    {
-                        smallestXDiff = xDiff;
-                        closestEntity = other;
-                    }
-                }
-            }
-            
-            if (smallestXDiff != INT_MAX)
-            {
-                auto& other_transform = closestEntity->getComponent<Comp::Transform>();
-                
-                if (smallestXDiff > 12)
-                {
-                    groundHit = false;
-                    ceilingHit = false;
-                }
-                else if (transform.position.y < other_transform.position.y) groundHit = true;
-                else if (transform.position.y > other_transform.position.y) ceilingHit = true;
-
-            }
-            
-            if (ceilingHit) 
+            if (controller.collisionState.ceilingHit) 
             {
                 controller.frameVelocity.y = fmax(0, controller.frameVelocity.y);
             }
 
-            if (!controller.grounded && groundHit)
+            if (!controller.grounded && controller.collisionState.groundHit)
             {
                 controller.grounded = true;
-                controller.hasDash = true;
                 controller.coyoteUsable = true;
                 controller.bufferedJumpUsable = true;
                 controller.endedJumpEarly = false;
             }
-            else if (controller.grounded && !groundHit)
+            else if (controller.collisionState.groundHit)
+            {
+                controller.hasDash = true;
+                controller.endedJumpEarly = false;
+
+            }
+            else if (controller.grounded && !controller.collisionState.groundHit)
             {
                 controller.grounded = false;
                 controller.frameLeftGround = controller._time;        
             }
+            
+            controller.collisionState.groundHit = false;
+            controller.collisionState.ceilingHit = false;
+            
         }
     
     void HandleJump(const std::shared_ptr<Entity>& player)
