@@ -8,6 +8,8 @@
 #include <string>
 #include <map>
 #include <unordered_map>
+#include <memory>
+#include <stdexcept>
 
 #include "Renderer/Texture.hpp"
 #include "glm/glm.hpp"

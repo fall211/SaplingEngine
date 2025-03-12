@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <SFML/Graphics.hpp>
-
 #include "Physics/Physics.hpp"
 
 #include "Core/Engine.hpp"
