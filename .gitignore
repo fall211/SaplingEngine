@@ -14,7 +14,7 @@ Build/
 *.so
 
 # Game Content
-GameContent/*
+GameContent/
 
 # Logs & temp
 *.log
