@@ -29,8 +29,10 @@ set(FMOD_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/fmod")
 set(FMOD_CORE_LIB_DIR "${FMOD_ROOT}/core/lib")
 set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT}/studio/lib")
 
-# Link libraries
 if(APPLE)
+    set(FMOD_CORE_LIB_DIR "${FMOD_ROOT}/core/lib")
+    set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT}/studio/lib")
+
     target_link_libraries(Sapling PRIVATE
         "-framework Cocoa"
         "-framework QuartzCore"
@@ -39,21 +41,37 @@ if(APPLE)
         "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
         "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
     )
-else()
-    # Windows or other platform linking
+
+    add_custom_command(TARGET Sapling POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
+            "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
+            $<TARGET_FILE_DIR:Sapling>
+    )
+
+    set_target_properties(Sapling PROPERTIES
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH "@executable_path"
+    )
+
+elseif(WIN32)
+    set(FMOD_CORE_LIB_DIR "${FMOD_ROOT}/core/lib/x86")
+    set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT}/studio/lib/x86")
+
     target_link_libraries(Sapling PRIVATE
-        "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
-        "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
+        "${FMOD_CORE_LIB_DIR}/fmod_vc.lib"
+        "${FMOD_STUDIO_LIB_DIR}/fmodstudio_vc.lib"
+    )
+
+    # Copy FMOD DLLs after build
+    add_custom_command(TARGET Sapling POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${FMOD_CORE_LIB_DIR}/fmod.dll"
+            "${FMOD_STUDIO_LIB_DIR}/fmodstudio.dll"
+            $<TARGET_FILE_DIR:Sapling>
     )
 endif()
 
-# Copy FMOD dylibs to the executable directory
-add_custom_command(TARGET Sapling POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
-    "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
-    $<TARGET_FILE_DIR:Sapling>
-)
 
 # Set RPATH for the executable
 if(APPLE)

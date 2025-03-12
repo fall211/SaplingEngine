@@ -12,6 +12,8 @@
 #include "Renderer/Texture.hpp"
 #include "glm/glm.hpp"
 #include "fmod.hpp"
+#include <memory>
+#include <stdexcept>
 
 class AudioEngine;
 

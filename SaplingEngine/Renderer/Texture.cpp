@@ -6,9 +6,7 @@
 
 #include "Texture.hpp"
 #include "Sprout.hpp"
-#include <cstddef>
-#include <memory>
-#include <string>
+
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"

@@ -74,6 +74,9 @@ namespace Sprout
     
     void Window::Init()
     {
+        memset(&m_state, 0, sizeof(m_state));
+        memset(&draw_frame, 0, sizeof(draw_frame));
+
         draw_frame.view_projection = glm::ortho(
             -0.5f * (m_width),
             0.5f * (m_width),
@@ -93,12 +96,9 @@ namespace Sprout
         sg_desc desc = {};
         desc.environment = sglue_environment();
         
+
         sg_setup(&desc);
-        if (sg_isvalid()) {
-                printf("Sokol GFX successfully initialized!\n");
-            } else {
-                printf("ERROR: Failed to initialize Sokol GFX!\n");
-            }
+
         // vertex buffer 
         sg_buffer_desc vbuf_desc = {};
         vbuf_desc.size = sizeof(draw_frame.quads);
@@ -171,7 +171,8 @@ namespace Sprout
         pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
         pass_action.colors[0].clear_value = {1.0f, 1.0f, 1.0f, 1.0f};
         m_state.pass_action = pass_action;
-        
+
+
         // bake images into atlas
         bake_atlas();
     }
@@ -202,7 +203,7 @@ namespace Sprout
         std::sort(draw_frame.quads.begin(), draw_frame.quads.begin() + draw_frame.num_quads, sortByZ);
         
         m_state.bind.images[IMG_tex0] = m_atlas.img;
-    
+
         sg_update_buffer(m_state.bind.vertex_buffers[0], SG_RANGE(draw_frame.quads));
 
 

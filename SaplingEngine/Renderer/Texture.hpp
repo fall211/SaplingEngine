@@ -8,7 +8,8 @@
 #include <cstddef>
 #include <string>
 #include <glm/glm.hpp>
-
+#include <vector>
+#include <memory>
 
 namespace Sprout
 {

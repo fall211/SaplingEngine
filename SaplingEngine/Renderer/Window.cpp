@@ -141,15 +141,13 @@ namespace Sprout
                 tex->setAtlasUVs(uv);
             }
             
-            sg_image_desc img_desc = {
-                .width = m_atlas.width,
-                .height = m_atlas.height,
-                .pixel_format = SG_PIXELFORMAT_RGBA8,
-                .data.subimage[0][0] = {
-                    .ptr = atlas_data,
-                    .size = (size_t)m_atlas.width * m_atlas.height * 4
-                }
-            };
+            sg_image_desc img_desc = {};
+            img_desc.width = m_atlas.width;
+            img_desc.height = m_atlas.height;
+            img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
+            img_desc.data.subimage[0][0].ptr = atlas_data;
+            img_desc.data.subimage[0][0].size = (size_t)m_atlas.width * m_atlas.height * 4;
+ 
             
             m_atlas.img = sg_make_image(&img_desc);
             
