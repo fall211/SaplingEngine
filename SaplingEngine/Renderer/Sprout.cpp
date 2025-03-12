@@ -3,16 +3,22 @@
 //  Sapling Engine, Sprout Renderer
 //
 
+#if defined(__APPLE__)
+    #define SOKOL_METAL
+#elif defined(_WIN32)
+    #define SOKOL_D3D11
+    #define SOKOL_IMPL
+#else
+    #define SOKOL_GLCORE
+    #define SOKOL_IMPL
+#endif
 
-#include "glm/ext/matrix_transform.hpp"
-#include <chrono>
-#define SOKOL_IMPL
-#define SOKOL_GLCORE
 #define SOKOL_NO_ENTRY
 #include "Sprout.hpp"
 #include "quad.h"
 
 #include <algorithm>
+#include <iostream>
 
 namespace Sprout 
 {
@@ -84,19 +90,20 @@ namespace Sprout
         //zoom 3x
         draw_frame.camera_xform = glm::scale(draw_frame.camera_xform, glm::vec3(3.0f, 3.0f, 1.0f));
         
-        sg_desc desc = 
-        {
-            .environment = sglue_environment()
-        };
+        sg_desc desc = {};
+        desc.environment = sglue_environment();
         
         sg_setup(&desc);
-        
+        if (sg_isvalid()) {
+                printf("Sokol GFX successfully initialized!\n");
+            } else {
+                printf("ERROR: Failed to initialize Sokol GFX!\n");
+            }
         // vertex buffer 
-        sg_buffer_desc vbuf_desc = {
-            .size = sizeof(draw_frame.quads),
-            .usage = SG_USAGE_DYNAMIC,
-            .label = "quad-vertices"
-        };
+        sg_buffer_desc vbuf_desc = {};
+        vbuf_desc.size = sizeof(draw_frame.quads);
+        vbuf_desc.usage = SG_USAGE_DYNAMIC;
+        vbuf_desc.label = "quad-vertices";
         
         m_state.bind.vertex_buffers[0] = sg_make_buffer(&vbuf_desc);
         
@@ -115,59 +122,55 @@ namespace Sprout
     		i += 6;
         }
         
-        sg_buffer_desc ibuf_desc = {
-            .type = SG_BUFFERTYPE_INDEXBUFFER,
-            .size = sizeof(indices),
-            .data = SG_RANGE(indices),
-            .label = "quad-indices"
-        };
+        sg_buffer_desc ibuf_desc = {};
+        ibuf_desc.type = SG_BUFFERTYPE_INDEXBUFFER;
+        ibuf_desc.size = sizeof(indices);
+        ibuf_desc.data = SG_RANGE(indices);
+        ibuf_desc.label = "quad-indices";
         
         m_state.bind.index_buffer = sg_make_buffer(&ibuf_desc);
         
-        sg_sampler_desc sampler_desc = {
-            .min_filter = SG_FILTER_NEAREST,
-            .mag_filter = SG_FILTER_NEAREST,
-            .mipmap_filter = SG_FILTER_NEAREST,
-            .wrap_u = SG_WRAP_REPEAT,
-            .wrap_v = SG_WRAP_REPEAT,
-        };
+        sg_sampler_desc sampler_desc = {};
+        sampler_desc.min_filter = SG_FILTER_NEAREST;
+        sampler_desc.mag_filter = SG_FILTER_NEAREST;
+        sampler_desc.mipmap_filter = SG_FILTER_NEAREST;
+        sampler_desc.wrap_u = SG_WRAP_REPEAT;
+        sampler_desc.wrap_v = SG_WRAP_REPEAT;
         
         m_state.bind.samplers[SMP_default_sampler] = sg_make_sampler(&sampler_desc);
         
         // pipeline
         sg_shader shd = sg_make_shader(quad_shader_desc(sg_query_backend()));
         
-        sg_pipeline_desc pip_desc = {
-            .shader = shd,
-            .index_type = SG_INDEXTYPE_UINT16,
-            .layout = {
-                .attrs = {
-                    [ATTR_quad_position0].format = SG_VERTEXFORMAT_FLOAT4,
-                    [ATTR_quad_color0].format = SG_VERTEXFORMAT_FLOAT4,
-                    [ATTR_quad_uv0].format = SG_VERTEXFORMAT_FLOAT2,
-                    [ATTR_quad_color_override0].format = SG_VERTEXFORMAT_FLOAT4
-                }
-            },
-            .label = "quad-pipeline"
-        };
+        sg_pipeline_desc pip_desc = {};
+        pip_desc.shader = shd;
+        pip_desc.index_type = SG_INDEXTYPE_UINT16;
+        pip_desc.layout.attrs[ATTR_quad_position0].format = SG_VERTEXFORMAT_FLOAT4;
+        pip_desc.layout.attrs[ATTR_quad_color0].format = SG_VERTEXFORMAT_FLOAT4;
+        pip_desc.layout.attrs[ATTR_quad_uv0].format = SG_VERTEXFORMAT_FLOAT2;
+        pip_desc.layout.attrs[ATTR_quad_color_override0].format = SG_VERTEXFORMAT_FLOAT4;
+        pip_desc.label = "quad-pipeline";
         
-        sg_blend_state blend_state = {
-            .enabled = true,
-            .src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
-            .dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
-            .op_rgb = SG_BLENDOP_ADD,
-            .src_factor_alpha = SG_BLENDFACTOR_ONE,
-            .dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
-            .op_alpha = SG_BLENDOP_ADD
-        };
+        sg_blend_state blend_state = {};
+        blend_state.enabled = true;
+        blend_state.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
+        blend_state.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_state.op_rgb = SG_BLENDOP_ADD;
+        blend_state.src_factor_alpha = SG_BLENDFACTOR_ONE;
+        blend_state.dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_state.op_alpha = SG_BLENDOP_ADD;
         
         pip_desc.colors[0].blend = blend_state;
         
         m_state.pip = sg_make_pipeline(&pip_desc);
         
-        m_state.pass_action = (sg_pass_action){
-            .colors[0] = { .load_action=SG_LOADACTION_CLEAR, .clear_value = { 1.0f, 1.0f, 1.0f, 1.0f } }
-        };
+        // m_state.pass_action = (sg_pass_action){
+        //     .colors[0] = { .load_action=SG_LOADACTION_CLEAR, .clear_value = { 1.0f, 1.0f, 1.0f, 1.0f } }
+        // };
+        sg_pass_action pass_action = {};
+        pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
+        pass_action.colors[0].clear_value = {1.0f, 1.0f, 1.0f, 1.0f};
+        m_state.pass_action = pass_action;
         
         // bake images into atlas
         bake_atlas();
@@ -201,10 +204,11 @@ namespace Sprout
         m_state.bind.images[IMG_tex0] = m_atlas.img;
     
         sg_update_buffer(m_state.bind.vertex_buffers[0], SG_RANGE(draw_frame.quads));
-        sg_pass pass = {
-            .action = m_state.pass_action,
-            .swapchain = sglue_swapchain()
-        };
+
+
+        sg_pass pass = {};
+        pass.action = m_state.pass_action;
+        pass.swapchain = sglue_swapchain();
         sg_begin_pass(&pass);
         sg_apply_pipeline(m_state.pip);
         sg_apply_bindings(&m_state.bind);
@@ -251,19 +255,33 @@ namespace Sprout
         }
     }
     
+    // auto Window::sokol_main() -> sapp_desc 
+    // {
+    //     return (sapp_desc)
+    //     {
+    //         .init_cb = init_cb,
+    //         .frame_cb = frame_cb,
+    //         .cleanup_cb = cleanup_cb,
+    //         .event_cb = event_cb,
+    //         .width = instance->m_width,
+    //         .height = instance->m_height,
+    //         .high_dpi = true,
+    //         .window_title = instance->m_title,
+    //     };
+    // }
+    
     auto Window::sokol_main() -> sapp_desc 
     {
-        return (sapp_desc)
-        {
-            .init_cb = init_cb,
-            .frame_cb = frame_cb,
-            .cleanup_cb = cleanup_cb,
-            .event_cb = event_cb,
-            .width = instance->m_width,
-            .height = instance->m_height,
-            .high_dpi = true,
-            .window_title = instance->m_title,
-        };
+        sapp_desc desc = {};
+        desc.init_cb = init_cb;
+        desc.frame_cb = frame_cb;
+        desc.cleanup_cb = cleanup_cb;
+        desc.event_cb = event_cb;
+        desc.width = instance->m_width;
+        desc.height = instance->m_height;
+        desc.high_dpi = true;
+        desc.window_title = instance->m_title;
+        return desc;
     }
     
     Sprout::Window* Window::instance = nullptr;

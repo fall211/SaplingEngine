@@ -1,52 +1,58 @@
 cmake_minimum_required(VERSION 3.10)
 project(Sapling)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
-# Add executable
 add_executable(Sapling)
+
+if(APPLE)
+    target_sources(Sapling PRIVATE "${CMAKE_SOURCE_DIR}/SaplingEngine/Renderer/SproutMetal.mm")
+    set_source_files_properties("${CMAKE_SOURCE_DIR}/SaplingEngine/Renderer/SproutMetal.mm"
+                                PROPERTIES
+                                COMPILE_FLAGS "-x objective-c++")
+endif()
 
 file(GLOB_RECURSE ENGINE_SOURCES 
     "${CMAKE_SOURCE_DIR}/GameContent/main.cpp"
     "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.cpp"
     "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.hpp"
-    "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.mm"
 )
-target_sources(Sapling PRIVATE ${ENGINE_SOURCES})
-
 file(GLOB_RECURSE GAME_CONTENT_SOURCES 
     "${CMAKE_SOURCE_DIR}/GameContent/**/*.cpp"
     "${CMAKE_SOURCE_DIR}/GameContent/**/*.hpp"
-    "${CMAKE_SOURCE_DIR}/GameContent/**/*.mm"
 )
-target_sources(Sapling PRIVATE ${GAME_CONTENT_SOURCES})
 
-
-
-
-set_source_files_properties(Sprout.mm PROPERTIES LANGUAGE CXX)
-# target_sources(Sapling PRIVATE Sprout.mm)
+target_sources(Sapling PRIVATE ${ENGINE_SOURCES} ${GAME_CONTENT_SOURCES})
 
 # FMOD setup
 set(FMOD_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/fmod")
 set(FMOD_CORE_LIB_DIR "${FMOD_ROOT}/core/lib")
 set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT}/studio/lib")
 
-target_link_libraries(Sapling PRIVATE
-    "-framework Cocoa"
-    "-framework QuartzCore"
-    "-framework Metal"
-    "-framework OpenGL"
-    "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
-    "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
-)
+# Link libraries
+if(APPLE)
+    target_link_libraries(Sapling PRIVATE
+        "-framework Cocoa"
+        "-framework QuartzCore"
+        "-framework Metal"
+        "-framework MetalKit"
+        "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
+        "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
+    )
+else()
+    # Windows or other platform linking
+    target_link_libraries(Sapling PRIVATE
+        "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
+        "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
+    )
+endif()
 
 # Copy FMOD dylibs to the executable directory
 add_custom_command(TARGET Sapling POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
-        "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
-        $<TARGET_FILE_DIR:Sapling>
+    "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
+    "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
+    $<TARGET_FILE_DIR:Sapling>
 )
 
 # Set RPATH for the executable
@@ -56,7 +62,6 @@ if(APPLE)
         INSTALL_RPATH "@executable_path"
     )
 endif()
-
 
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/")
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SPRITES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/Sprites/")
