@@ -77,10 +77,10 @@ namespace Comp
         inst->requestRemoveTag("drawable");
     }
     
-    void Sprite::setColorOverride(const glm::vec4& color, const size_t frametime)
+    void Sprite::setColorOverride(const glm::vec4& color, const float time)
     {
         color_override = color;
-        colorOverrideFrametime = frametime;
+        colorOverrideTime = time;
     }
     
     SimplePlayerControls::SimplePlayerControls(Inst inst, const float speedIn, const int jumpStrIn)

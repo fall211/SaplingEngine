@@ -37,6 +37,7 @@ void Scene::disable()
 
 void Scene::sRender(EntityList& entities)
 {
+    float dt = m_engine.deltaTime();
     for (const auto& e : entities)
     {
         if (e->hasComponent<Comp::Sprite>())
@@ -47,12 +48,13 @@ void Scene::sRender(EntityList& entities)
 
             if (cSprite.type == Comp::Sprite::Type::Animated)
             {
-                // update the animation frame                
-                if (m_engine.getCurrentFrame() % cSprite.animationSpeed == 0 )
+                // update the animation frame based on delta time
+                cSprite.animationTime += dt;
+                if (cSprite.animationTime >= (1.0f / cSprite.animationSpeed))
                 {
                     cSprite.currentFrame = (cSprite.currentFrame + 1) % cSprite.numFrames;
+                    cSprite.animationTime = 0.0f;
                 }
-
             }
             glm::f32 layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
             
@@ -61,12 +63,13 @@ void Scene::sRender(EntityList& entities)
             
             m_engine.getWindow().draw_sprite(cSprite.texture, pos, layer, cTransform.rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, cTransform.pivot);
             
-            if (cSprite.colorOverrideFrametime > 0)
+            if (cSprite.colorOverrideTime > 0)
             {
-                cSprite.colorOverrideFrametime--;
-                if (cSprite.colorOverrideFrametime == 0)
+                cSprite.colorOverrideTime -= dt;
+                if (cSprite.colorOverrideTime <= 0)
                 {
                     cSprite.color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+                    cSprite.colorOverrideTime = 0;
                 }
             }
         }

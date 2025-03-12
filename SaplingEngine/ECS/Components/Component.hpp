@@ -129,7 +129,7 @@ namespace Comp
             
             void flipX(bool flip);
             
-            void setColorOverride(const glm::vec4& color, size_t frametime);
+            void setColorOverride(const glm::vec4& color, float time);
             
             enum class Type {
                 Static,
@@ -144,8 +144,9 @@ namespace Comp
             size_t currentFrame = 0;
             size_t frameSize;
             size_t animationSpeed = 60;
+            float animationTime = 0.0f;
             glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-            size_t colorOverrideFrametime = 0;
+            float colorOverrideTime = 0;
             bool flip_X = false;
     };
     
