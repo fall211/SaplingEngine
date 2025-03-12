@@ -30,6 +30,7 @@ namespace Comp
             void OnAddToEntity() override
             {
                 inst->ListenForEvent<Inst>("PickupInput", E_PickupInput);
+                inst->ListenForEvent<Inst>("ForceDrop", E_ForceDrop);
                 inst->ListenForEvent<Inst, Inst>("TriggerEnter", E_TriggerEnter);
                 inst->ListenForEvent<Inst, Inst>("TriggerExit", E_TriggerExit);
             }
@@ -37,6 +38,7 @@ namespace Comp
             void OnRemoveFromEntity() override
             {
                 inst->RemoveEventCallback("PickupInput", E_PickupInput);
+                inst->RemoveEventCallback("ForceDrop", E_ForceDrop);
                 inst->RemoveEventCallback("TriggerEnter", E_TriggerEnter);
                 inst->RemoveEventCallback("TriggerExit", E_TriggerExit);
                 
@@ -63,6 +65,21 @@ namespace Comp
                         if (pickup->hasComponent<Comp::Pickup>()) 
                         {
                             pickup->PushEvent("Pickup", pickup, inst);
+                        }
+                    }
+                }
+            }
+            
+            static void ForceDrop(const Inst& inst)
+            {
+                if (inst->hasComponent<TransformHierarchy>())
+                {
+                    auto transform = inst->getComponent<TransformHierarchy>();
+                    for (auto& child : transform.children)
+                    {
+                        if (child->hasComponent<Comp::Pickup>())
+                        {
+                            child->PushEvent("Drop", child);
                         }
                     }
                 }
@@ -107,6 +124,7 @@ namespace Comp
         
             //events
             std::function<void(Inst)> E_PickupInput = PickupHandler::PickupInput;
+            std::function<void(Inst)> E_ForceDrop = PickupHandler::ForceDrop;
             std::function<void(Inst, Inst)> E_TriggerEnter = PickupHandler::TriggerEnter;
             std::function<void(Inst, Inst)> E_TriggerExit = PickupHandler::TriggerExit;
     };

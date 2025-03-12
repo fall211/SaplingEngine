@@ -39,13 +39,13 @@ namespace Comp
             {
                 if (inst->hasComponent<Bubble>())
                 {
-                    if (other->hasComponent<Health>())
+                    if (other->hasComponent<Health>() && other->hasTag("enemy"))
                     {
                         int damage = 1;
                         other->PushEvent("TakeDamage", other, damage);
                     }
                     
-                    if (!other->hasTag("player")) inst->destroy();
+                    if (!other->hasTag("player"))   inst->destroy();
                 }
             }
 

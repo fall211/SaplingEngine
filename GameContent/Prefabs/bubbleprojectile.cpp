@@ -23,7 +23,7 @@ namespace Prefab
         
         auto& sprite = inst->addComponent<Comp::Sprite>(AssetManager::getTexture("bubble_projectile"));
         sprite.setLayer(Comp::Sprite::Layer::Foreground);
-        auto& collider = inst->addComponent<Comp::BBox>(12, 12);
+        auto& collider = inst->addComponent<Comp::BBox>(6, 6);
         collider.isStatic = false;
         collider.isTrigger = true;
         collider.collisionEventsEnabled = true;

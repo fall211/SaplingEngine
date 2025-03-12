@@ -17,6 +17,8 @@ namespace System
 {
     inline void EnemySpawner(EntityList& entities, const std::shared_ptr<EntityManager>& entManager, float dt)
     {
+        std::shuffle(entities.begin(), entities.end(), std::mt19937(std::random_device()()));
+        
         for (auto& e : entities)
         {
             if (!e->hasComponent<Comp::EnemySpawner<Prefab::ForestSpirit>>()) continue;

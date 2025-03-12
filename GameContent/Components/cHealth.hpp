@@ -55,7 +55,7 @@ namespace Comp
                 
                 if (health.health <= 0)
                 {
-                    inst->destroy();
+                    inst->PushEvent("Death", inst);
                 }
             }
             
@@ -63,8 +63,11 @@ namespace Comp
             {
                 if (inst->hasComponent<Comp::Health>() && other->hasComponentEnabled<Damage>())
                 {
-                    int damage = other->getComponent<Damage>().damage;
-                    inst->PushEvent("TakeDamage", inst, damage);
+                    if (inst->hasTag("player") && other->hasTag("enemy"))
+                    {
+                        int damage = other->getComponent<Damage>().damage;
+                        inst->PushEvent("TakeDamage", inst, damage);
+                    }
                 }
             }
             

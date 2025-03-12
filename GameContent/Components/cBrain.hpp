@@ -74,6 +74,7 @@ namespace Comp
                 inst->ListenForEvent<Inst>("Attack", E_Attack);
                 inst->ListenForEvent<Inst>("FinishAttack", E_FinishAttack);
                 inst->ListenForEvent<Inst>("FloorCollision", E_FloorCollision);
+                inst->ListenForEvent<Inst>("Death", E_Death);
             }
             
             void OnRemoveFromEntity() override
@@ -83,6 +84,7 @@ namespace Comp
                 inst->RemoveEventCallback("Attack", E_Attack);
                 inst->RemoveEventCallback("FinishAttack", E_FinishAttack);
                 inst->RemoveEventCallback("FloorCollision", E_FloorCollision);
+                inst->RemoveEventCallback("Death", E_Death);
             }
             
             
@@ -143,12 +145,17 @@ namespace Comp
                 }
             }
             
+            static void Death(const Inst& inst)
+            {
+                inst->destroy();
+            }
+            
         private:
             std::function<void(Inst)> E_Jump = Brain::Jump;
             std::function<void(Inst)> E_Attack = Brain::Attack;
             std::function<void(Inst)> E_FinishAttack = Brain::FinishAttack;
             std::function<void(Inst)> E_FloorCollision = Brain::FloorCollision;
-            
+            std::function<void(Inst)> E_Death = Brain::Death;
             
     };
     

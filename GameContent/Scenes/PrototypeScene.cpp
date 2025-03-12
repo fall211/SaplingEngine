@@ -9,7 +9,6 @@
 #include "Input/Input.hpp"
 #include "enemy.hpp"
 
-#include <_strings.h>
 #include <memory>
 
 
@@ -65,23 +64,21 @@ void PrototypeScene::update()
     sRender(entitiesInRange);
     
     // post frame - debug draws
-    System::DrawTransforms(entitiesInRange);
+    // System::DrawTransforms(entitiesInRange);
     // System::DrawBoundingBoxes(entitiesInRange);
 
 }
 
 void PrototypeScene::sSpawn()
 {
-    // auto map = System::SpawnMap(std::string(ASSETS_PATH) + "map.csv", *m_entityManager);
     auto optimizedMap = System::SpawnCollisionOptimizedMap(std::string(ASSETS_PATH) + "map.csv", *m_entityManager);
 
 
     auto player = m_entityManager->instantiatePrefab<Prefab::Player>();
+    auto weapon = m_entityManager->instantiatePrefab<Prefab::Weapon>();
+    weapon->getComponent<Comp::Transform>().position = player->getComponent<Comp::Transform>().position + glm::vec2(0.0f, 1.0f);
 
-    // m_entityManager->instantiatePrefab<Prefab::Weapon>();
-    // m_entityManager->instantiatePrefab<Prefab::Enemy>();
     
-    // System::FoliageSpawner(m_entityManager);
     AudioEngine::getInstance()->playSound("woodpecker", 5.0);
 
 }

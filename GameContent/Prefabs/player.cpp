@@ -31,6 +31,7 @@ namespace Prefab
         collider.interactWithTriggers = true;
         collider.collisionEventsEnabled = true;
         
+        // pickup
         inst->addComponent<Comp::TransformHierarchy>();
         inst->addComponent<Comp::PickupHandler>();
 
@@ -38,7 +39,7 @@ namespace Prefab
         inst->addComponent<Comp::PlayerController>();
         
         // health
-        inst->addComponent<Comp::Health>(100);
+        inst->addComponent<Comp::Health>(25);
         
     }
 }

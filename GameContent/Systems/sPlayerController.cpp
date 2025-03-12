@@ -36,11 +36,6 @@ namespace System::PlayerController
         HandleGravity(player, dt);
         ApplyMovement(player);
         
-        // move player to 0,0 if they fall off the map
-        if (player->getComponent<Comp::Transform>().position.y > 1000)
-        {
-            player->getComponent<Comp::Transform>().reset = true;
-        }
     }
     
     void GatherInput(const std::shared_ptr<Entity>& player)

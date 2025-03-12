@@ -28,14 +28,7 @@ namespace System
                     e->destroy();
                 }
             }
-            if (e->hasComponent<Comp::Health>())
-            {
-                auto& health = e->getComponent<Comp::Health>();
-                if (health.health <= 0)
-                {
-                    e->destroy();
-                }
-            }
+
         }
     }
 }

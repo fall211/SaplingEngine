@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Component.hpp"
+#include "cHealth.hpp"
 #include "cPickup.hpp"
 #include "Entity.hpp"
 #include "Input/Input.hpp"
@@ -15,6 +16,7 @@
 #include <functional>
 #include <utility>
 #include "Audio/AudioEngine.hpp"
+#include "cPickupHandler.hpp"
 
 namespace Comp
 {
@@ -132,6 +134,7 @@ namespace Comp
                 inst->ListenForEvent<Inst>("Dash", E_Dash);
                 inst->ListenForEvent<Inst>("FloorCollision", E_FloorCollision);
                 inst->ListenForEvent<Inst>("CeilingCollision", E_CeilingCollision);
+                inst->ListenForEvent<Inst>("Death", E_Death);
             }
             
             void OnRemoveFromEntity() override
@@ -145,6 +148,7 @@ namespace Comp
                 inst->RemoveEventCallback("Dash", E_Dash);
                 inst->RemoveEventCallback("FloorCollision", E_FloorCollision);
                 inst->RemoveEventCallback("CeilingCollision", E_CeilingCollision);
+                inst->RemoveEventCallback("Death", E_Death);
             }
             
             static void Jump(const Inst& inst)
@@ -195,6 +199,23 @@ namespace Comp
                     controller.collisionState.ceilingHit = true;
                 }
             }
+            
+            static void Death(const Inst& inst)
+            {
+                if (inst->hasComponent<Transform>() && inst->hasComponent<Health>())
+                {
+                    auto& transform = inst->getComponent<Transform>();
+                    auto& health = inst->getComponent<Health>();
+                    
+                    transform.position = glm::vec2(280, 140);
+                    health.health = 25;
+                    
+                    if (inst->hasComponent<PickupHandler>())
+                    {
+                        inst->PushEvent("ForceDrop", inst);
+                    }
+                }
+            }
 
             
         private:
@@ -204,5 +225,6 @@ namespace Comp
             std::function<void(Inst)> E_Dash = PlayerController::Dash;
             std::function<void(Inst)> E_FloorCollision = PlayerController::FloorCollision;
             std::function<void(Inst)> E_CeilingCollision = PlayerController::CeilingCollision;
+            std::function<void(Inst)> E_Death = PlayerController::Death;
     };
 }
