@@ -5,21 +5,18 @@
 
 #pragma once
 
-#include <string>
 #include <map>
+#include <string>
 #include <unordered_map>
+#include <memory>
+#include <stdexcept>
 
 #include "Renderer/Texture.hpp"
 #include "glm/glm.hpp"
 #include "fmod.hpp"
-#include <memory>
-#include <stdexcept>
+
 
 class AudioEngine;
-
-#ifndef ASSETS_PATH
-#define ASSETS_PATH "../GameContent/Assets/"
-#endif
 
 class AssetManager {
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
@@ -28,6 +25,7 @@ class AssetManager {
     
     std::unordered_map<std::string, FMOD::Sound*> m_sounds = std::unordered_map<std::string, FMOD::Sound*>();
     
+    
     static AssetManager* Instance;
 
     AssetManager() = default;
@@ -35,7 +33,7 @@ class AssetManager {
 
 public:
 
-
+    static std::string getAssetsPath();
     static AssetManager* getInstance()
     {
         if (Instance == nullptr) {

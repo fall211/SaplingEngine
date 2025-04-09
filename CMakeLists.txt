@@ -1,4 +1,29 @@
 cmake_minimum_required(VERSION 3.10)
+
+function(bundle_macos_app target app_name assets_src dylibs)
+    set(APP_DIR "${CMAKE_BINARY_DIR}/${app_name}.app")
+    set(MACOS_DIR "${APP_DIR}/Contents/MacOS")
+    set(RESOURCES_DIR "${APP_DIR}/Contents/Resources")
+
+    set_target_properties(${target} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${MACOS_DIR}"
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH "@executable_path"
+    )
+
+    foreach(dylib ${dylibs})
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dylib}" "${MACOS_DIR}"
+        )
+    endforeach()
+
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCES_DIR}/Assets"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${assets_src}" "${RESOURCES_DIR}/Assets"
+    )
+endfunction()
+
+
 project(Sapling)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -81,11 +106,19 @@ if(APPLE)
     )
 endif()
 
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/")
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SPRITES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/Sprites/")
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC COMPONENTS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Components/")
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PREFABS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Prefabs/")
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SYSTEMS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Systems/")
+if(APPLE)
+    target_compile_definitions(Sapling
+        PUBLIC 
+            $<$<CONFIG:Debug>:ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/">
+    )
+elseif(WIN32)
+    target_compile_definitions(Sapling
+        PUBLIC 
+            $<$<CONFIG:Debug>:ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/">
+    )
+endif()
+
+
 
 # Add include directories
 target_include_directories(Sapling PUBLIC
@@ -111,5 +144,11 @@ target_include_directories(Sapling PUBLIC
     /opt/homebrew/include
 )
 
-message(STATUS "FMOD Core Library Dir: ${FMOD_CORE_LIB_DIR}")
-message(STATUS "FMOD Studio Library Dir: ${FMOD_STUDIO_LIB_DIR}")
+
+if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(FMOD_DYLIBS
+        "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
+        "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
+    )
+    bundle_macos_app(Sapling "Sapling" "${CMAKE_SOURCE_DIR}/GameContent/Assets" "${FMOD_DYLIBS}")
+endif()
