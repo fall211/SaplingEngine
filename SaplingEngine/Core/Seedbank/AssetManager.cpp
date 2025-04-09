@@ -15,6 +15,9 @@ AssetManager* AssetManager::Instance = nullptr;
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #endif
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 std::string AssetManager::getAssetsPath() {
     
@@ -37,14 +40,19 @@ std::string AssetManager::getAssetsPath() {
     }
 #endif
 
-    std::filesystem::path cwd = std::filesystem::current_path();
-    std::filesystem::path fallbackPath = cwd / "GameContent" / "Assets";
-
-    if (std::filesystem::exists(fallbackPath)) {
-        return fallbackPath.string() + "/";
+#ifdef _WIN32
+    char path[MAX_PATH];
+    DWORD length = GetModuleFileNameA(NULL, path, MAX_PATH);
+    if (length > 0 && length < MAX_PATH) {
+        std::string fullPath(path);
+        size_t pos = fullPath.find_last_of("\\/");
+        if (pos != std::string::npos) {
+            return fullPath.substr(0, pos) + "\\Assets\\";
+        }
     }
+#endif
 
-    return "../../GameContent/Assets/";
+    return "../../GameContent/Assets/"; // fallback path for development
 }
 
 void AssetManager::addTexture(const std::string& name, const std::string& path, const glm::i32 numFrames) {

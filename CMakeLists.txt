@@ -37,6 +37,7 @@ if(APPLE)
                                 COMPILE_FLAGS "-x objective-c++")
 endif()
 
+
 file(GLOB_RECURSE ENGINE_SOURCES 
     "${CMAKE_SOURCE_DIR}/GameContent/main.cpp"
     "${CMAKE_SOURCE_DIR}/SaplingEngine/**/*.cpp"
@@ -98,6 +99,7 @@ elseif(WIN32)
 endif()
 
 
+
 # Set RPATH for the executable
 if(APPLE)
     set_target_properties(Sapling PROPERTIES
@@ -152,3 +154,25 @@ if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
     )
     bundle_macos_app(Sapling "Sapling" "${CMAKE_SOURCE_DIR}/GameContent/Assets" "${FMOD_DYLIBS}")
 endif()
+
+if (WIN32)
+    add_custom_command(TARGET Sapling POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Checking config: $<CONFIG>"
+        COMMAND ${CMAKE_COMMAND} -E $<IF:$<CONFIG:Release>,copy_directory,echo>
+            "${CMAKE_SOURCE_DIR}/GameContent/Assets"
+            "$<TARGET_FILE_DIR:Sapling>/Assets"
+    )
+
+    set_target_properties(Sapling PROPERTIES
+        WIN32_EXECUTABLE $<IF:$<CONFIG:Release>,YES,NO>
+    )
+
+
+    target_compile_definitions(Sapling
+        PUBLIC 
+            $<$<NOT:$<CONFIG:Release>>:DEBUG>
+    )
+
+
+endif()
+
