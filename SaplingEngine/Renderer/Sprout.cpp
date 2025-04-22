@@ -59,6 +59,21 @@ namespace Sprout
             m_height(height), 
             m_title(title)
         {    
+            memset(&m_state, 0, sizeof(m_state));
+            memset(&draw_frame, 0, sizeof(draw_frame));
+    
+            draw_frame.view_projection = glm::ortho(
+                -0.5f * (m_width),
+                0.5f * (m_width),
+                0.5f * (m_height),
+                -0.5f * (m_height),
+                1.0f,
+                -1.0f
+            );
+            
+            draw_frame.orthoSize = glm::vec2(m_width, m_height);
+            draw_frame.camera_xform = glm::mat4(1.0f);
+
             instance = this;
         }
     
@@ -89,32 +104,9 @@ namespace Sprout
     
     
     void Window::Init()
-    {
-        memset(&m_state, 0, sizeof(m_state));
-        memset(&draw_frame, 0, sizeof(draw_frame));
-
-        draw_frame.view_projection = glm::ortho(
-            -0.5f * (m_width),
-            0.5f * (m_width),
-            0.5f * (m_height),
-            -0.5f * (m_height),
-            1.0f,
-            -1.0f
-        );
-        
-        draw_frame.orthoSize = glm::vec2(m_width, m_height);
-        
-        // we draw in a 640x360 space, so we need to scale the view projection to match the screen size
-        // draw_frame.view_projection = glm::scale(draw_frame.view_projection, glm::vec3(1.0f / 640.0f * m_width, 1.0f / 360.0f * m_height, 1.0f));
-        
-        draw_frame.camera_xform = glm::mat4(1.0f);
-        //zoom 3x
-        // draw_frame.camera_xform = glm::scale(draw_frame.camera_xform, glm::vec3(3.0f, 3.0f, 1.0f));
-        
+    {        
         sg_desc desc = {};
-        desc.environment = sglue_environment();
-        
-
+        desc.environment = sglue_environment();   
         sg_setup(&desc);
 
         // vertex buffer 
@@ -179,12 +171,8 @@ namespace Sprout
         blend_state.op_alpha = SG_BLENDOP_ADD;
         
         pip_desc.colors[0].blend = blend_state;
-        
         m_state.pip = sg_make_pipeline(&pip_desc);
         
-        // m_state.pass_action = (sg_pass_action){
-        //     .colors[0] = { .load_action=SG_LOADACTION_CLEAR, .clear_value = { 1.0f, 1.0f, 1.0f, 1.0f } }
-        // };
         sg_pass_action pass_action = {};
         pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
         pass_action.colors[0].clear_value = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -264,7 +252,6 @@ namespace Sprout
                 
                 const float referenceWidth = 640.0f;
                 const float referenceHeight = 360.0f;
-                
 
                 float windowAspect = static_cast<float>(m_width) / m_height;
                 float referenceAspect = referenceWidth / referenceHeight;
@@ -288,40 +275,10 @@ namespace Sprout
                     -1.0f
                 );
                 draw_frame.orthoSize = glm::vec2(orthoWidth, orthoHeight);
-                
-                
-                //old implementation - keep everything same physical size
-                // m_width = e->window_width;
-                // m_height = e->window_height;
-                
-                // draw_frame.view_projection = glm::ortho(
-                //     -0.5f * (m_width),
-                //     0.5f * (m_width),
-                //     0.5f * (m_height),
-                //     -0.5f * (m_height),
-                //     1.0f,
-                //     -1.0f
-                // );
-
             }
         }
     }
-    
-    // auto Window::sokol_main() -> sapp_desc 
-    // {
-    //     return (sapp_desc)
-    //     {
-    //         .init_cb = init_cb,
-    //         .frame_cb = frame_cb,
-    //         .cleanup_cb = cleanup_cb,
-    //         .event_cb = event_cb,
-    //         .width = instance->m_width,
-    //         .height = instance->m_height,
-    //         .high_dpi = true,
-    //         .window_title = instance->m_title,
-    //     };
-    // }
-    
+        
     auto Window::sokol_main() -> sapp_desc 
     {
         sapp_desc desc = {};
