@@ -6,6 +6,7 @@
 #pragma once
 
 
+
 #include "Renderer/Texture.hpp"
 #include "Sprout.hpp"
 #include "glm/glm.hpp"
@@ -42,18 +43,17 @@ namespace Comp
         * velocity (vec2): The velocity of the entity.
         * rotation (f32): The rotation of the entity.
     */
-    class Transform final : public Component
+    struct Transform final : public Component
     {
-        public:
-            glm::vec2 position = glm::vec2(0, 0);
-            glm::vec2 velocity = glm::vec2(0, 0);
-            glm::f32 rotation = 0.0f;
-            glm::vec3 scale = glm::vec3(1, 1, 1);
-            Sprout::Pivot pivot = Sprout::Pivot::CENTER;
-            bool reset = false;
-    
-            Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);
-            Transform(Inst inst, const glm::vec2& positionin);
+        glm::vec2 position = glm::vec2(0, 0);
+        glm::vec2 velocity = glm::vec2(0, 0);
+        glm::f32 rotation = 0.0f;
+        glm::vec3 scale = glm::vec3(1, 1, 1);
+        Sprout::Pivot pivot = Sprout::Pivot::CENTER;
+        bool reset = false;
+
+        Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);
+        Transform(Inst inst, const glm::vec2& positionin);
     };
     
     
@@ -62,34 +62,32 @@ namespace Comp
         * w (f32): The width of the bounding box.
         * h (f32): The height of the bounding box.
     */
-    class BBox final : public Component
+    struct BBox final : public Component
     {
-        public:
-            float h;
-            float w;
-            bool isTrigger = false;
-            bool isStatic = true;
-            bool interactWithTriggers = false;
-            bool collisionEventsEnabled = false;
-            std::unordered_set<BBox*> collidingWith = {};
-            
-            BBox(Inst inst, float win, float hin);
-            void OnAddToEntity() override;
-            void OnRemoveFromEntity() override;
+        float h;
+        float w;
+        bool isTrigger = false;
+        bool isStatic = true;
+        bool interactWithTriggers = false;
+        bool collisionEventsEnabled = false;
+        std::unordered_set<BBox*> collidingWith = {};
+        
+        BBox(Inst inst, float win, float hin);
+        void OnAddToEntity() override;
+        void OnRemoveFromEntity() override;
     };
     
     /*
         * A bounding circle component for collision detection.
         * radius (f32): The radius of the bounding circle.
     */
-    class BCircle final : public Component
+    struct BCircle final : public Component
     {
-        public: 
-            float radius = 1.0f;
-            
-            BCircle(Inst inst, float radiusIn);
-            void OnAddToEntity() override;
-            void OnRemoveFromEntity() override;
+        float radius = 1.0f;
+        
+        BCircle(Inst inst, float radiusIn);
+        void OnAddToEntity() override;
+        void OnRemoveFromEntity() override;
     };
         
     
@@ -104,76 +102,85 @@ namespace Comp
         * frameSize (size_t): The size of each frame in the animation.
         * animationSpeed (size_t): The speed of the animation.
     */
-    class Sprite final : public Component 
+    struct Sprite final : public Component 
     {
-        public:
-            std::shared_ptr<Sprout::Texture> texture;
-            explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin);
-            explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin, float animSpeed);
-            void OnAddToEntity() override;
-            void OnRemoveFromEntity() override;
-            
-            glm::vec2 transformOffset = glm::vec2(0.0f, 0.0f);
-            glm::vec3 scaleOffset = glm::vec3(1.0f, 1.0f, 1.0f);
-            
-            enum class Layer {
-                Background,
-                Midground,
-                Player,
-                Foreground,
-                UserInterface,
-                Count
-            };
-            
-            void setLayer(Layer layerIn) { layer = layerIn; }
-            
-            void flipX(bool flip);
-            
-            void setColorOverride(const glm::vec4& color, float time);
-            
-            enum class Type {
-                Static,
-                Animated
-            };
-            
-            Type type = Type::Static;
-            Layer layer = Layer::Midground;
-            
-            // animated frame stuff
-            size_t numFrames = 1;
-            size_t currentFrame = 0;
-            size_t frameSize;
-            size_t animationSpeed = 60;
-            float animationTime = 0.0f;
-            glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-            float colorOverrideTime = 0;
-            bool flip_X = false;
+        std::shared_ptr<Sprout::Texture> texture;
+        explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin);
+        explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin, float animSpeed);
+        void OnAddToEntity() override;
+        void OnRemoveFromEntity() override;
+        
+        glm::vec2 transformOffset = glm::vec2(0.0f, 0.0f);
+        glm::vec3 scaleOffset = glm::vec3(1.0f, 1.0f, 1.0f);
+        
+        enum class Layer : std::uint8_t {
+            Background,
+            Midground,
+            Player,
+            Foreground,
+            UserInterface,
+            Count
+        };
+        
+        void setLayer(Layer layerIn) { layer = layerIn; }
+        
+        void flipX(bool flip);
+        
+        void setColorOverride(const glm::vec4& color, float time);
+        
+        enum class Type : std::uint8_t {
+            Static,
+            Animated
+        };
+        
+        Type type = Type::Static;
+        Layer layer = Layer::Midground;
+        
+        // animated frame stuff
+        size_t numFrames = 1;
+        size_t currentFrame = 0;
+        size_t frameSize;
+        size_t animationSpeed = 60;
+        float animationTime = 0.0f;
+        glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        float colorOverrideTime = 0;
+        bool flip_X = false;
     };
     
-    class FollowMouse final : public Component {};
+    struct FollowMouse final : public Component {};
     
-    class SimplePlayerControls final : public Component 
+    struct SimplePlayerControls final : public Component 
     {
-        public:
-            float moveSpeed = 0.0f;
-            int jumpStr;
-            bool grounded = true;
-            SimplePlayerControls(Inst inst, float speedIn, int jumpStrIn);
+        float moveSpeed = 0.0f;
+        int jumpStr;
+        bool grounded = true;
+        SimplePlayerControls(Inst inst, float speedIn, int jumpStrIn);
     };
 
     
-    class TransformHierarchy final : public Component
+    struct TransformHierarchy final : public Component
     {
-        public:
-            Inst parent = nullptr;
-            std::vector<Inst> children = {};
-            
-            TransformHierarchy(Inst inst);
-            
-            void setParent(Inst parentIn);
-            void removeParent();
-            
-            void addChild(const Inst& child);
-            void removeChild(const Inst& child);
+        Inst parent = nullptr;
+        std::vector<Inst> children = {};
+        
+        TransformHierarchy(Inst inst);
+        
+        void setParent(Inst parentIn);
+        void removeParent();
+        
+        void addChild(const Inst& child);
+        void removeChild(const Inst& child);
+    };
+    
+    struct GUITransform final : public Component
+    {
+        GUITransform(Inst inst, const glm::vec2& screenPos, Sprout::Pivot pivotIn);
+        // void OnAddToEntity() override;
+        // void OnRemoveFromEntity() override;
+        
+        glm::vec2 screenPosition = glm::vec2(0, 0);
+        glm::vec3 scale = glm::vec3(1, 1, 1);
+        Sprout::Pivot pivot = Sprout::Pivot::CENTER;
     };
 }
+

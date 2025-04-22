@@ -8,9 +8,9 @@
 //  For the sokol window setup, see Sprout.mm
 
 #include "Sprout.hpp"
+#include "Debug.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include <cmath>
 #include <memory>
 
 #define STB_RECT_PACK_IMPLEMENTATION
@@ -151,7 +151,9 @@ namespace Sprout
             
             m_atlas.img = sg_make_image(&img_desc);
             
+            #ifdef DEBUG
             stbi_write_png("atlas.png", m_atlas.width, m_atlas.height, 4, atlas_data, m_atlas.width * 4);
+            #endif
             
             free(atlas_data);
             free(nodes);
@@ -186,12 +188,29 @@ namespace Sprout
         const glm::i32 frameNum,
         const glm::vec4 color_override,
         const glm::vec3 scale,
-        const Pivot pivot)
+        const Pivot pivot,
+        const bool worldSpace)
     {   
         glm::mat4 xform0 = glm::mat4(1.0f);
         
+
         // translate
-        xform0 = glm::translate(xform0, glm::vec3(position, 0.0f));
+        if (worldSpace)
+        {
+            xform0 = glm::translate(xform0, glm::vec3(position, 0.0f));     
+        }
+        else // ui elements need to use pivot for an anchor as well as a pivot
+        {
+            glm::vec2 anchor_offset = getAnchorOffset(pivot);
+            glm::vec2 pos = glm::vec2(position.x * anchor_offset.x * -1, position.y * anchor_offset.y * -1);
+            if (anchor_offset.x == 0)       pos.x = position.x;
+            if (anchor_offset.y == 0)       pos.y = -position.y;
+            
+            anchor_offset.x = anchor_offset.x * draw_frame.orthoSize.x + pos.x;
+            anchor_offset.y = anchor_offset.y * draw_frame.orthoSize.y + pos.y;
+            
+            xform0 = glm::translate(xform0, glm::vec3(anchor_offset, 0.0f));       
+        }
         
         // scale
         xform0 = glm::scale(xform0, scale);
@@ -217,17 +236,39 @@ namespace Sprout
         }
         
         // draw
-        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override, pivot);
+        if (worldSpace)
+        {
+            draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override, pivot);
+        }
+        else // ui elements are screen space
+        {
+            draw_rect_projected(draw_frame.view_projection * xform0, frame_size, layer, uv, color_override, pivot);
+        }
     }
     
-    void Window::draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture> texture, glm::vec4 color)
+    void Window::draw_rectangle(
+        float x, 
+        float y, 
+        float width, 
+        float height, 
+        const std::shared_ptr<Sprout::Texture>& texture, 
+        glm::vec4 color,
+        bool worldSpace)
     {
         // draw rectangle
         auto xform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
         glm::vec4 uv = texture->getAtlasUVs();
 
-        draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER);
+        if (worldSpace)
+        {
+            draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER);
+        }
+        else
+        {
+            draw_rect_projected(draw_frame.view_projection * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER);
+        }
     }
+    
     
     void Window::draw_rect_projected(
         glm::mat4 projection,
@@ -237,14 +278,13 @@ namespace Sprout
         glm::vec4 color_override,
         Pivot pivot)
     {
-        
         glm::vec2 pivot_offset = getPivotOffset(pivot) * size;
+
 
         glm::vec4 bottom_left = glm::vec4(0.0f - pivot_offset.x, 0.0f - pivot_offset.y, layer, 1.0f);
         glm::vec4 bottom_right = glm::vec4(size.x - pivot_offset.x, 0.0f - pivot_offset.y, layer, 1.0f);
         glm::vec4 top_left = glm::vec4(0.0f - pivot_offset.x, size.y - pivot_offset.y, layer, 1.0f);
         glm::vec4 top_right = glm::vec4(size.x - pivot_offset.x, size.y - pivot_offset.y, layer, 1.0f);
-                
         
         std::array<glm::vec4, 4> positions = {bottom_left, top_left, top_right, bottom_right};
         glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -257,10 +297,11 @@ namespace Sprout
         };
         std::array<glm::vec4, 4> color_overrides = {color_override, color_override, color_override, color_override};
         
-        draw_quad_projected(projection, positions, colors, uvs, color_overrides) ; 
+        draw_quad(projection, positions, colors, uvs, color_overrides) ; 
     }
     
-    void Window::draw_quad_projected(
+    
+    void Window::draw_quad(
         glm::mat4 projection, 
         std::array<glm::vec4, 4> positions,
         std::array<glm::vec4, 4> colors,
@@ -288,11 +329,11 @@ namespace Sprout
     
     glm::vec2 Window::screenToWorld(glm::vec2 screen_pos) 
     {
-        glm::mat4 inv_proj = glm::inverse(Window::instance->draw_frame.view_projection * Window::instance->draw_frame.camera_xform);
+        glm::mat4 inv_proj = glm::inverse(Window::getInstance()->draw_frame.view_projection * Window::getInstance()->draw_frame.camera_xform);
     
         // normalize screen pos
-        float normal_x = (screen_pos.x) / Window::instance->getWidth() - 1.0f;
-        float normal_y = 1.0f - (screen_pos.y) / Window::instance->getHeight();
+        float normal_x = (screen_pos.x) / Window::getInstance()->getWidth() - 1.0f;
+        float normal_y = 1.0f - (screen_pos.y) / Window::getInstance()->getHeight();
         glm::vec4 ndc_pos = glm::vec4(normal_x, normal_y, 0.0f, 1.0f);
     
         glm::vec4 world_pos = inv_proj * ndc_pos;

@@ -40,7 +40,7 @@ namespace Sprout
     
     void Texture::registerTexture()
     {
-        Window::instance->addTexture(std::shared_ptr<Texture>(this));
+        Window::getInstance()->addTexture(std::shared_ptr<Texture>(this));
     }
     
     glm::vec2 Texture::getSize()

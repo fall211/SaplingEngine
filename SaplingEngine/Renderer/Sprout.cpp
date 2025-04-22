@@ -37,6 +37,22 @@ namespace Sprout
         }
     }
     
+    glm::vec2 getAnchorOffset(Pivot pivot)
+    {
+        switch (pivot) {
+            case Pivot::TOP_LEFT:   return glm::vec2(-0.5f, -0.5f);
+            case Pivot::TOP_CENTER: return glm::vec2(0.0f, -0.5f);
+            case Pivot::TOP_RIGHT:  return glm::vec2(0.5f, -0.5f);
+            case Pivot::CENTER_LEFT:   return glm::vec2(-0.5f, 0.0f);
+            case Pivot::CENTER:        return glm::vec2(0.0f, 0.0f);
+            case Pivot::CENTER_RIGHT:  return glm::vec2(0.5f, 0.0f);
+            case Pivot::BOTTOM_LEFT:      return glm::vec2(-0.5f, 0.5f);
+            case Pivot::BOTTOM_CENTER:    return glm::vec2(0.0f, 0.5f);
+            case Pivot::BOTTOM_RIGHT:     return glm::vec2(0.5f, 0.5f);
+            default:                   return glm::vec2(0.0f, 0.0f); // default to center
+        }
+    }
+    
     
     Window::Window(int width, int height, const char* title)
         :   m_width(width), 
@@ -86,12 +102,14 @@ namespace Sprout
             -1.0f
         );
         
+        draw_frame.orthoSize = glm::vec2(m_width, m_height);
+        
         // we draw in a 640x360 space, so we need to scale the view projection to match the screen size
-        draw_frame.view_projection = glm::scale(draw_frame.view_projection, glm::vec3(1.0f / 640.0f * m_width, 1.0f / 360.0f * m_height, 1.0f));
+        // draw_frame.view_projection = glm::scale(draw_frame.view_projection, glm::vec3(1.0f / 640.0f * m_width, 1.0f / 360.0f * m_height, 1.0f));
         
         draw_frame.camera_xform = glm::mat4(1.0f);
         //zoom 3x
-        draw_frame.camera_xform = glm::scale(draw_frame.camera_xform, glm::vec3(3.0f, 3.0f, 1.0f));
+        // draw_frame.camera_xform = glm::scale(draw_frame.camera_xform, glm::vec3(3.0f, 3.0f, 1.0f));
         
         sg_desc desc = {};
         desc.environment = sglue_environment();
@@ -244,14 +262,47 @@ namespace Sprout
                 m_width = e->window_width;
                 m_height = e->window_height;
                 
+                const float referenceWidth = 640.0f;
+                const float referenceHeight = 360.0f;
+                
+
+                float windowAspect = static_cast<float>(m_width) / m_height;
+                float referenceAspect = referenceWidth / referenceHeight;
+                
+                float orthoWidth, orthoHeight;
+                
+                if (windowAspect > referenceAspect) {
+                    orthoHeight = referenceHeight;
+                    orthoWidth = orthoHeight * windowAspect;
+                } else {
+                    orthoWidth = referenceWidth;
+                    orthoHeight = orthoWidth / windowAspect;
+                }
+                
                 draw_frame.view_projection = glm::ortho(
-                    -0.5f * (m_width),
-                    0.5f * (m_width),
-                    0.5f * (m_height),
-                    -0.5f * (m_height),
+                    -0.5f * orthoWidth,
+                    0.5f * orthoWidth,
+                    0.5f * orthoHeight,
+                    -0.5f * orthoHeight,
                     1.0f,
                     -1.0f
                 );
+                draw_frame.orthoSize = glm::vec2(orthoWidth, orthoHeight);
+                
+                
+                //old implementation - keep everything same physical size
+                // m_width = e->window_width;
+                // m_height = e->window_height;
+                
+                // draw_frame.view_projection = glm::ortho(
+                //     -0.5f * (m_width),
+                //     0.5f * (m_width),
+                //     0.5f * (m_height),
+                //     -0.5f * (m_height),
+                //     1.0f,
+                //     -1.0f
+                // );
+
             }
         }
     }

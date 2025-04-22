@@ -137,4 +137,10 @@ namespace Comp
             childHierarchy.removeParent();
         }
     }
+    
+    GUITransform::GUITransform(Inst inst, const glm::vec2& screenPos, Sprout::Pivot pivotIn)
+        :   Component(std::move(inst)),
+            screenPosition(screenPos),
+            pivot(pivotIn)
+        {}
 }

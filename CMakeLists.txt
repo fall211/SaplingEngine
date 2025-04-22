@@ -112,11 +112,13 @@ if(APPLE)
     target_compile_definitions(Sapling
         PUBLIC 
             $<$<CONFIG:Debug>:ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/">
+            $<$<CONFIG:Debug>:DEBUG>
     )
 elseif(WIN32)
     target_compile_definitions(Sapling
         PUBLIC 
             $<$<CONFIG:Debug>:ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GameContent/Assets/">
+            $<$<CONFIG:Debug>:DEBUG>
     )
 endif()
 

@@ -86,6 +86,7 @@ namespace Sprout
         int num_quads = 0;
         glm::mat4 view_projection;
         glm::mat4 camera_xform;
+        glm::vec2 orthoSize;
     };
     
     /*
@@ -104,13 +105,14 @@ namespace Sprout
     };
     
     glm::vec2 getPivotOffset(Pivot pivot);
+    glm::vec2 getAnchorOffset(Pivot pivot);
     
     class Window
     {
         public: 
             Window(int width, int height, const char* title);
             ~Window();
-            static Window* instance;
+            static Window* getInstance() { return instance; }
             DrawFrame draw_frame; 
         
             /*
@@ -151,6 +153,7 @@ namespace Sprout
                 * @param frameNumber The frame number of the sprite
                 * @param color_override The color override of the sprite
                 * @param scale The scale of the sprite
+                * @param worldSpace Whether the sprite is in world space or not
             */
             void draw_sprite(
                 std::shared_ptr<Sprout::Texture> texture,
@@ -160,7 +163,8 @@ namespace Sprout
                 glm::i32 frameNumber = 1,
                 glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
                 glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-                Pivot pivot = Pivot::CENTER
+                Pivot pivot = Pivot::CENTER,
+                bool worldSpace = true
             );
             
             /*
@@ -171,8 +175,9 @@ namespace Sprout
                 * @param height The height of the rectangle
                 * @param texture The texture of the rectangle
                 * @param color The color of the rectangle
+                * @param worldSpace Whether the rectangle is in world space or not
             */
-            void draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture> texture, glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            void draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture>& texture, glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), bool worldSpace = true);
             
             // TODO: draw text
             void draw_text();
@@ -207,6 +212,8 @@ namespace Sprout
             int m_width = 0;
             int m_height = 0;
             const char* m_title;
+            static Window* instance;
+
             
             State m_state;
             UpdateFrameCallback m_update_frame_callback;
@@ -246,7 +253,7 @@ namespace Sprout
                 Pivot pivot
             );
             
-            void draw_quad_projected(
+            void draw_quad(
                 glm::mat4 projection, 
                 std::array<glm::vec4, 4> positions,
                 std::array<glm::vec4, 4> colors,

@@ -5,6 +5,8 @@
 
 #include "Scene.hpp"
 #include "Audio/AudioEngine.hpp"
+#include "Component.hpp"
+#include "Sprout.hpp"
 
 
 Scene::Scene(Engine& engine) : m_engine(engine)
@@ -44,7 +46,6 @@ void Scene::sRender(EntityList& entities)
         {
             
             auto& cSprite = e->getComponent<Comp::Sprite>();
-            auto& cTransform = e->getComponent<Comp::Transform>();
 
             if (cSprite.type == Comp::Sprite::Type::Animated)
             {
@@ -56,12 +57,33 @@ void Scene::sRender(EntityList& entities)
                     cSprite.animationTime = 0.0f;
                 }
             }
-            glm::f32 layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
+            glm::f32 layer = 0.0f;
+            glm::vec2 pos = glm::vec2(0.0f);
+            glm::vec3 scale = glm::vec3(1.0f);
+            glm::f32 rotation = 0.0f;
+            Sprout::Pivot pivot = Sprout::Pivot::CENTER;
+            bool worldSpace = true;
             
-            glm::vec2 pos = cTransform.position + cSprite.transformOffset;
-            glm::vec3 scale = cTransform.scale * cSprite.scaleOffset;
+            if (e->hasComponent<Comp::Transform>())
+            {
+                auto& cTransform = e->getComponent<Comp::Transform>();
+                layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
+                pos = cTransform.position + cSprite.transformOffset;
+                scale = cTransform.scale * cSprite.scaleOffset;
+                rotation = cTransform.rotation;
+                pivot = cTransform.pivot;
+            }
+            else if (e->hasComponent<Comp::GUITransform>())
+            {
+                auto& cUITransform = e->getComponent<Comp::GUITransform>();
+                layer = 1.0f;
+                worldSpace = false;
+                pos = cUITransform.screenPosition;
+                pivot = cUITransform.pivot;
+                scale = cUITransform.scale;
+            }
             
-            m_engine.getWindow().draw_sprite(cSprite.texture, pos, layer, cTransform.rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, cTransform.pivot);
+            m_engine.getWindow().draw_sprite(cSprite.texture, pos, layer, rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, pivot, worldSpace);
             
             if (cSprite.colorOverrideTime > 0)
             {
