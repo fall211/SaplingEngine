@@ -4,6 +4,7 @@
 //
 
 #pragma once
+#include "Font.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -50,6 +51,9 @@ namespace Sprout
         glm::vec4 color;
         glm::vec2 uv;
         glm::vec4 color_override;
+        uint8_t bytes;
+        uint8_t padding[3];
+        
     };
     
     /*
@@ -143,6 +147,12 @@ namespace Sprout
                 * @param tex The texture to add
             */            
             void addTexture(std::shared_ptr<Sprout::Texture> tex);
+            
+            /*
+                * Adds a font to the window
+                * @param font The font to add
+            */
+            void addFont(const std::shared_ptr<Font> font);
         
             /*
                 * Draws a sprite to the screen, called from game render code.
@@ -180,7 +190,7 @@ namespace Sprout
             void draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture>& texture, glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), bool worldSpace = true);
             
             // TODO: draw text
-            void draw_text();
+            void draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale = 1.0f, Pivot pivot = Pivot::TOP_LEFT, bool worldSpace = true);
             
             /*
                 * Transforms a screen position to a world position.
@@ -222,6 +232,10 @@ namespace Sprout
             Atlas m_atlas;
             std::vector<std::shared_ptr<Sprout::Texture>> m_textures;
             void bake_atlas();
+            
+            std::vector<std::shared_ptr<Sprout::Font>> m_fonts;
+            void init_fonts();
+            std::vector<Atlas> m_fontAtlases;
         
             std::chrono::time_point<std::chrono::system_clock> m_init_time = std::chrono::system_clock::now();
             std::chrono::time_point<std::chrono::system_clock> m_last_frame_time = std::chrono::system_clock::now();
@@ -250,7 +264,8 @@ namespace Sprout
                 glm::f32 layer,
                 glm::vec4 uv,
                 glm::vec4 color_override,
-                Pivot pivot
+                Pivot pivot,
+                uint8_t img_tex_id
             );
             
             void draw_quad(
@@ -258,7 +273,8 @@ namespace Sprout
                 std::array<glm::vec4, 4> positions,
                 std::array<glm::vec4, 4> colors,
                 std::array<glm::vec2, 4> uvs,
-                std::array<glm::vec4, 4> color_overrides
+                std::array<glm::vec4, 4> color_overrides,
+                uint8_t img_tex_id
             );
             
     };

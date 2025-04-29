@@ -182,5 +182,15 @@ namespace Comp
         glm::vec3 scale = glm::vec3(1, 1, 1);
         Sprout::Pivot pivot = Sprout::Pivot::CENTER;
     };
+    
+    struct Text final : public Component
+    {
+        Text(Inst inst, const std::string& text, const std::string& font, glm::vec4 color);
+        
+        std::string text = "";
+        std::string font = "";
+        glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        glm::vec2 transformOffset = glm::vec2(0, 0);
+    };
 }
 

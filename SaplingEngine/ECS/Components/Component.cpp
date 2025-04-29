@@ -143,4 +143,11 @@ namespace Comp
             screenPosition(screenPos),
             pivot(pivotIn)
         {}
+        
+    Text::Text(Inst inst, const std::string& text, const std::string& font, glm::vec4 color)
+        :   Component(std::move(inst)),
+            text(text),
+            font(font),
+            color(color)
+        {}
 }

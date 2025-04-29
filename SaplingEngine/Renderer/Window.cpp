@@ -7,10 +7,14 @@
 //  related to windowing but not part of sokol implementation.
 //  For the sokol window setup, see Sprout.mm
 
+#include "Font.hpp"
 #include "Sprout.hpp"
+#include "quad.h"
 #include "Debug.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <cstdint>
+#include <machine/limits.h>
 #include <memory>
 
 #define STB_RECT_PACK_IMPLEMENTATION
@@ -157,12 +161,73 @@ namespace Sprout
             
             free(atlas_data);
             free(nodes);
-
     }
     
     void Window::addTexture(const std::shared_ptr<Texture> tex)
     {
         m_textures.push_back(tex);
+    }
+    
+    void Window::init_fonts()
+    {
+        int atlas_width = 512;
+        int atlas_height = 512;
+
+        for (size_t i = 0; i < m_fonts.size(); i++)
+        {
+            float font_size = m_fonts[i]->size;
+            unsigned char* atlas_data = new unsigned char[atlas_width * atlas_height];
+            memset(atlas_data, 0, atlas_width * atlas_height);
+
+            int error = stbtt_BakeFontBitmap(
+                m_fonts[i]->data,           // unsigned char* font data
+                0,                          // font offset
+                font_size,                  // pixel height
+                atlas_data,                 // output bitmap
+                atlas_width,                // output bitmap width
+                atlas_height,               // output bitmap height
+                32,                         // first character (space)
+                96,                         // number of characters
+                m_fonts[i]->bakedChars      // output character data
+            );
+
+            std::vector<unsigned char> rgba_data(atlas_width * atlas_height * 4, 0);
+            for (int j = 0; j < atlas_width * atlas_height; j++) {
+                unsigned char alpha = atlas_data[j];
+                rgba_data[j * 4 + 0] = 255;  // R
+                rgba_data[j * 4 + 1] = 255;  // G
+                rgba_data[j * 4 + 2] = 255;  // B
+                rgba_data[j * 4 + 3] = alpha;  // A
+            }
+
+            sg_image_desc img_desc = {};
+            img_desc.width = atlas_width;
+            img_desc.height = atlas_height;
+            img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
+            img_desc.data.subimage[0][0].ptr = rgba_data.data();
+            img_desc.data.subimage[0][0].size = rgba_data.size();
+
+            Atlas fontAtlas;
+            fontAtlas.img = sg_make_image(&img_desc);
+            fontAtlas.width = atlas_width;
+            fontAtlas.height = atlas_height;
+            
+            m_fontAtlases.push_back(fontAtlas);
+            
+            m_fonts[i]->fontId = i;
+            
+            #ifdef DEBUG
+            std::string filename = "fontAtlas" + std::to_string(i) + ".png";
+            stbi_write_png(filename.c_str(), atlas_width, atlas_height, 1, atlas_data, atlas_width);
+            #endif
+            
+            delete[] atlas_data;
+        }
+    }
+    
+    void Window::addFont(const std::shared_ptr<Font> font)
+    {
+        m_fonts.push_back(font);
     }
     
     void Window::SetUpdateFrameCallback(UpdateFrameCallback callback)
@@ -238,11 +303,11 @@ namespace Sprout
         // draw
         if (worldSpace)
         {
-            draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override, pivot);
+            draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform0, frame_size, layer, uv, color_override, pivot, 0);
         }
         else // ui elements are screen space
         {
-            draw_rect_projected(draw_frame.view_projection * xform0, frame_size, layer, uv, color_override, pivot);
+            draw_rect_projected(draw_frame.view_projection * xform0, frame_size, layer, uv, color_override, pivot, 0);
         }
     }
     
@@ -261,11 +326,11 @@ namespace Sprout
 
         if (worldSpace)
         {
-            draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER);
+            draw_rect_projected(draw_frame.view_projection * draw_frame.camera_xform * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER, 0);
         }
         else
         {
-            draw_rect_projected(draw_frame.view_projection * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER);
+            draw_rect_projected(draw_frame.view_projection * xform, glm::vec2(width, height), 1.0f, uv, color, Pivot::CENTER, 0);
         }
     }
     
@@ -276,7 +341,8 @@ namespace Sprout
         glm::f32 layer,
         glm::vec4 uv,
         glm::vec4 color_override,
-        Pivot pivot)
+        Pivot pivot,
+        uint8_t img_tex_id)
     {
         glm::vec2 pivot_offset = getPivotOffset(pivot) * size;
 
@@ -297,7 +363,7 @@ namespace Sprout
         };
         std::array<glm::vec4, 4> color_overrides = {color_override, color_override, color_override, color_override};
         
-        draw_quad(projection, positions, colors, uvs, color_overrides) ; 
+        draw_quad(projection, positions, colors, uvs, color_overrides, img_tex_id) ; 
     }
     
     
@@ -306,7 +372,8 @@ namespace Sprout
         std::array<glm::vec4, 4> positions,
         std::array<glm::vec4, 4> colors,
         std::array<glm::vec2, 4> uvs,
-        std::array<glm::vec4, 4> color_overrides)
+        std::array<glm::vec4, 4> color_overrides,
+        uint8_t img_tex_id)
     {
         if (draw_frame.num_quads > MAX_QUADS)
         {
@@ -322,6 +389,7 @@ namespace Sprout
             vertex.color = colors[i];
             vertex.uv = uvs[i];
             vertex.color_override = color_overrides[i];
+            vertex.bytes = img_tex_id;
         }
         
         draw_frame.num_quads++;
@@ -374,4 +442,73 @@ namespace Sprout
         return position / scale;
     }
     
+    void Window::draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale, Pivot pivot, bool worldSpace)
+    {
+        float x = 0, y = 0;
+        
+        glm::mat4 globalXform = glm::mat4(1.0f);        
+
+        // translate
+        if (worldSpace)
+        {
+            globalXform = glm::translate(globalXform, glm::vec3(position, 0.0f));     
+        }
+        else // ui elements need to use pivot for an anchor as well as a pivot
+        {
+            glm::vec2 anchor_offset = getAnchorOffset(pivot);
+            glm::vec2 pos = glm::vec2(position.x * anchor_offset.x * -1, position.y * anchor_offset.y * -1);
+            if (anchor_offset.x == 0)       pos.x = position.x;
+            if (anchor_offset.y == 0)       pos.y = -position.y;
+            
+            anchor_offset.x = anchor_offset.x * draw_frame.orthoSize.x + pos.x;
+            anchor_offset.y = anchor_offset.y * draw_frame.orthoSize.y + pos.y;
+            
+            globalXform = glm::translate(globalXform, glm::vec3(anchor_offset, 0.0f));       
+        }
+
+        globalXform = glm::scale(globalXform, glm::vec3(scale, scale, 1.0f));
+        
+        for (char c : text)
+        {
+            int char_index = c - 32;
+            
+            float advance_x = x, advance_y = y;
+            stbtt_aligned_quad quad;
+            
+            stbtt_GetBakedQuad
+            (
+                font->bakedChars, 
+                m_fontAtlases[font->fontId].width, 
+                m_fontAtlases[font->fontId].height, 
+                char_index, 
+                &advance_x, 
+                &advance_y, 
+                &quad, 
+                1
+            );
+            
+            glm::vec2 size = glm::vec2(quad.x1 - quad.x0, quad.y1 - quad.y0);
+            
+            glm::mat4 charXform = globalXform;
+            charXform = glm::translate(charXform, glm::vec3(quad.x0, quad.y0, 0.0f));
+            glm::vec4 uv = glm::vec4(quad.s0, quad.t0, quad.s1, quad.t1);
+            
+            glm::mat4 projection;
+            if (worldSpace)
+            {
+                projection = draw_frame.view_projection * draw_frame.camera_xform * charXform;            
+
+            }
+            else
+            {
+                projection = draw_frame.view_projection * charXform;
+            }
+            
+            draw_rect_projected(projection, size, 1.0f, uv, color, Pivot::TOP_LEFT, font->fontId+1);
+            
+            x = advance_x;
+            y = advance_y;
+        }
+    }
+
 }

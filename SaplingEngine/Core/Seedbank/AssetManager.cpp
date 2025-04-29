@@ -5,6 +5,7 @@
 
 #include "AssetManager.hpp"
 #include "Audio/AudioEngine.hpp"
+#include "Font.hpp"
 #include "Debug.hpp"
 #include <filesystem>
 #include <iostream>
@@ -113,6 +114,25 @@ auto AssetManager::getSound(const std::string &name) -> FMOD::Sound*
     auto it = getInstance()->m_sounds.find(name);
     if (it == getInstance()->m_sounds.end()) {
         throw std::runtime_error("Sound not found: " + name);
+    }
+    return it->second;
+}
+
+void AssetManager::addFont(const std::string &name, const std::string &path, float size)
+{
+    auto font = std::make_shared<Sprout::Font>();
+    if (!font->loadFromFile(getAssetsPath() + path, size))
+    {
+        throw std::runtime_error("Error loading font file: " + path);
+    }
+    getInstance()->m_fonts[name] = font;
+}
+
+auto AssetManager::getFont(const std::string &name) -> std::shared_ptr<Sprout::Font>
+{
+    auto it = getInstance()->m_fonts.find(name);
+    if (it == getInstance()->m_fonts.end()) {
+        throw std::runtime_error("Font not found: " + name);
     }
     return it->second;
 }

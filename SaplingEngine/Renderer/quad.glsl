@@ -8,17 +8,19 @@ in vec4 position0;
 in vec4 color0;
 in vec2 uv0;
 in vec4 color_override0;
+in vec4 bytes0;
 
 out vec4 color;
 out vec2 uv;
 out vec4 color_override;
-
+out vec4 bytes;
 
 void main() {
 	gl_Position = position0;
 	color = color0;
 	uv = uv0;
 	color_override = color_override0;
+	bytes = bytes0;
 }
 @end
 
@@ -27,29 +29,28 @@ void main() {
 // FRAGMENT SHADER
 //
 @fs fs
-layout(binding=0) uniform texture2D tex0;
+layout(binding=0) uniform texture2D texture0;
+layout(binding=1) uniform texture2D fontTex1;
 layout(binding=0) uniform sampler default_sampler;
 
 in vec4 color;
 in vec2 uv;
 in vec4 color_override;
+in vec4 bytes;
 
 out vec4 col_out;
 
 void main() {
 
-    vec4 tex_col = texture(sampler2D(tex0, default_sampler), uv);
-
-	// int tex_index = int(bytes.x * 255.0);
+	int tex_index = int(bytes.x * 255.0);
 	
-	// vec4 tex_col = vec4(1.0);
-	// if (tex_index == 0) {
-	// 	tex_col = texture(sampler2D(tex0, default_sampler), uv);
-	// } 
-	// else if (tex_index == 1) {
-	// 	// this is text, it's only got the single .r channel so we stuff it into the alpha
-	// 	tex_col.a = texture(sampler2D(tex1, default_sampler), uv).r;
-	// }
+	vec4 tex_col = vec4(1.0);
+	if (tex_index == 0) {
+		tex_col = texture(sampler2D(texture0, default_sampler), uv);
+	} 
+	else if (tex_index == 1) {
+		tex_col = texture(sampler2D(fontTex1, default_sampler), uv);
+	}
 	
 	col_out = tex_col;
 	col_out *= color;

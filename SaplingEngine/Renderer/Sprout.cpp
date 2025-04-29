@@ -159,6 +159,7 @@ namespace Sprout
         pip_desc.layout.attrs[ATTR_quad_color0].format = SG_VERTEXFORMAT_FLOAT4;
         pip_desc.layout.attrs[ATTR_quad_uv0].format = SG_VERTEXFORMAT_FLOAT2;
         pip_desc.layout.attrs[ATTR_quad_color_override0].format = SG_VERTEXFORMAT_FLOAT4;
+        pip_desc.layout.attrs[ATTR_quad_bytes0].format = SG_VERTEXFORMAT_UBYTE4N;
         pip_desc.label = "quad-pipeline";
         
         sg_blend_state blend_state = {};
@@ -181,6 +182,7 @@ namespace Sprout
 
         // bake images into atlas
         bake_atlas();
+        init_fonts();
     }
     
     bool sortByZ(const Quad& a, const Quad& b)
@@ -208,7 +210,8 @@ namespace Sprout
         // sort quads by z so we have layers (z buffer alternative to keep transparency)
         std::sort(draw_frame.quads.begin(), draw_frame.quads.begin() + draw_frame.num_quads, sortByZ);
         
-        m_state.bind.images[IMG_tex0] = m_atlas.img;
+        m_state.bind.images[IMG_texture0] = m_atlas.img;
+        m_state.bind.images[IMG_fontTex1] = m_fontAtlases[0].img;
 
         sg_update_buffer(m_state.bind.vertex_buffers[0], SG_RANGE(draw_frame.quads));
 

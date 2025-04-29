@@ -29,7 +29,7 @@ void Scene::postUpdate()
 void Scene::enable()
 {
     // set the window's event callback to our input system
-    m_engine.getWindow().SetEventCallback([this](const sapp_event* e) { Input::update(e); });
+    m_engine.getWindow().SetEventCallback([](const sapp_event* e) { Input::update(e); });
 }
 
 void Scene::disable()
@@ -94,6 +94,36 @@ void Scene::sRender(EntityList& entities)
                     cSprite.colorOverrideTime = 0;
                 }
             }
+        }
+        if (e->hasComponent<Comp::Text>())
+        {
+            auto& cText = e->getComponent<Comp::Text>();
+            
+            glm::vec2 pos = glm::vec2(0.0f);
+            float scale = 1.0f;
+            Sprout::Pivot pivot = Sprout::Pivot::TOP_LEFT;
+            bool worldSpace = true;
+            
+            if (e->hasComponent<Comp::Transform>())
+            {
+                auto& cTransform = e->getComponent<Comp::Transform>();
+                pos = cTransform.position + cText.transformOffset;
+                scale = cTransform.scale.x;
+                pivot = cTransform.pivot;
+            }
+            else if (e->hasComponent<Comp::GUITransform>())
+            {
+                auto& cUITransform = e->getComponent<Comp::GUITransform>();
+                worldSpace = false;
+                pos = cUITransform.screenPosition + cText.transformOffset;
+                pivot = cUITransform.pivot;
+                scale = cUITransform.scale.x;
+            }
+            
+            
+            m_engine.getWindow().draw_text(cText.text, AssetManager::getFont(cText.font), pos, cText.color, scale, pivot, worldSpace);
+            
+            
         }
     }
 }

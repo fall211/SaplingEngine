@@ -12,6 +12,7 @@
 #include <stdexcept>
 
 #include "Renderer/Texture.hpp"
+#include "Renderer/Font.hpp"
 #include "glm/glm.hpp"
 #include "fmod.hpp"
 
@@ -20,10 +21,12 @@ class AudioEngine;
 
 class AssetManager {
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
+    std::unordered_map<std::string, std::shared_ptr<Sprout::Font>> m_fonts = std::unordered_map<std::string, std::shared_ptr<Sprout::Font>>();
     
     std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>> m_tilesets = std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>>();
     
     std::unordered_map<std::string, FMOD::Sound*> m_sounds = std::unordered_map<std::string, FMOD::Sound*>();
+    
     
     
     static AssetManager* Instance;
@@ -89,5 +92,20 @@ public:
         * @return Pointer to the sound with the given name
     */
     static auto getSound(const std::string& name) -> FMOD::Sound*;
+    
+    /*
+        * Adds a font to the asset manager
+        * @param name The name of the font
+        * @param path The path to the font
+        * @param size The size of the font
+    */
+    static void addFont(const std::string& name, const std::string& path, float size);
+    
+    /*
+        * Gets the font with the given name
+        * @param name The name of the font
+        * @return Pointer to the font with the given name
+    */
+    static auto getFont(const std::string& name) -> std::shared_ptr<Sprout::Font>;
 };
 
