@@ -14,7 +14,6 @@
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <cstdint>
-#include <machine/limits.h>
 #include <memory>
 
 #define STB_RECT_PACK_IMPLEMENTATION
