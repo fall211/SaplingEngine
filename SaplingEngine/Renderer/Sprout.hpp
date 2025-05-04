@@ -4,6 +4,7 @@
 //
 
 #pragma once
+#include "Color.hpp"
 #include "Font.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
@@ -171,7 +172,7 @@ namespace Sprout
                 glm::f32 layer,
                 glm::f32 rotation = 0.0f,
                 glm::i32 frameNumber = 1,
-                glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+                glm::vec4 color_override = Color::Transparent,
                 glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
                 Pivot pivot = Pivot::CENTER,
                 bool worldSpace = true
@@ -187,7 +188,7 @@ namespace Sprout
                 * @param color The color of the rectangle
                 * @param worldSpace Whether the rectangle is in world space or not
             */
-            void draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture>& texture, glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), bool worldSpace = true);
+            void draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture>& texture, glm::vec4 color = Color::Red, bool worldSpace = true);
             
             // TODO: draw text
             void draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale = 1.0f, Pivot pivot = Pivot::TOP_LEFT, bool worldSpace = true);

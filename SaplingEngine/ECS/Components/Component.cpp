@@ -54,18 +54,24 @@ namespace Comp
     
     Sprite::Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin)
         :   Component(std::move(inst)),
-            texture(texin) ,
-            frameSize(texin->getWidth() / numFrames)
-        {}
+            texture(texin) 
+        {
+            glm::i32 x = texin->getWidth() / numFrames;
+            glm::i32 y = texin->getHeight();
+            size = glm::vec2(x, y);
+        }
     
     Sprite::Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin, const float animSpeed) 
         :   Component(std::move(inst)),
             texture(texin), 
             type(Type::Animated), 
             numFrames(texin->getNumFrames()), 
-            frameSize(texin->getWidth() / numFrames),
             animationSpeed((size_t)(60.0f / animSpeed)) 
-        {}
+        {
+            glm::i32 x = texin->getWidth() / numFrames;
+            glm::i32 y = texin->getHeight();
+            size = glm::vec2(x, y);
+        }
         
     void Sprite::OnAddToEntity()
     {
@@ -144,10 +150,11 @@ namespace Comp
             pivot(pivotIn)
         {}
         
-    Text::Text(Inst inst, const std::string& text, const std::string& font, glm::vec4 color)
+    Text::Text(Inst inst, const std::string& text, const std::string& font, uint8_t size, glm::vec4 color)
         :   Component(std::move(inst)),
             text(text),
             font(font),
+            size(size),
             color(color)
         {}
 }

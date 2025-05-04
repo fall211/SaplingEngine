@@ -7,6 +7,7 @@
 //  related to windowing but not part of sokol implementation.
 //  For the sokol window setup, see Sprout.mm
 
+#include "Color.hpp"
 #include "Font.hpp"
 #include "Sprout.hpp"
 #include "quad.h"
@@ -352,7 +353,7 @@ namespace Sprout
         glm::vec4 top_right = glm::vec4(size.x - pivot_offset.x, size.y - pivot_offset.y, layer, 1.0f);
         
         std::array<glm::vec4, 4> positions = {bottom_left, top_left, top_right, bottom_right};
-        glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        glm::vec4 color = Color::White;;
         std::array<glm::vec4, 4> colors = {color, color, color, color};
         std::array<glm::vec2, 4> uvs = {
             glm::vec2(uv.x, uv.y),
