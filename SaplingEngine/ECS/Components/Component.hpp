@@ -7,10 +7,12 @@
 
 
 
+#include "Color.hpp"
 #include "Renderer/Texture.hpp"
 #include "Sprout.hpp"
 #include "glm/glm.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <unordered_set>
 #include <utility>
@@ -105,6 +107,7 @@ namespace Comp
     struct Sprite final : public Component 
     {
         std::shared_ptr<Sprout::Texture> texture;
+        glm::vec2 size;
         explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin);
         explicit Sprite(Inst inst, const std::shared_ptr<Sprout::Texture>& texin, float animSpeed);
         void OnAddToEntity() override;
@@ -139,10 +142,10 @@ namespace Comp
         // animated frame stuff
         size_t numFrames = 1;
         size_t currentFrame = 0;
-        size_t frameSize;
+        // size_t frameSize;
         size_t animationSpeed = 60;
         float animationTime = 0.0f;
-        glm::vec4 color_override = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        glm::vec4 color_override = Color::Transparent;
         float colorOverrideTime = 0;
         bool flip_X = false;
     };
@@ -185,11 +188,12 @@ namespace Comp
     
     struct Text final : public Component
     {
-        Text(Inst inst, const std::string& text, const std::string& font, glm::vec4 color);
+        Text(Inst inst, const std::string& text, const std::string& font, uint8_t size, glm::vec4 color);
         
         std::string text = "";
         std::string font = "";
-        glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        uint8_t size = 1;
+        glm::vec4 color = Color::Black;
         glm::vec2 transformOffset = glm::vec2(0, 0);
     };
 }

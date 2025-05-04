@@ -100,7 +100,7 @@ void Scene::sRender(EntityList& entities)
             auto& cText = e->getComponent<Comp::Text>();
             
             glm::vec2 pos = glm::vec2(0.0f);
-            float scale = 1.0f;
+            float scale = 0.025f * cText.size;
             Sprout::Pivot pivot = Sprout::Pivot::TOP_LEFT;
             bool worldSpace = true;
             
@@ -108,7 +108,6 @@ void Scene::sRender(EntityList& entities)
             {
                 auto& cTransform = e->getComponent<Comp::Transform>();
                 pos = cTransform.position + cText.transformOffset;
-                scale = cTransform.scale.x;
                 pivot = cTransform.pivot;
             }
             else if (e->hasComponent<Comp::GUITransform>())
@@ -117,7 +116,6 @@ void Scene::sRender(EntityList& entities)
                 worldSpace = false;
                 pos = cUITransform.screenPosition + cText.transformOffset;
                 pivot = cUITransform.pivot;
-                scale = cUITransform.scale.x;
             }
             
             
