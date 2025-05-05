@@ -44,7 +44,7 @@ class AudioEngine
         void update();
         void cleanup();
         
-        void playSound(const std::string& soundName, float volume = 1.0f);
+        void playSound(const std::string& soundName, bool loop = false, float volume = 1.0f);
         void stopSound(const std::string& soundName);
         void setPitch(const std::string& soundName, float pitch);
         void setVolume(const std::string& soundName, float volume);

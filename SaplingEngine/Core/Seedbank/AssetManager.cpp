@@ -106,6 +106,8 @@ void AssetManager::addSound(const std::string &name, const std::string &path, bo
     {
         throw std::runtime_error("Error loading sound file: " + path);
     }
+    sound->setMode(FMOD_LOOP_NORMAL);
+    
     getInstance()->m_sounds[name] = sound;
 }
 

@@ -52,9 +52,11 @@ void AudioEngine::cleanup() {
     }
 }
 
-void AudioEngine::playSound(const std::string& name, float volume) {
+void AudioEngine::playSound(const std::string& name, bool loop, float volume) {
     FMOD::Sound* sound = AssetManager::getInstance()->getSound(name);
     if (sound) {
+        if (loop) sound->setLoopCount(-1);
+        else sound->setLoopCount(0);
         FMOD::Channel* channel = nullptr;
         m_system->playSound(sound, nullptr, false, &channel);
         if (channel) {
