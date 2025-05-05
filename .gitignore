@@ -6,7 +6,6 @@
 
 # Compiled & Build
 Build/
-*.dll
 *.com
 *.class
 *.exe
