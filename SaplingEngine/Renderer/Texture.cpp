@@ -14,7 +14,10 @@
 namespace Sprout
 {
     
-    Texture::~Texture() {}
+    Texture::~Texture()
+    {
+        release();
+    }
         
     bool Texture::loadFromFile(const std::string& path, const glm::i32 numFrames) 
     {
@@ -136,6 +139,11 @@ namespace Sprout
             tile->registerTexture();
         }
         return tiles;
+    }
+    
+    void Texture::release()
+    {
+        free(m_pixels);
     }
 
 } // namespace Sprout

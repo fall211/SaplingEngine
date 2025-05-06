@@ -102,6 +102,8 @@ namespace Sprout
             */
             auto loadFromMemory(unsigned char* data, glm::i32 width, glm::i32 height, glm::i32 numFrames = 1) -> bool;
             
+            void release();
+            
         private:
             glm::i32 m_width, m_height;
             glm::vec4 m_atlas_uvs = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);

@@ -32,5 +32,6 @@ namespace Sprout
             
             bool loadFromFile(const std::string& fontPath, float size);
             void registerFont();
+            void release();
         };
 }

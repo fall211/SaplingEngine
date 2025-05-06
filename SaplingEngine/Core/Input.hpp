@@ -55,14 +55,22 @@ class Input
         static auto getKeyDown(int key) -> bool;
         static auto getKeyUp(int key) -> bool;
     
+        Input();
+        ~Input();
     public:
+
         static Input* getInstance()
         {
-            if (Instance == nullptr) {
+            if (!Instance)
+            {
                 Instance = new Input();
             }
             return Instance;
         }
+        
+        static void initialize();
+        static void cleanUp();
+        
         /*
             * Updates the input state. This is set as the event callback for the window by the owning scene.
         */
@@ -156,8 +164,6 @@ class Input
             * @return The current mouse position in world coordinates
         */
         static auto getMouseWorldPosition() -> glm::vec2;
-        
-        Input();
     
     private:
         std::array<Key, static_cast<size_t>(Input::MouseButton::COUNT)> m_mouseKeys;

@@ -21,30 +21,31 @@
 class AudioEngine;
 
 class AssetManager {
+    static AssetManager* Instance;
+    
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
     std::unordered_map<std::string, std::shared_ptr<Sprout::Font>> m_fonts = std::unordered_map<std::string, std::shared_ptr<Sprout::Font>>();
     
     std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>> m_tilesets = std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>>();
     
     std::unordered_map<std::string, FMOD::Sound*> m_sounds = std::unordered_map<std::string, FMOD::Sound*>();
-    
-    
-    
-    static AssetManager* Instance;
 
     AssetManager() = default;
-    ~AssetManager() = default;
+    ~AssetManager();
 
 public:
 
-    static std::string getAssetsPath();
     static AssetManager* getInstance()
     {
-        if (Instance == nullptr) {
+        if (!Instance) 
+        {
             Instance = new AssetManager();
         }
         return Instance;
     }
+    static void initialize();
+    static void cleanUp();
+    static std::string getAssetsPath();
 
     /*
         * Adds a texture to the asset manager

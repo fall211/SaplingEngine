@@ -8,46 +8,52 @@
 AudioEngine* AudioEngine::Instance = nullptr;
 
 
-AudioEngine::AudioEngine() : m_system(nullptr), m_studioSystem(nullptr) {
-    initialize();
-}
+AudioEngine::AudioEngine() : m_system(nullptr), m_studioSystem(nullptr) {}
 
 AudioEngine::~AudioEngine() {
-    cleanup();
+    cleanUp();
 }
 
 void AudioEngine::initialize() {
-    // Initialize FMOD Studio System
-    FMOD::Studio::System::create(&m_studioSystem);
-    m_studioSystem->initialize(32, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
+    if (!Instance) Instance = new AudioEngine();
     
+    
+    // Initialize FMOD Studio System
+    FMOD::Studio::System::create(&Instance->m_studioSystem);
+    Instance->m_studioSystem->initialize(32, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
+
     // Get core system
-    m_studioSystem->getCoreSystem(&m_system);
+    Instance->m_studioSystem->getCoreSystem(&Instance->m_system);
 }
 
 void AudioEngine::update() {
-    if (m_studioSystem) {
-        m_studioSystem->update();
+    if (Instance->m_studioSystem) {
+        Instance->m_studioSystem->update();
     }
 }
 
-void AudioEngine::cleanup() {
+void AudioEngine::cleanUp() {
     // Stop all channels
-    for (auto& channel : m_channels) {
+    for (auto& channel : Instance->m_channels) {
         if (channel.second) {
             channel.second->stop();
         }
     }
-    m_channels.clear();
-    
+    Instance->m_channels.clear();
+
     // Release FMOD systems
-    if (m_studioSystem) {
-        m_studioSystem->release();
-        free(m_studioSystem);
+    if (Instance->m_studioSystem) {
+        Instance->m_studioSystem->release();
+        free(Instance->m_studioSystem);
     }
-    if (m_system) {
-        m_system->release();
-        free(m_system);
+    if (Instance->m_system) {
+        Instance->m_system->release();
+        free(Instance->m_system);
+    }
+    
+    if (Instance) 
+    {
+        delete Instance;
     }
 }
 
@@ -57,38 +63,38 @@ void AudioEngine::playSound(const std::string& name, bool loop, float volume) {
         if (loop) sound->setLoopCount(-1);
         else sound->setLoopCount(0);
         FMOD::Channel* channel = nullptr;
-        m_system->playSound(sound, nullptr, false, &channel);
+        Instance->m_system->playSound(sound, nullptr, false, &channel);
         if (channel) {
             channel->setVolume(volume);
-            m_channels[name] = channel;
+            Instance->m_channels[name] = channel;
         }
     }
 }
 
 void AudioEngine::stopSound(const std::string& name) {
-    auto it = m_channels.find(name);
-    if (it != m_channels.end() && it->second) {
+    auto it = Instance->m_channels.find(name);
+    if (it != Instance->m_channels.end() && it->second) {
         it->second->stop();
     }
 }
 
 void AudioEngine::setPitch(const std::string& name, float pitch) {
-    auto it = m_channels.find(name);
-    if (it != m_channels.end() && it->second) {
+    auto it = Instance->m_channels.find(name);
+    if (it != Instance->m_channels.end() && it->second) {
         it->second->setPitch(pitch);
     }
 }
 
 void AudioEngine::setVolume(const std::string& name, float volume) {
-    auto it = m_channels.find(name);
-    if (it != m_channels.end() && it->second) {
+    auto it = Instance->m_channels.find(name);
+    if (it != Instance->m_channels.end() && it->second) {
         it->second->setVolume(volume);
     }
 }
 
 bool AudioEngine::isPlaying(const std::string& name) {
-    auto it = m_channels.find(name);
-    if (it != m_channels.end() && it->second) {
+    auto it = Instance->m_channels.find(name);
+    if (it != Instance->m_channels.end() && it->second) {
         bool playing = false;
         it->second->isPlaying(&playing);
         return playing;

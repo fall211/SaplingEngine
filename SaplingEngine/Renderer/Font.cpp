@@ -53,4 +53,10 @@ namespace Sprout
         Window::getInstance()->addFont(std::shared_ptr<Font>(this));
     }
 
+    void Font::release()
+    {
+        free(bakedChars);
+        free(data);
+    }
+    
 }

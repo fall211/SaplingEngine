@@ -37,18 +37,18 @@ class AudioEngine
             }
             return Instance;
         }
-        FMOD::System* getSystem()
+        static FMOD::System* getSystem()
         {
-            return m_system;
+            return Instance->m_system;
         }
         
-        void initialize();
-        void update();
-        void cleanup();
+        static void initialize();
+        static void update();
+        static void cleanUp();
         
-        void playSound(const std::string& soundName, bool loop = false, float volume = 1.0f);
-        void stopSound(const std::string& soundName);
-        void setPitch(const std::string& soundName, float pitch);
-        void setVolume(const std::string& soundName, float volume);
-        bool isPlaying(const std::string& soundName);
+        static void playSound(const std::string& soundName, bool loop = false, float volume = 1.0f);
+        static void stopSound(const std::string& soundName);
+        static void setPitch(const std::string& soundName, float pitch);
+        static void setVolume(const std::string& soundName, float volume);
+        static bool isPlaying(const std::string& soundName);
 };

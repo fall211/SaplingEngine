@@ -21,6 +21,42 @@ AssetManager* AssetManager::Instance = nullptr;
 #include <windows.h>
 #endif
 
+
+AssetManager::~AssetManager()
+{
+    cleanUp();
+}
+void AssetManager::initialize()
+{
+    if (!Instance)
+    {
+        Instance = new AssetManager();
+    }
+}
+
+void AssetManager::cleanUp()
+{
+    for (auto& pair : Instance->m_textures) {
+        pair.second->release();
+    }
+    Instance->m_textures.clear();
+    
+    for (auto& pair : Instance->m_fonts) {
+        pair.second->release();
+    }
+    Instance->m_fonts.clear();
+    
+    for (auto& pair : Instance->m_sounds) {
+        pair.second->release();
+    }
+    Instance->m_sounds.clear();
+    
+    if (Instance)
+    {
+        delete Instance;
+    }
+}
+
 std::string AssetManager::getAssetsPath() {
     
 #ifdef ASSETS_PATH
@@ -65,12 +101,12 @@ void AssetManager::addTexture(const std::string& name, const std::string& path, 
         std::string fullPath = getAssetsPath() + path;
         throw std::runtime_error("Error loading texture file: " + fullPath);
     }
-    getInstance()->m_textures[name] = tex;
+    Instance->m_textures[name] = tex;
 }
 
 auto AssetManager::getTexture(const std::string& name) -> std::shared_ptr<Sprout::Texture> {
-    auto it = getInstance()->m_textures.find(name);
-    if (it == getInstance()->m_textures.end()) {
+    auto it = Instance->m_textures.find(name);
+    if (it == Instance->m_textures.end()) {
         throw std::runtime_error("Texture not found: " + name);
     }
     
@@ -84,13 +120,13 @@ void AssetManager::addTileSet(const std::string& name, const std::string& path, 
     {
         throw std::runtime_error("Error loading tileset file: " + path);
     }
-    getInstance()->m_tilesets[name] = tileset;
+    Instance->m_tilesets[name] = tileset;
 }
 
 auto AssetManager::getTileSet(const std::string &name) -> std::vector<std::shared_ptr<Sprout::Texture>>&
 {
-    auto it = getInstance()->m_tilesets.find(name);
-    if (it == getInstance()->m_tilesets.end()) {
+    auto it = Instance->m_tilesets.find(name);
+    if (it == Instance->m_tilesets.end()) {
         throw std::runtime_error("Tileset not found: " + name);
     }
     return it->second;
@@ -101,7 +137,7 @@ void AssetManager::addSound(const std::string &name, const std::string &path, bo
     FMOD::Sound* sound = nullptr;
     FMOD_MODE mode = loop ? FMOD_LOOP_NORMAL : FMOD_DEFAULT;
     
-    FMOD::System* system = AudioEngine::getInstance()->getSystem();
+    FMOD::System* system = AudioEngine::getSystem();
     FMOD_RESULT result = system->createSound((getAssetsPath() + path).c_str(), mode, nullptr, &sound);
     if (result != FMOD_OK)
     {
@@ -109,13 +145,13 @@ void AssetManager::addSound(const std::string &name, const std::string &path, bo
     }
     sound->setMode(FMOD_LOOP_NORMAL);
     
-    getInstance()->m_sounds[name] = sound;
+    Instance->m_sounds[name] = sound;
 }
 
 auto AssetManager::getSound(const std::string &name) -> FMOD::Sound*
 {
-    auto it = getInstance()->m_sounds.find(name);
-    if (it == getInstance()->m_sounds.end()) {
+    auto it = Instance->m_sounds.find(name);
+    if (it == Instance->m_sounds.end()) {
         throw std::runtime_error("Sound not found: " + name);
     }
     return it->second;
@@ -128,13 +164,13 @@ void AssetManager::addFont(const std::string &name, const std::string &path, flo
     {
         throw std::runtime_error("Error loading font file: " + path);
     }
-    getInstance()->m_fonts[name] = font;
+    Instance->m_fonts[name] = font;
 }
 
 auto AssetManager::getFont(const std::string &name) -> std::shared_ptr<Sprout::Font>
 {
-    auto it = getInstance()->m_fonts.find(name);
-    if (it == getInstance()->m_fonts.end()) {
+    auto it = Instance->m_fonts.find(name);
+    if (it == Instance->m_fonts.end()) {
         throw std::runtime_error("Font not found: " + name);
     }
     return it->second;
