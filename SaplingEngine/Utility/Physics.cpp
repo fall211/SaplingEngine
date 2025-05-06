@@ -3,10 +3,7 @@
 //  SaplingEngine, Twig Physics
 //
 
-#include "Physics.hpp"
-#include "Sprout.hpp"
-#include "glm/geometric.hpp"
-#include <set>
+#include "Utility/Physics.hpp"
 
 
 auto Physics2D::bBoxCollision(const std::shared_ptr<Entity>& e0, const std::shared_ptr<Entity>& e1) -> glm::vec2

@@ -3,10 +3,11 @@
 //  SaplingEngine, Seedbank Asset Manager
 //
 
-#include "AssetManager.hpp"
-#include "Audio/AudioEngine.hpp"
-#include "Font.hpp"
-#include "Debug.hpp"
+#include "Core/AssetManager.hpp"
+#include "Core/AudioEngine.hpp"
+#include "Renderer/Font.hpp"
+#include "Utility/Debug.hpp"
+
 #include <filesystem>
 #include <iostream>
 #include <string>

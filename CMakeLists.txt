@@ -127,15 +127,9 @@ endif()
 # Add include directories
 target_include_directories(Sapling PUBLIC
     ${CMAKE_SOURCE_DIR}/SaplingEngine
-    ${CMAKE_SOURCE_DIR}/SaplingEngine/Audio
     ${CMAKE_SOURCE_DIR}/SaplingEngine/Core
-    ${CMAKE_SOURCE_DIR}/SaplingEngine/Core/Canopy
-    ${CMAKE_SOURCE_DIR}/SaplingEngine/Core/Input
-    ${CMAKE_SOURCE_DIR}/SaplingEngine/Core/Seedbank
     ${CMAKE_SOURCE_DIR}/SaplingEngine/ECS
-    ${CMAKE_SOURCE_DIR}/SaplingEngine/ECS/Components
-    ${CMAKE_SOURCE_DIR}/SaplingEngine/ECS/Entities
-    ${CMAKE_SOURCE_DIR}/SaplingEngine/Physics
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/Utility
     ${CMAKE_SOURCE_DIR}/SaplingEngine/Renderer
     ${CMAKE_SOURCE_DIR}/thirdparty
     ${CMAKE_SOURCE_DIR}/thirdparty/stb

@@ -5,16 +5,17 @@
 
 #pragma once
 
+#include "Renderer/Texture.hpp"
+#include "Renderer/Font.hpp"
+
+#include "glm/glm.hpp"
+#include "fmod.hpp"
+
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <memory>
 #include <stdexcept>
-
-#include "Renderer/Texture.hpp"
-#include "Renderer/Font.hpp"
-#include "glm/glm.hpp"
-#include "fmod.hpp"
 
 
 class AudioEngine;

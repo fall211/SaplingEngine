@@ -3,8 +3,8 @@
 //  SaplingEngine
 //
 
-#include "Component.hpp"
-#include "Entity.hpp"
+#include "ECS/Component.hpp"
+#include "ECS/Entity.hpp"
 
 #include <utility>
 

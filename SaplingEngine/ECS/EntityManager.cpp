@@ -3,7 +3,7 @@
 //  SaplingEngine
 //
 
-#include "EntityManager.hpp"
+#include "ECS/EntityManager.hpp"
 
 EntityManager::EntityManager()
 {

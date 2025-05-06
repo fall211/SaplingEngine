@@ -5,15 +5,13 @@
 
 #pragma once
 
-#include "Physics/Physics.hpp"
-
-#include "Engine.hpp"
-#include "Debug.hpp"
-
-#include "EntityManager.hpp"
-#include "Entity.hpp"
-#include "Component.hpp"
-#include "Input/Input.hpp"
+#include "Core/Engine.hpp"
+#include "Core/Input.hpp"
+#include "Utility/Debug.hpp"
+#include "Utility/Physics.hpp"
+#include "ECS/EntityManager.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/Component.hpp"
 
 #include <cstdio>
 #include <memory>

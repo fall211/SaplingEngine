@@ -14,11 +14,9 @@
 #endif
 
 #define SOKOL_NO_ENTRY
-#include "Sprout.hpp"
-#include "quad.h"
+#include "Renderer/Sprout.hpp"
+#include "Renderer/quad.h"
 
-#include <algorithm>
-#include <iostream>
 
 namespace Sprout 
 {

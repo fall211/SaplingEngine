@@ -5,9 +5,10 @@
 
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include <cstddef>
 #include <string>
-#include <glm/glm.hpp>
 #include <vector>
 #include <memory>
 

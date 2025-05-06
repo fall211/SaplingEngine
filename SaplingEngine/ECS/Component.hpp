@@ -7,10 +7,12 @@
 
 
 
-#include "Color.hpp"
 #include "Renderer/Texture.hpp"
-#include "Sprout.hpp"
+#include "Renderer/Sprout.hpp"
+#include "Utility/Color.hpp"
+
 #include "glm/glm.hpp"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>

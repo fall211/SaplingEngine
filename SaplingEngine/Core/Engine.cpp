@@ -4,8 +4,8 @@
 //
 
 
-#include "Engine.hpp"
-#include "Seedbank/AssetManager.hpp"
+#include "Core/Engine.hpp"
+#include "Core/AssetManager.hpp"
 #include <memory>
 
 

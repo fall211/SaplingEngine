@@ -5,10 +5,12 @@
 
 
 #pragma once
+#include "Core/AssetManager.hpp"
 
 #include "fmod.hpp"
 #include "fmod_studio.hpp"
 #include "fmod_errors.h"
+
 #include <unordered_map>
 #include <string>
 

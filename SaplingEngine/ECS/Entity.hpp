@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "ECS/Component.hpp"
+
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -19,8 +21,6 @@
 #include <utility>
 #include <memory>
 
-#include "Component.hpp"
-#include "Debug.hpp"
 
 class Component;
 class EntityManager;

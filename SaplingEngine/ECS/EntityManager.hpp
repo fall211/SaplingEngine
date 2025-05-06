@@ -5,11 +5,12 @@
 
 #pragma once
 
+#include "Utility/SpatialGrid.hpp"
+
 #include <string>
 #include <map>
 #include <memory>
 #include <vector>
-#include "SpatialGrid.hpp"
 
 class Entity;
 

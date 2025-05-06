@@ -7,11 +7,11 @@
 //  related to windowing but not part of sokol implementation.
 //  For the sokol window setup, see Sprout.mm
 
-#include "Color.hpp"
-#include "Font.hpp"
-#include "Sprout.hpp"
-#include "quad.h"
-#include "Debug.hpp"
+#include "Renderer/Font.hpp"
+#include "Renderer/Sprout.hpp"
+#include "Renderer/quad.h"
+#include "Utility/Color.hpp"
+#include "Utility/Debug.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <cstdint>
@@ -179,7 +179,7 @@ namespace Sprout
             unsigned char* atlas_data = new unsigned char[atlas_width * atlas_height];
             memset(atlas_data, 0, atlas_width * atlas_height);
 
-            int error = stbtt_BakeFontBitmap(
+            stbtt_BakeFontBitmap(
                 m_fonts[i]->data,           // unsigned char* font data
                 0,                          // font offset
                 font_size,                  // pixel height

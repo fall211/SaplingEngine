@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "EntityManager.hpp"
-#include "Entity.hpp"
+#include "ECS/EntityManager.hpp"
+#include "ECS/Entity.hpp"
 
 template <typename T, typename... Args>
 auto EntityManager::instantiatePrefab(Args... args) -> std::shared_ptr<Entity>

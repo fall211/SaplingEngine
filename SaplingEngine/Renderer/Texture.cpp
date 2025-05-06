@@ -4,9 +4,8 @@
 //
 
 
-#include "Texture.hpp"
-#include "Sprout.hpp"
-
+#include "Renderer/Texture.hpp"
+#include "Renderer/Sprout.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"

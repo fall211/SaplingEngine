@@ -6,12 +6,14 @@
 
 #pragma once
 
+#include "ECS/Entity.hpp"
+#include "ECS/Component.hpp"
+
+#include "glm/glm.hpp"
+
 #include <memory>
 #include <vector>
 #include <unordered_map>
-#include "Entity.hpp"
-#include "Component.hpp"
-#include "glm/glm.hpp"
 
 class SpatialGrid {
 private:

@@ -3,8 +3,9 @@
 //  SaplingEngine, sokol Input Wrapper
 //
 
-#include "Input.hpp"
+#include "Core/Input.hpp"
 #include "Renderer/Sprout.hpp"
+
 #include <stdexcept>
 
 Input* Input::Instance = nullptr;

@@ -3,10 +3,10 @@
 //  SaplingEngine, Canopy Scene Manager
 //  
 
-#include "Scene.hpp"
-#include "Audio/AudioEngine.hpp"
-#include "Component.hpp"
-#include "Sprout.hpp"
+#include "Core/Scene.hpp"
+#include "Core/AudioEngine.hpp"
+#include "ECS/Component.hpp"
+#include "Renderer/Sprout.hpp"
 
 
 Scene::Scene(Engine& engine) : m_engine(engine)

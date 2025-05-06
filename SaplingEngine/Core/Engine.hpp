@@ -6,8 +6,8 @@
 #pragma once
 
 #include "Renderer/Sprout.hpp"
-#include "Canopy/Scene.hpp"
-#include "Seedbank/AssetManager.hpp"
+#include "Core/Scene.hpp"
+#include "Core/AssetManager.hpp"
 
 #include <memory>
 #include <string>

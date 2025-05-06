@@ -4,24 +4,28 @@
 //
 
 #pragma once
-#include "Color.hpp"
-#include "Font.hpp"
+
+#include "Renderer/Texture.hpp"
+#include "Renderer/Font.hpp"
+#include "Utility/Color.hpp"
+
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
-#include "string"
-#include <cassert>
-#include <memory>
-#include <chrono>
-#include <array>
-
 #include "sokol/sokol_gfx.h"
 #include "sokol/sokol_app.h"
 #include "sokol/sokol_glue.h"
 
-#include "Texture.hpp"
+#include <cassert>
+#include <memory>
+#include <chrono>
+#include <array>
+#include <algorithm>
+#include <iostream>
+
+
 
 
 

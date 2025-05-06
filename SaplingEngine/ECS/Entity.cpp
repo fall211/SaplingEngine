@@ -3,8 +3,9 @@
 //  SaplingEngine
 //
 
-#include "Entity.hpp"
-#include "EntityManager.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/EntityManager.hpp"
+
 #include <any>
 #include <memory>
 

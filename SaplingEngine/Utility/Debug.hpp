@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include <iostream>
 #include "Renderer/Sprout.hpp"
-#include "Seedbank/AssetManager.hpp"
+#include "Core/AssetManager.hpp"
+
+#include <iostream>
 
 class Debug {
     public:
