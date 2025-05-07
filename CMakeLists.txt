@@ -51,7 +51,7 @@ file(GLOB_RECURSE GAME_CONTENT_SOURCES
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${ENGINE_SOURCES} ${GAME_CONTENT_SOURCES})
 
 # FMOD setup
-set(FMOD_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/fmod")
+set(FMOD_ROOT "${CMAKE_SOURCE_DIR}/SaplingEngine/thirdparty/fmod")
 set(FMOD_CORE_LIB_DIR "${FMOD_ROOT}/core/lib")
 set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT}/studio/lib")
 
@@ -131,10 +131,10 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/SaplingEngine/ECS
     ${CMAKE_SOURCE_DIR}/SaplingEngine/Utility
     ${CMAKE_SOURCE_DIR}/SaplingEngine/Renderer
-    ${CMAKE_SOURCE_DIR}/thirdparty
-    ${CMAKE_SOURCE_DIR}/thirdparty/stb
-    ${CMAKE_SOURCE_DIR}/thirdparty/fmod/studio/inc
-    ${CMAKE_SOURCE_DIR}/thirdparty/fmod/core/inc
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/thirdparty
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/thirdparty/stb
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/thirdparty/fmod/studio/inc
+    ${CMAKE_SOURCE_DIR}/SaplingEngine/thirdparty/fmod/core/inc
     ${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Scenes
     ${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Systems
     ${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Components
