@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "glm/glm.hpp"
 #include "sokol/sokol_app.h"
 
@@ -58,16 +57,13 @@ class Input
         Input();
         ~Input();
     public:
-
         static Input* getInstance()
         {
-            if (!Instance)
-            {
+            if (Instance == nullptr) {
                 Instance = new Input();
             }
             return Instance;
         }
-        
         static void initialize();
         static void cleanUp();
         
@@ -164,7 +160,8 @@ class Input
             * @return The current mouse position in world coordinates
         */
         static auto getMouseWorldPosition() -> glm::vec2;
-    
+        
+
     private:
         std::array<Key, static_cast<size_t>(Input::MouseButton::COUNT)> m_mouseKeys;
         

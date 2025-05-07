@@ -11,10 +11,10 @@ CompileFlags:
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty,
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty/fmod/core/inc,
     -I/Users/tuukkav/Documents/GitHub/SaplingEngine/thirdparty/fmod/studio/inc,
-    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Components,
-    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Prefabs,
-    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Systems,
-    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/GameContent/Scenes
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/Springuins/Components,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/Springuins/Prefabs,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/Springuins/Systems,
+    -I/Users/tuukkav/Documents/GitHub/SaplingEngine/Springuins/Scenes
     ]
 
 Diagnostics:

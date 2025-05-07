@@ -4,6 +4,8 @@
 //
 
 #include "Core/AudioEngine.hpp"
+#include "Core/AssetManager.hpp"
+
 
 AudioEngine* AudioEngine::Instance = nullptr;
 
@@ -16,12 +18,11 @@ AudioEngine::~AudioEngine() {
 
 void AudioEngine::initialize() {
     if (!Instance) Instance = new AudioEngine();
-    
-    
+
     // Initialize FMOD Studio System
     FMOD::Studio::System::create(&Instance->m_studioSystem);
     Instance->m_studioSystem->initialize(32, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
-
+    
     // Get core system
     Instance->m_studioSystem->getCoreSystem(&Instance->m_system);
 }
@@ -40,7 +41,7 @@ void AudioEngine::cleanUp() {
         }
     }
     Instance->m_channels.clear();
-
+    
     // Release FMOD systems
     if (Instance->m_studioSystem) {
         Instance->m_studioSystem->release();
@@ -51,17 +52,17 @@ void AudioEngine::cleanUp() {
         free(Instance->m_system);
     }
     
-    if (Instance) 
+    if (Instance)
     {
         delete Instance;
     }
 }
 
 void AudioEngine::playSound(const std::string& name, bool loop, float volume) {
-    FMOD::Sound* sound = AssetManager::getInstance()->getSound(name);
+    FMOD::Sound* sound = AssetManager::getSound(name);
     if (sound) {
-        if (loop) sound->setLoopCount(-1);
-        else sound->setLoopCount(0);
+        if (!loop) sound->setLoopCount(0);
+        else sound->setLoopCount(-1);
         FMOD::Channel* channel = nullptr;
         Instance->m_system->playSound(sound, nullptr, false, &channel);
         if (channel) {

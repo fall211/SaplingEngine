@@ -4,9 +4,11 @@
 //
 
 #include "Core/AssetManager.hpp"
-#include "Core/AudioEngine.hpp"
+#include "Core//AudioEngine.hpp"
 #include "Renderer/Font.hpp"
 #include "Utility/Debug.hpp"
+
+#include "fmod_common.h"
 
 #include <filesystem>
 #include <iostream>
@@ -22,10 +24,6 @@ AssetManager* AssetManager::Instance = nullptr;
 #endif
 
 
-AssetManager::~AssetManager()
-{
-    cleanUp();
-}
 void AssetManager::initialize()
 {
     if (!Instance)
@@ -35,7 +33,7 @@ void AssetManager::initialize()
 }
 
 void AssetManager::cleanUp()
-{
+{   
     for (auto& pair : Instance->m_textures) {
         pair.second->release();
     }
@@ -50,11 +48,15 @@ void AssetManager::cleanUp()
         pair.second->release();
     }
     Instance->m_sounds.clear();
-    
     if (Instance)
     {
         delete Instance;
     }
+}
+
+AssetManager::~AssetManager()
+{
+    cleanUp();
 }
 
 std::string AssetManager::getAssetsPath() {
@@ -143,6 +145,7 @@ void AssetManager::addSound(const std::string &name, const std::string &path, bo
     {
         throw std::runtime_error("Error loading sound file: " + path);
     }
+    
     sound->setMode(FMOD_LOOP_NORMAL);
     
     Instance->m_sounds[name] = sound;

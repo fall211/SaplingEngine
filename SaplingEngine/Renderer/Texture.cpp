@@ -7,6 +7,7 @@
 #include "Renderer/Texture.hpp"
 #include "Renderer/Sprout.hpp"
 
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
@@ -14,10 +15,7 @@
 namespace Sprout
 {
     
-    Texture::~Texture()
-    {
-        release();
-    }
+    Texture::~Texture() {}
         
     bool Texture::loadFromFile(const std::string& path, const glm::i32 numFrames) 
     {

@@ -87,6 +87,11 @@ class EntityManager : public std::enable_shared_from_this<EntityManager>
         void destroyEntity(const std::shared_ptr<Entity>& entity);
         
         /*
+            * Clears all entities from the entity manager
+        */
+        void clear();
+        
+        /*
             * Gets the spatial grid used by the entity manager
             * @return The spatial grid
         */

@@ -17,6 +17,7 @@ InputAxis::InputAxis(std::string  name, const int pKey, const int nKey)
     {}
 
 
+
 Input::Input()
 {
     m_actionsMap = std::map<std::string, std::vector<int>>();

@@ -4,12 +4,15 @@
 //
 
 #include "Renderer/Font.hpp"
-#include "Renderer/Sprout.hpp"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>
 
+#include "Renderer/Sprout.hpp"
 
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 namespace Sprout
 {
@@ -52,11 +55,11 @@ namespace Sprout
     {
         Window::getInstance()->addFont(std::shared_ptr<Font>(this));
     }
-
+    
     void Font::release()
     {
         free(bakedChars);
         free(data);
     }
-    
+
 }

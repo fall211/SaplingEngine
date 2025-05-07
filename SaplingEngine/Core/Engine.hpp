@@ -21,7 +21,7 @@ using namespace std::chrono;
 using sceneMap = std::unordered_map<std::string, std::shared_ptr<Scene>>;
 
 class Engine {
-    Sprout::Window m_window = Sprout::Window(640, 360, "Sapling Engine");
+    Sprout::Window m_window;// = Sprout::Window(640, 360, "Sapling Engine");
     float m_deltaTime = 0.0f;
 
     sceneMap m_scenes;
@@ -32,7 +32,7 @@ class Engine {
 
 public:
 
-    Engine();
+    Engine(size_t width, size_t height, const char* title);
     ~Engine() = default;
     
     /**

@@ -7,6 +7,8 @@
 
 #include "Core/Engine.hpp"
 #include "Core/Input.hpp"
+#include "Core/AssetManager.hpp"
+#include "Core/AudioEngine.hpp"
 #include "Utility/Debug.hpp"
 #include "Utility/Physics.hpp"
 #include "ECS/EntityManager.hpp"

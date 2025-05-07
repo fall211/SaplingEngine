@@ -18,7 +18,7 @@ Scene::Scene(Engine& engine) : m_engine(engine)
 void Scene::preUpdate()
 {
     m_entityManager->update();
-    AudioEngine::getInstance()->update();
+    AudioEngine::update();
 }
 
 void Scene::postUpdate()
@@ -30,6 +30,7 @@ void Scene::enable()
 {
     // set the window's event callback to our input system
     m_engine.getWindow().SetEventCallback([](const sapp_event* e) { Input::update(e); });
+    Debug::log("enabling scene");
 }
 
 void Scene::disable()

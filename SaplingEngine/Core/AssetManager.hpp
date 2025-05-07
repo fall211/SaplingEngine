@@ -17,36 +17,39 @@
 #include <memory>
 #include <stdexcept>
 
-
 class AudioEngine;
 
 class AssetManager {
-    static AssetManager* Instance;
-    
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
     std::unordered_map<std::string, std::shared_ptr<Sprout::Font>> m_fonts = std::unordered_map<std::string, std::shared_ptr<Sprout::Font>>();
     
     std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>> m_tilesets = std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>>();
     
     std::unordered_map<std::string, FMOD::Sound*> m_sounds = std::unordered_map<std::string, FMOD::Sound*>();
+    
+    
+    
+    static AssetManager* Instance;
 
     AssetManager() = default;
     ~AssetManager();
 
 public:
-
+    static void initialize();
+    static void cleanUp();
     static AssetManager* getInstance()
     {
-        if (!Instance) 
-        {
+        if (Instance == nullptr) {
             Instance = new AssetManager();
         }
         return Instance;
     }
-    static void initialize();
-    static void cleanUp();
+    
+    /*
+        * Gets the assets path used by the game.
+        * @return The assets path
+    */
     static std::string getAssetsPath();
-
     /*
         * Adds a texture to the asset manager
         * @param name The name of the texture

@@ -4,9 +4,8 @@
 //
 
 #pragma once
-
-#include "Renderer/Texture.hpp"
 #include "Renderer/Font.hpp"
+#include "Renderer/Texture.hpp"
 #include "Utility/Color.hpp"
 
 #include "glm/fwd.hpp"
@@ -14,17 +13,15 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
-#include "sokol/sokol_gfx.h"
-#include "sokol/sokol_app.h"
-#include "sokol/sokol_glue.h"
-
+#include "string"
 #include <cassert>
 #include <memory>
 #include <chrono>
 #include <array>
-#include <algorithm>
-#include <iostream>
 
+#include "sokol/sokol_gfx.h"
+#include "sokol/sokol_app.h"
+#include "sokol/sokol_glue.h"
 
 
 
@@ -226,6 +223,8 @@ namespace Sprout
         private:
             int m_width = 0;
             int m_height = 0;
+            float m_aspectRatio;
+            bool m_lockAspectRatio = true;
             const char* m_title;
             static Window* instance;
 

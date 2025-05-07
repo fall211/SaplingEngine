@@ -5,14 +5,9 @@
 
 #pragma once
 
-
-#include <stb/stb_truetype.h>
-
 #include <cstdint>
 #include <string>
-#include <fstream>
-#include <iostream>
-#include <vector>
+#include <stb/stb_truetype.h>
 
 namespace Sprout
 {

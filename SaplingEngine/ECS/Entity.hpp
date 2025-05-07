@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ECS/Component.hpp"
+#include "Utility/Debug.hpp"
 
 #include <string>
 #include <tuple>
@@ -132,8 +133,13 @@ class Entity : public std::enable_shared_from_this<Entity>
         */
         template <typename T>
         void removeComponent() {
-            m_components[typeid(T)]->OnRemoveFromEntity();
-            m_components.erase(typeid(T));
+            auto it = m_components.find(typeid(T));
+            if (it != m_components.end()) {
+                it->second->OnRemoveFromEntity();
+                m_components.erase(it);
+            } else {
+                Debug::log("Trying to remove a component that doesn't exist!");
+            }
         }
     
         /*

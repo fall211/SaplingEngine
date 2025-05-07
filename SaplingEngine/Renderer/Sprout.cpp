@@ -14,9 +14,13 @@
 #endif
 
 #define SOKOL_NO_ENTRY
+
 #include "Renderer/Sprout.hpp"
+#include "Utility/Color.hpp"
 #include "Renderer/quad.h"
 
+#include <algorithm>
+#include <iostream>
 
 namespace Sprout 
 {
@@ -38,16 +42,16 @@ namespace Sprout
     glm::vec2 getAnchorOffset(Pivot pivot)
     {
         switch (pivot) {
-            case Pivot::TOP_LEFT:   return glm::vec2(-0.5f, -0.5f);
-            case Pivot::TOP_CENTER: return glm::vec2(0.0f, -0.5f);
-            case Pivot::TOP_RIGHT:  return glm::vec2(0.5f, -0.5f);
-            case Pivot::CENTER_LEFT:   return glm::vec2(-0.5f, 0.0f);
-            case Pivot::CENTER:        return glm::vec2(0.0f, 0.0f);
-            case Pivot::CENTER_RIGHT:  return glm::vec2(0.5f, 0.0f);
-            case Pivot::BOTTOM_LEFT:      return glm::vec2(-0.5f, 0.5f);
-            case Pivot::BOTTOM_CENTER:    return glm::vec2(0.0f, 0.5f);
-            case Pivot::BOTTOM_RIGHT:     return glm::vec2(0.5f, 0.5f);
-            default:                   return glm::vec2(0.0f, 0.0f); // default to center
+            case Pivot::TOP_LEFT:   return glm::vec2(0.0f, 0.0f);
+            case Pivot::TOP_CENTER: return glm::vec2(0.5f, 0.0f);
+            case Pivot::TOP_RIGHT:  return glm::vec2(1.0f, 0.0f);
+            case Pivot::CENTER_LEFT:   return glm::vec2(0.0f, 0.5f);
+            case Pivot::CENTER:        return glm::vec2(0.5f, 0.5f);
+            case Pivot::CENTER_RIGHT:  return glm::vec2(1.0f, 0.5f);
+            case Pivot::BOTTOM_LEFT:      return glm::vec2(0.0f, 1.0f);
+            case Pivot::BOTTOM_CENTER:    return glm::vec2(0.5f, 1.0f);
+            case Pivot::BOTTOM_RIGHT:     return glm::vec2(1.0f, 1.0f);
+            default:                   return glm::vec2(0.0f, 0.0f); // default to top left
         }
     }
     
@@ -60,11 +64,13 @@ namespace Sprout
             memset(&m_state, 0, sizeof(m_state));
             memset(&draw_frame, 0, sizeof(draw_frame));
     
+            m_aspectRatio = static_cast<float>(m_width) / static_cast<float>(m_height);
+            
             draw_frame.view_projection = glm::ortho(
-                -0.5f * (m_width),
-                0.5f * (m_width),
-                0.5f * (m_height),
-                -0.5f * (m_height),
+                0.0f,
+                1.0f * (m_width),
+                1.0f * (m_height),
+                0.0f,
                 1.0f,
                 -1.0f
             );
@@ -248,34 +254,22 @@ namespace Sprout
             }
             else if (e->type == SAPP_EVENTTYPE_RESIZED)
             {
-                m_width = e->window_width;
-                m_height = e->window_height;
+                // m_width = e->window_width;
+                // m_height = e->window_height;
                 
-                const float referenceWidth = 640.0f;
-                const float referenceHeight = 360.0f;
+                // const float referenceWidth = 640.0f;
+                // const float referenceHeight = 360.0f;
 
-                float windowAspect = static_cast<float>(m_width) / m_height;
-                float referenceAspect = referenceWidth / referenceHeight;
-                
-                float orthoWidth, orthoHeight;
-                
-                if (windowAspect > referenceAspect) {
-                    orthoHeight = referenceHeight;
-                    orthoWidth = orthoHeight * windowAspect;
-                } else {
-                    orthoWidth = referenceWidth;
-                    orthoHeight = orthoWidth / windowAspect;
-                }
-                
+                // scale to fit screen
                 draw_frame.view_projection = glm::ortho(
-                    -0.5f * orthoWidth,
-                    0.5f * orthoWidth,
-                    0.5f * orthoHeight,
-                    -0.5f * orthoHeight,
+                    0.0f,
+                    static_cast<float>(m_width),
+                    static_cast<float>(m_height),
+                    0.0f,
                     1.0f,
                     -1.0f
                 );
-                draw_frame.orthoSize = glm::vec2(orthoWidth, orthoHeight);
+                draw_frame.orthoSize = glm::vec2(static_cast<float>(m_width), static_cast<float>(m_height));
             }
         }
     }

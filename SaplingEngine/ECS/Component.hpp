@@ -7,9 +7,9 @@
 
 
 
+#include "Utility/Color.hpp"
 #include "Renderer/Texture.hpp"
 #include "Renderer/Sprout.hpp"
-#include "Utility/Color.hpp"
 
 #include "glm/glm.hpp"
 
@@ -53,7 +53,7 @@ namespace Comp
         glm::vec2 velocity = glm::vec2(0, 0);
         glm::f32 rotation = 0.0f;
         glm::vec3 scale = glm::vec3(1, 1, 1);
-        Sprout::Pivot pivot = Sprout::Pivot::CENTER;
+        Sprout::Pivot pivot = Sprout::Pivot::TOP_LEFT;
         bool reset = false;
 
         Transform(Inst inst, const glm::vec2& positionin, const glm::vec2& velocityin);

@@ -5,11 +5,14 @@
 
 
 #include "Core/Engine.hpp"
-#include "Core/AssetManager.hpp"
+#include "Core//AssetManager.hpp"
+
+#include <cstddef>
 #include <memory>
 
 
-Engine::Engine()
+Engine::Engine(size_t width, size_t height, const char* title)
+    : m_window(width, height, title)
 {
     m_scenes = sceneMap();
     AssetManager::getInstance();

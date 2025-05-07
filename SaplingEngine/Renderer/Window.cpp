@@ -10,10 +10,12 @@
 #include "Renderer/Font.hpp"
 #include "Renderer/Sprout.hpp"
 #include "Renderer/quad.h"
-#include "Utility/Color.hpp"
 #include "Utility/Debug.hpp"
+#include "Utility/Color.hpp"
+
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+
 #include <cstdint>
 #include <memory>
 
@@ -29,8 +31,8 @@ namespace Sprout
     void Window::bake_atlas()
     {
         const int PADDING = 2;
-            m_atlas.width = 512;
-            m_atlas.height = 512;
+            m_atlas.width = 1024;
+            m_atlas.height = 1024;
             
             unsigned char* atlas_data = (unsigned char*)malloc(m_atlas.width * m_atlas.height * 4);
             memset((void*)atlas_data, 0, m_atlas.width * m_atlas.height * 4);
@@ -179,7 +181,7 @@ namespace Sprout
             unsigned char* atlas_data = new unsigned char[atlas_width * atlas_height];
             memset(atlas_data, 0, atlas_width * atlas_height);
 
-            stbtt_BakeFontBitmap(
+            int error = stbtt_BakeFontBitmap(
                 m_fonts[i]->data,           // unsigned char* font data
                 0,                          // font offset
                 font_size,                  // pixel height

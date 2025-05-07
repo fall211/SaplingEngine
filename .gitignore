@@ -13,9 +13,8 @@ Build/
 *.so
 
 # Game Content
-GameContent/**/*
-GameContent/**/**/*
-GameContent
+GameContent/
+Springuins/
 
 # Logs & temp
 *.log

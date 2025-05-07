@@ -68,8 +68,22 @@ void EntityManager::addTagToEntity(const std::shared_ptr<Entity>& entity, const 
 void EntityManager::removeTagFromEntity(const std::shared_ptr<Entity>& entity, const std::string& tag)
 {
     entity->removeTag(tag);
+    
+    // Get the entity list with the given tag
     auto& entityListWithTag = m_entityMap[tag];
-    entityListWithTag.erase(std::remove(entityListWithTag.begin(), entityListWithTag.end(), entity), entityListWithTag.end());
+    
+    // Use std::remove_if with a comparison that checks entity IDs
+    entityListWithTag.erase(
+        std::remove_if(
+            entityListWithTag.begin(), 
+            entityListWithTag.end(),
+            [&entity](const std::shared_ptr<Entity>& e) {
+                // Compare by entity ID or some unique identifier
+                return e.get() == entity.get(); // Compare the raw pointers
+            }
+        ),
+        entityListWithTag.end()
+    );
 }
 
 void EntityManager::destroyEntity(const std::shared_ptr<Entity>& entity)
@@ -82,6 +96,22 @@ void EntityManager::destroyEntity(const std::shared_ptr<Entity>& entity)
     m_spatialGrid.removeEntity(entity);
 
     m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
+}
+
+void EntityManager::clear()
+{
+    m_spatialGrid.clear();
+    
+    m_entities.clear();
+    m_entitiesToAdd.clear();
+    
+    for (auto& [tag, entityList] : m_entityMap)
+    {
+        entityList.clear();
+    }
+    m_entityMap.clear();
+    
+    m_idCounter = 0;
 }
 
 SpatialGrid& EntityManager::getSpatialGrid()
