@@ -509,6 +509,38 @@ namespace Sprout
     
     void Window::draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale, Pivot pivot, bool worldSpace)
     {
+        float totalWidth = 0.0f, maxHeight = 0.0f;
+        float temp_x = 0.0f, temp_y = 0.0f;
+        
+        // calculate width of the text
+        for (char c : text)
+        {
+            int char_index = c - 32;
+            
+            float advance_x = temp_x, advance_y = temp_y;
+            stbtt_aligned_quad quad;
+            
+            stbtt_GetBakedQuad
+            (
+                font->bakedChars, 
+                m_fontAtlases[font->fontId].width, 
+                m_fontAtlases[font->fontId].height, 
+                char_index, 
+                &advance_x, 
+                &advance_y, 
+                &quad, 
+                1
+            );
+            
+            temp_x = advance_x;
+            temp_y = advance_y;
+            
+            float charHeight = quad.y1 - quad.y0;
+            if (charHeight > maxHeight) maxHeight = charHeight;
+        }
+        
+        totalWidth = temp_x; // temp_x == total width
+        
         float x = 0, y = 0;
         
         glm::mat4 globalXform = glm::mat4(1.0f);        
@@ -521,7 +553,7 @@ namespace Sprout
         else // ui elements need to use pivot for an anchor as well as a pivot
         {
             glm::vec2 anchor_offset = getAnchorOffset(pivot);
-            glm::vec2 pos = glm::vec2(position.x * anchor_offset.x * -1, position.y * anchor_offset.y * -1);
+            glm::vec2 pos = glm::vec2((totalWidth / 2.0f + position.x) * anchor_offset.x * -1, (position.y) * anchor_offset.y * -1);
             if (anchor_offset.x == 0)       pos.x = position.x;
             if (anchor_offset.y == 0)       pos.y = -position.y;
             
