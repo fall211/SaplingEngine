@@ -118,7 +118,8 @@ namespace Comp
         glm::vec2 transformOffset = glm::vec2(0.0f, 0.0f);
         glm::vec3 scaleOffset = glm::vec3(1.0f, 1.0f, 1.0f);
         
-        enum class Layer : std::uint8_t {
+        enum class Layer : std::uint8_t 
+        {
             Background,
             Midground,
             Player,
@@ -133,7 +134,8 @@ namespace Comp
         
         void setColorOverride(const glm::vec4& color, float time);
         
-        enum class Type : std::uint8_t {
+        enum class Type : std::uint8_t 
+        {
             Static,
             Animated
         };

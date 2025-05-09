@@ -98,7 +98,8 @@ namespace Sprout
     /*
         * Pre-defined pivots for use with Sprout::getPivotOffset.
     */
-    enum class Pivot {
+    enum class Pivot 
+    {
         BOTTOM_LEFT,
         BOTTOM_CENTER,
         BOTTOM_RIGHT,

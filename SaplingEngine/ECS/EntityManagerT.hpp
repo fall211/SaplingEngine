@@ -19,9 +19,10 @@ auto EntityManager::instantiatePrefab(Args... args) -> std::shared_ptr<Entity>
 }
 
 template <typename T>
-auto EntityManager::getEntitiesByComponent() -> EntityList
+auto EntityManager::getEntitiesByComponent() -> EntityList&
 {
-    EntityList entities;
+    static EntityList entities;
+    entities.clear();
     for (const auto& e : m_entities){
         if (e && e->hasComponent<T>()){
             entities.push_back(e);

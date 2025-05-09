@@ -64,7 +64,7 @@ class EntityManager : public std::enable_shared_from_this<EntityManager>
             * @return The list of entities with the given component
         */
         template <typename T>
-        auto getEntitiesByComponent() -> EntityList;
+        auto getEntitiesByComponent() -> EntityList&;
         
         /*
             * Adds a tag to the given entity

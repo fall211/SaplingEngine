@@ -8,6 +8,7 @@
 #include "glm/glm.hpp"
 #include "sokol/sokol_app.h"
 
+#include <cstdint>
 #include <string>
 #include <map>
 
@@ -120,7 +121,7 @@ class Input
         */
         static auto getAxis(const std::string& name) -> float;
         
-        enum MouseButton 
+        enum MouseButton : std::uint8_t
         {
             LEFT = 0,
             RIGHT = 1,
