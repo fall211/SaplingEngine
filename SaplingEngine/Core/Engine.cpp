@@ -11,8 +11,8 @@
 #include <memory>
 
 
-Engine::Engine(size_t width, size_t height, const char* title)
-    : m_window(width, height, title)
+Engine::Engine(size_t viewportWidth, size_t viewportHeight, const char* title)
+    : m_window(viewportWidth, viewportHeight, title)
 {
     m_scenes = sceneMap();
     AssetManager::getInstance();

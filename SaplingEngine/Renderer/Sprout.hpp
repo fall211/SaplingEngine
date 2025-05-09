@@ -15,6 +15,7 @@
 
 #include "string"
 #include <cassert>
+#include <cstdint>
 #include <memory>
 #include <chrono>
 #include <array>
@@ -92,13 +93,13 @@ namespace Sprout
         int num_quads = 0;
         glm::mat4 view_projection;
         glm::mat4 camera_xform;
-        glm::vec2 orthoSize;
+        glm::vec4 viewport; // x, y, width, height
     };
     
     /*
         * Pre-defined pivots for use with Sprout::getPivotOffset.
     */
-    enum class Pivot 
+    enum class Pivot : std::uint8_t
     {
         BOTTOM_LEFT,
         BOTTOM_CENTER,
@@ -117,9 +118,9 @@ namespace Sprout
     class Window
     {
         public: 
-            Window(int width, int height, const char* title);
+            Window(int viewportWidth, int viewportHeight, const char* title);
             ~Window();
-            static Window* getInstance() { return instance; }
+            static Window* getInstance() { return Instance; }
             DrawFrame draw_frame; 
         
             /*
@@ -220,14 +221,34 @@ namespace Sprout
                 * @return The camera position
             */
             glm::vec2 getCameraPosition();
+            
+            /*
+                * Updates the viewport based on window dimensions
+            */
+            void updateViewport();
+            
+            /*
+                * Sets the viewport dimensions
+                * @param width The desired viewport width
+                * @param height The desired viewport height
+            */
+            void setViewportSize(int width, int height);
+            
+            /*
+                * Converts window coordinates to viewport coordinates
+                * @param windowPos Window coordinates
+                * @return Viewport coordinates
+            */
+            glm::vec2 windowToViewport(glm::vec2 windowPos);
 
         private:
-            int m_width = 0;
-            int m_height = 0;
-            float m_aspectRatio;
-            bool m_lockAspectRatio = true;
+            static Window* Instance;
+            
             const char* m_title;
-            static Window* instance;
+
+            int m_viewportWidth;
+            int m_viewportHeight;
+            float m_viewportAspectRatio = 1.0f;
 
             
             State m_state;
@@ -256,11 +277,8 @@ namespace Sprout
             void Cleanup();
             void Event(const sapp_event* e);
             
-            int getWidth() const { return m_width; }
-            int getHeight() const { return m_height; }
-            
-            // drawing things onto the screen
-            void draw_test();
+            int getWidth() const { return sapp_width(); }
+            int getHeight() const { return sapp_height(); }
 
             
             void draw_rect_projected(

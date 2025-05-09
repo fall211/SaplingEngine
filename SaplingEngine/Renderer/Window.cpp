@@ -181,7 +181,7 @@ namespace Sprout
             unsigned char* atlas_data = new unsigned char[atlas_width * atlas_height];
             memset(atlas_data, 0, atlas_width * atlas_height);
 
-            int error = stbtt_BakeFontBitmap(
+            stbtt_BakeFontBitmap(
                 m_fonts[i]->data,           // unsigned char* font data
                 0,                          // font offset
                 font_size,                  // pixel height
@@ -273,8 +273,8 @@ namespace Sprout
             if (anchor_offset.x == 0)       pos.x = position.x;
             if (anchor_offset.y == 0)       pos.y = -position.y;
             
-            anchor_offset.x = anchor_offset.x * draw_frame.orthoSize.x + pos.x;
-            anchor_offset.y = anchor_offset.y * draw_frame.orthoSize.y + pos.y;
+            anchor_offset.x = anchor_offset.x * m_viewportWidth + pos.x;
+            anchor_offset.y = anchor_offset.y * m_viewportHeight + pos.y;
             
             xform0 = glm::translate(xform0, glm::vec3(anchor_offset, 0.0f));       
         }
@@ -399,16 +399,79 @@ namespace Sprout
     
     glm::vec2 Window::screenToWorld(glm::vec2 screen_pos) 
     {
+        glm::vec2 viewport_pos = Instance->windowToViewport(screen_pos);
+        
+        if (viewport_pos.x < 0 || viewport_pos.y < 0) {
+            return glm::vec2(-1.0f, -1.0f);
+        }
+    
         glm::mat4 inv_proj = glm::inverse(Window::getInstance()->draw_frame.view_projection * Window::getInstance()->draw_frame.camera_xform);
-    
-        // normalize screen pos
-        float normal_x = (screen_pos.x) / Window::getInstance()->getWidth() - 1.0f;
-        float normal_y = 1.0f - (screen_pos.y) / Window::getInstance()->getHeight();
-        glm::vec4 ndc_pos = glm::vec4(normal_x, normal_y, 0.0f, 1.0f);
-    
-        glm::vec4 world_pos = inv_proj * ndc_pos;
+ 
+        glm::vec4 world_pos = inv_proj * glm::vec4(viewport_pos.x, viewport_pos.y, 0.0f, 1.0f);
+        
         return glm::vec2(world_pos.x, world_pos.y);
     }
+    
+        void Window::updateViewport()
+        {
+            float window_aspect = static_cast<float>(sapp_width()) / static_cast<float>(sapp_height());
+    
+            int viewport_x, viewport_y, viewport_width, viewport_height;
+    
+            if (window_aspect > m_viewportAspectRatio) {
+                // window is wider than the target aspect - letterboxing on sides
+                viewport_height = sapp_height();
+                viewport_width = static_cast<int>(sapp_height() * m_viewportAspectRatio);
+                viewport_y = 0;
+                viewport_x = (sapp_width() - viewport_width) / 2;
+            } else {
+                // window is taller than the target aspect - letterboxing on top/bottom
+                viewport_width = sapp_width();
+                viewport_height = static_cast<int>(sapp_width() / m_viewportAspectRatio);
+                viewport_x = 0;
+                viewport_y = (sapp_height() - viewport_height) / 2;
+            }
+    
+            draw_frame.viewport = glm::vec4(viewport_x, viewport_y, viewport_width, viewport_height);
+        }
+    
+        void Window::setViewportSize(int width, int height)
+        {
+            if (width <= 0 || height <= 0) {
+                return;
+            }
+        
+            m_viewportWidth = width;
+            m_viewportHeight = height;
+            m_viewportAspectRatio = static_cast<float>(width) / static_cast<float>(height);
+    
+            draw_frame.view_projection = glm::ortho(
+                0.0f,
+                static_cast<float>(m_viewportWidth),
+                static_cast<float>(m_viewportHeight),
+                0.0f,
+                1.0f,
+                -1.0f
+            );
+    
+            updateViewport();
+        }
+    
+        glm::vec2 Window::windowToViewport(glm::vec2 windowPos)
+        {
+            glm::vec4 viewport = draw_frame.viewport;
+        
+            // check if outside viewport
+            if (windowPos.x < viewport.x || windowPos.x > viewport.x + viewport.z ||
+                windowPos.y < viewport.y || windowPos.y > viewport.y + viewport.w) {
+                return glm::vec2(-1.0f, -1.0f);
+            }
+    
+            float viewport_x = ((windowPos.x - viewport.x) / viewport.z) * m_viewportWidth;
+            float viewport_y = ((windowPos.y - viewport.y) / viewport.w) * m_viewportHeight;
+    
+            return glm::vec2(viewport_x, viewport_y);
+        }
 
     void Window::translateCamera(glm::f32 deltaX, glm::f32 deltaY)
     {
@@ -462,8 +525,8 @@ namespace Sprout
             if (anchor_offset.x == 0)       pos.x = position.x;
             if (anchor_offset.y == 0)       pos.y = -position.y;
             
-            anchor_offset.x = anchor_offset.x * draw_frame.orthoSize.x + pos.x;
-            anchor_offset.y = anchor_offset.y * draw_frame.orthoSize.y + pos.y;
+            anchor_offset.x = anchor_offset.x * m_viewportWidth + pos.x;
+            anchor_offset.y = anchor_offset.y * m_viewportHeight + pos.y;
             
             globalXform = glm::translate(globalXform, glm::vec3(anchor_offset, 0.0f));       
         }
@@ -499,7 +562,6 @@ namespace Sprout
             if (worldSpace)
             {
                 projection = draw_frame.view_projection * draw_frame.camera_xform * charXform;            
-
             }
             else
             {

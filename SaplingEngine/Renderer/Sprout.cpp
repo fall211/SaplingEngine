@@ -24,7 +24,8 @@
 
 namespace Sprout 
 {
-    glm::vec2 getPivotOffset(Pivot pivot) {
+    glm::vec2 getPivotOffset(Pivot pivot)
+    {
         switch (pivot) {
             case Pivot::TOP_LEFT:   return glm::vec2(0.0f, 0.0f);
             case Pivot::TOP_CENTER: return glm::vec2(0.5f, 0.0f);
@@ -56,59 +57,66 @@ namespace Sprout
     }
     
     
-    Window::Window(int width, int height, const char* title)
-        :   m_width(width), 
-            m_height(height), 
-            m_title(title)
+    Window::Window(int viewportWidth, int viewportHeight, const char* title)
+        :   m_title(title),
+            m_viewportWidth(viewportWidth),
+            m_viewportHeight(viewportHeight)
         {    
             memset(&m_state, 0, sizeof(m_state));
             memset(&draw_frame, 0, sizeof(draw_frame));
     
-            m_aspectRatio = static_cast<float>(m_width) / static_cast<float>(m_height);
+            m_viewportAspectRatio = static_cast<float>(m_viewportWidth) / static_cast<float>(m_viewportHeight);
             
+            // set the projection to the viewport (will update once the viewport gets scaled to window)
             draw_frame.view_projection = glm::ortho(
                 0.0f,
-                1.0f * (m_width),
-                1.0f * (m_height),
+                static_cast<float>(m_viewportWidth),
+                static_cast<float>(m_viewportHeight),
                 0.0f,
                 1.0f,
                 -1.0f
             );
             
-            draw_frame.orthoSize = glm::vec2(m_width, m_height);
             draw_frame.camera_xform = glm::mat4(1.0f);
 
-            instance = this;
+            // Initialize viewport dimensions (will be updated in Init())
+            draw_frame.viewport = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+            Instance = this;
         }
     
     Window::~Window()
     {
-        delete instance;
+        delete Instance;
     }
     
     void Window::init_cb()
     {
-        instance->Init();
+        Instance->Init();
     }
     
     void Window::frame_cb()
     {
-        instance->Frame();
+        Instance->Frame();
     }
     
     void Window::cleanup_cb()
     {
-        instance->Cleanup();
+        Instance->Cleanup();
     }
     
     void Window::event_cb(const sapp_event* e)
     {
-        instance->Event(e);
+        Instance->Event(e);
     }
     
     
     void Window::Init()
-    {        
+    {
+        
+        // Calculate initial viewport based on actual window size
+        updateViewport();
+        
         sg_desc desc = {};
         desc.environment = sglue_environment();   
         sg_setup(&desc);
@@ -180,7 +188,7 @@ namespace Sprout
         
         sg_pass_action pass_action = {};
         pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
-        pass_action.colors[0].clear_value = {1.0f, 1.0f, 1.0f, 1.0f};
+        pass_action.colors[0].clear_value = {0.0f, 0.0f, 0.0f, 1.0f};
         m_state.pass_action = pass_action;
 
 
@@ -224,6 +232,11 @@ namespace Sprout
         pass.action = m_state.pass_action;
         pass.swapchain = sglue_swapchain();
         sg_begin_pass(&pass);
+        
+        glm::vec4 viewport = draw_frame.viewport;
+        sg_apply_viewport((int)viewport.x, (int)viewport.y, (int)viewport.z, (int)viewport.w, true);
+        sg_apply_scissor_rect((int)viewport.x, (int)viewport.y, (int)viewport.z, (int)viewport.w, true);
+        
         sg_apply_pipeline(m_state.pip);
         sg_apply_bindings(&m_state.bind);
         sg_draw(0, 6 * draw_frame.num_quads, 1);
@@ -254,22 +267,7 @@ namespace Sprout
             }
             else if (e->type == SAPP_EVENTTYPE_RESIZED)
             {
-                // m_width = e->window_width;
-                // m_height = e->window_height;
-                
-                // const float referenceWidth = 640.0f;
-                // const float referenceHeight = 360.0f;
-
-                // scale to fit screen
-                draw_frame.view_projection = glm::ortho(
-                    0.0f,
-                    static_cast<float>(m_width),
-                    static_cast<float>(m_height),
-                    0.0f,
-                    1.0f,
-                    -1.0f
-                );
-                draw_frame.orthoSize = glm::vec2(static_cast<float>(m_width), static_cast<float>(m_height));
+                updateViewport();
             }
         }
     }
@@ -281,14 +279,13 @@ namespace Sprout
         desc.frame_cb = frame_cb;
         desc.cleanup_cb = cleanup_cb;
         desc.event_cb = event_cb;
-        desc.width = instance->m_width;
-        desc.height = instance->m_height;
         desc.high_dpi = true;
-        desc.window_title = instance->m_title;
+        desc.fullscreen = true;
+        desc.window_title = Instance->m_title;
         return desc;
     }
     
-    Sprout::Window* Window::instance = nullptr;
+    Sprout::Window* Window::Instance = nullptr;
     
     void Window::Run()
     {

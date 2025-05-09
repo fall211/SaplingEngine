@@ -32,7 +32,7 @@ class Engine {
 
 public:
 
-    Engine(size_t width, size_t height, const char* title);
+    Engine(size_t viewportWidth, size_t viewportHeight, const char* title);
     ~Engine() = default;
     
     /**
