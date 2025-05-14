@@ -11,16 +11,8 @@
 #include <cstdint>
 #include <string>
 #include <map>
-
-
-struct InputAxis
-{
-    std::string name;
-    int postiveKey;
-    int negativeKey;
-    
-    InputAxis(std::string  name, int pKey, int nKey);
-};
+#include <memory>
+#include <array>
 
 struct Key
 {
@@ -29,6 +21,15 @@ struct Key
     bool pressed = false;
     
     Key() = default;
+};
+
+struct InputAxis
+{
+    std::string name;
+    int postiveKey;
+    int negativeKey;
+    
+    InputAxis(std::string  name, int pKey, int nKey);
 };
 
 
