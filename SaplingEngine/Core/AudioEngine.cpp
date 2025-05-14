@@ -45,16 +45,17 @@ void AudioEngine::cleanUp() {
     // Release FMOD systems
     if (Instance->m_studioSystem) {
         Instance->m_studioSystem->release();
-        free(Instance->m_studioSystem);
+        Instance->m_studioSystem = nullptr;
     }
     if (Instance->m_system) {
         Instance->m_system->release();
-        free(Instance->m_system);
+        Instance->m_system = nullptr;
     }
     
     if (Instance)
     {
         delete Instance;
+        Instance = nullptr;
     }
 }
 
