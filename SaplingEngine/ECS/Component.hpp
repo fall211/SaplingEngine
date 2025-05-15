@@ -129,10 +129,9 @@ namespace Comp
         };
         
         void setLayer(Layer layerIn) { layer = layerIn; }
-        
         void flipX(bool flip);
-        
         void setColorOverride(const glm::vec4& color, float time);
+        void setAnimated(const float animSpeed);
         
         enum class Type : std::uint8_t 
         {

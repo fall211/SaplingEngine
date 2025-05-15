@@ -89,6 +89,17 @@ namespace Comp
         colorOverrideTime = time;
     }
     
+    void Sprite::setAnimated(const float animSpeed)
+    {
+        type = Type::Animated;
+        numFrames = texture->getNumFrames();
+        animationSpeed = (size_t)(60.0f / animSpeed);
+        
+        glm::i32 x = texture->getWidth() / numFrames;
+        glm::i32 y = texture->getHeight();
+        size = glm::vec2(x, y);
+    }
+    
     SimplePlayerControls::SimplePlayerControls(Inst inst, const float speedIn, const int jumpStrIn)
         :   Component(std::move(inst)),
             moveSpeed(speedIn),
