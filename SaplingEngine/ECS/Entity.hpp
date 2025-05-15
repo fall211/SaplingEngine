@@ -32,6 +32,7 @@ typedef std::shared_ptr<Entity> Inst;
 class Entity : public std::enable_shared_from_this<Entity>
 {
     private:
+        std::string m_name = "";
         TagList m_tags;
         size_t m_id = 0;
         std::shared_ptr<EntityManager> m_owner;
@@ -69,6 +70,9 @@ class Entity : public std::enable_shared_from_this<Entity>
 
         
     public:
+    
+        void setName(const std::string& name);
+        std::string& getName();
     
         /* 
             * Requests the addition of a tag to the entity through the entity manager.

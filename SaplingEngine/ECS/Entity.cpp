@@ -16,6 +16,10 @@ Entity::Entity(TagList  tags, const size_t id, std::shared_ptr<EntityManager> ow
         m_id(id),
         m_owner(std::move(owner))
     {}
+    
+void Entity::setName(const std::string& name) { m_name = name; }
+
+std::string& Entity::getName() { return m_name; }
 
 auto Entity::getId() const -> size_t { return m_id; }
 
