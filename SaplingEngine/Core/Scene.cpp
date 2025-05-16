@@ -40,6 +40,7 @@ void Scene::disable()
 
 void Scene::sRender(EntityList& entities)
 {
+    glm::f32 numEntities = entities.size();
     float dt = m_engine.deltaTime();
     for (const auto& e : entities)
     {
@@ -68,7 +69,7 @@ void Scene::sRender(EntityList& entities)
             if (e->hasComponent<Comp::Transform>())
             {
                 auto& cTransform = e->getComponent<Comp::Transform>();
-                layer = static_cast<glm::f32>(cSprite.layer) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
+                layer = (static_cast<glm::f32>(cSprite.layer) + + static_cast<glm::f32>(e->getId()) / numEntities) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
                 pos = cTransform.position + cSprite.transformOffset;
                 scale = cTransform.scale * cSprite.scaleOffset;
                 rotation = cTransform.rotation;
