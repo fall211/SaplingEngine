@@ -7,6 +7,7 @@
 
 
 
+#include "Renderer/StandaloneTexture.hpp"
 #include "Utility/Color.hpp"
 #include "Renderer/Texture.hpp"
 #include "Renderer/Sprout.hpp"
@@ -41,6 +42,17 @@ namespace Comp
         virtual void OnRemoveFromEntity() {}
     };
     
+    enum class Layer : std::uint8_t 
+    {
+        Background,
+        Midground,
+        Player,
+        Foreground,
+        UserInterface,
+        Count
+    };
+    
+    
     /*
         * A transform component for position and velocity.
         * position (vec2): The position of the entity.
@@ -60,6 +72,18 @@ namespace Comp
         Transform(Inst inst, const glm::vec2& positionin);
     };
     
+    struct GridTransform final : public Component
+    {
+        GridTransform(Inst inst, int8_t x, int8_t y);
+        
+        int8_t x;
+        int8_t y;
+        
+        glm::vec2 getGridPosition();
+        glm::vec2 getWorldPosition();
+
+        void OnAddToEntity() override;
+    };
     
     /*
         * A bounding box component for collision detection.
@@ -118,16 +142,6 @@ namespace Comp
         glm::vec2 transformOffset = glm::vec2(0.0f, 0.0f);
         glm::vec3 scaleOffset = glm::vec3(1.0f, 1.0f, 1.0f);
         
-        enum class Layer : std::uint8_t 
-        {
-            Background,
-            Midground,
-            Player,
-            Foreground,
-            UserInterface,
-            Count
-        };
-        
         void setLayer(Layer layerIn) { layer = layerIn; }
         void flipX(bool flip);
         void setColorOverride(const glm::vec4& color, float time);
@@ -153,14 +167,21 @@ namespace Comp
         bool flip_X = false;
     };
     
-    struct FollowMouse final : public Component {};
-    
-    struct SimplePlayerControls final : public Component 
+    struct Image final : public Component
     {
-        float moveSpeed = 0.0f;
-        int jumpStr;
-        bool grounded = true;
-        SimplePlayerControls(Inst inst, float speedIn, int jumpStrIn);
+        std::shared_ptr<Sprout::StandaloneTexture> texture;
+        glm::vec2 size;
+        glm::vec2 transformOffset = glm::vec2(0.0f, 0.0f);
+        glm::vec3 scaleOffset = glm::vec3(1.0f, 1.0f, 1.0f);
+        
+        
+        explicit Image(Inst inst, const std::shared_ptr<Sprout::StandaloneTexture>& texin);
+        
+        void OnAddToEntity() override;
+        void OnRemoveFromEntity() override;
+        void setLayer(Layer newLayer) { layer = newLayer; }
+        
+        Layer layer = Layer::Midground;
     };
 
     

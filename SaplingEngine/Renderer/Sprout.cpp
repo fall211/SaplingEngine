@@ -3,6 +3,9 @@
 //  Sapling Engine, Sprout Renderer
 //
 
+#include "Renderer/StandaloneTexture.hpp"
+#include "Utility/Debug.hpp"
+#include <cstddef>
 #if defined(__APPLE__)
     #define SOKOL_METAL
 #elif defined(_WIN32)
@@ -113,24 +116,31 @@ namespace Sprout
     
     void Window::Init()
     {
-        
-        // Calculate initial viewport based on actual window size
         updateViewport();
         
         sg_desc desc = {};
         desc.environment = sglue_environment();   
         sg_setup(&desc);
 
-        // vertex buffer 
+
+        // main vertex buffer for regular quads
         sg_buffer_desc vbuf_desc = {};
         vbuf_desc.size = sizeof(draw_frame.quads);
         vbuf_desc.usage = SG_USAGE_DYNAMIC;
         vbuf_desc.label = "quad-vertices";
         
-        m_state.bind.vertex_buffers[0] = sg_make_buffer(&vbuf_desc);
+        m_state.quad_vbuf = sg_make_buffer(&vbuf_desc);
+        
+        // separate vertex buffer for standalone quads
+        sg_buffer_desc standalone_vbuf_desc = {};
+        standalone_vbuf_desc.size = sizeof(draw_frame.standalone_quads);
+        standalone_vbuf_desc.usage = SG_USAGE_DYNAMIC;
+        standalone_vbuf_desc.label = "standalone-quad-vertices";
+        
+        m_state.standalone_vbuf = sg_make_buffer(&standalone_vbuf_desc);
         
         // index buffer
-        const int INDEX_BUFFER_COUNT = MAX_QUADS * 6;
+        const int INDEX_BUFFER_COUNT = MAX_QUADS * 6 + MAX_STANDALONE_TEXTURES * 6;
         std::array<glm::u16, INDEX_BUFFER_COUNT> indices;
         
         for (int i = 0; i < INDEX_BUFFER_COUNT;)
@@ -173,6 +183,7 @@ namespace Sprout
         pip_desc.layout.attrs[ATTR_quad_color_override0].format = SG_VERTEXFORMAT_FLOAT4;
         pip_desc.layout.attrs[ATTR_quad_bytes0].format = SG_VERTEXFORMAT_UBYTE4N;
         pip_desc.label = "quad-pipeline";
+
         
         sg_blend_state blend_state = {};
         blend_state.enabled = true;
@@ -183,12 +194,15 @@ namespace Sprout
         blend_state.dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
         blend_state.op_alpha = SG_BLENDOP_ADD;
         
-        pip_desc.colors[0].blend = blend_state;
+        pip_desc.colors[0].blend = blend_state;    
+        
+        
         m_state.pip = sg_make_pipeline(&pip_desc);
         
         sg_pass_action pass_action = {};
         pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
         pass_action.colors[0].clear_value = {0.0f, 0.0f, 0.0f, 1.0f};
+
         m_state.pass_action = pass_action;
 
 
@@ -199,7 +213,7 @@ namespace Sprout
     
     bool sortByZ(const Quad& a, const Quad& b)
     {
-        return a.vertices[0].pos.z < b.vertices[0].pos.z;
+        return a.vertices[0].pos.z > b.vertices[0].pos.z;
     }
     
     void Window::Frame()
@@ -207,6 +221,13 @@ namespace Sprout
         // reset draw frame
         draw_frame.num_quads = 0;
         std::fill(draw_frame.quads.begin(), draw_frame.quads.end(), Quad{});
+        
+        draw_frame.num_images = 0;
+        std::fill(draw_frame.standalone_quads.begin(), draw_frame.standalone_quads.end(), Quad{});
+        for (size_t i = 0; i < MAX_STANDALONE_TEXTURES; i++)
+        {
+            draw_frame.images[i].id = SG_INVALID_ID;
+        }
         
         // delta time calculation (not smoothed like sapp_frame_duration())
         // should be running at constant 60 fps, but just in case
@@ -221,15 +242,16 @@ namespace Sprout
         
         // sort quads by z so we have layers (z buffer alternative to keep transparency)
         std::sort(draw_frame.quads.begin(), draw_frame.quads.begin() + draw_frame.num_quads, sortByZ);
+        std::sort(draw_frame.standalone_quads.begin(), draw_frame.standalone_quads.begin() + draw_frame.num_images, sortByZ);
         
-        m_state.bind.images[IMG_texture0] = m_atlas.img;
         m_state.bind.images[IMG_fontTex1] = m_fontAtlases[0].img;
 
-        sg_update_buffer(m_state.bind.vertex_buffers[0], SG_RANGE(draw_frame.quads));
+        sg_update_buffer(m_state.quad_vbuf, SG_RANGE(draw_frame.quads));
 
-
+        // only called once
         sg_pass pass = {};
         pass.action = m_state.pass_action;
+
         pass.swapchain = sglue_swapchain();
         sg_begin_pass(&pass);
         
@@ -238,8 +260,30 @@ namespace Sprout
         sg_apply_scissor_rect((int)viewport.x, (int)viewport.y, (int)viewport.z, (int)viewport.w, true);
         
         sg_apply_pipeline(m_state.pip);
+
+        // draw standalone textures
+        if (draw_frame.num_images > 0) {
+            sg_update_buffer(m_state.standalone_vbuf, SG_RANGE(draw_frame.standalone_quads));
+            m_state.bind.vertex_buffers[0] = m_state.standalone_vbuf;
+
+            for (int i = 0; i < draw_frame.num_images; i++) {
+                if (draw_frame.images[i].id != SG_INVALID_ID) {
+                    m_state.bind.images[IMG_texture0] = draw_frame.images[i];
+                    sg_apply_bindings(&m_state.bind);
+                    sg_draw(i * 6, 6, 1);
+                }
+            }
+        }
+        m_state.bind.images[IMG_texture0] = m_atlas.img;
+        m_state.bind.vertex_buffers[0] = m_state.quad_vbuf;
+        m_state.bind.vertex_buffer_offsets[0] = 0;
         sg_apply_bindings(&m_state.bind);
         sg_draw(0, 6 * draw_frame.num_quads, 1);
+        
+        // draw standalone textures
+
+
+        // called once
         sg_end_pass();
         sg_commit();
     }

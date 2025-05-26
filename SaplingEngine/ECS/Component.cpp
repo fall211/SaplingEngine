@@ -5,6 +5,7 @@
 
 #include "ECS/Component.hpp"
 #include "ECS/Entity.hpp"
+#include "Renderer/StandaloneTexture.hpp"
 
 #include <utility>
 
@@ -22,6 +23,31 @@ namespace Comp
             position(positionin) 
         {}
     
+    GridTransform::GridTransform(Inst inst, int8_t x, int8_t y) 
+    :   Component(std::move(inst)), x(x), y(y)
+    {}
+    
+    glm::vec2 GridTransform::getGridPosition()
+    {
+        return glm::vec2(x, y);
+    }
+    
+    glm::vec2 GridTransform::getWorldPosition()
+    {
+        int padding = 16;
+        int worldX = x * 32 + padding;
+        int worldY = y * 32 + padding;
+        return glm::vec2(worldX, worldY);
+    }
+
+    void GridTransform::OnAddToEntity()
+    {
+        if (!inst->hasComponent<Transform>())
+        {
+            inst->addComponent<Transform>(glm::vec2(0,0));
+        }
+    }
+        
     BBox::BBox(Inst inst, const float win, const float hin) 
     :   Component(std::move(inst)),
         h(hin), 
@@ -100,11 +126,24 @@ namespace Comp
         size = glm::vec2(x, y);
     }
     
-    SimplePlayerControls::SimplePlayerControls(Inst inst, const float speedIn, const int jumpStrIn)
+    Image::Image(Inst inst, const std::shared_ptr<Sprout::StandaloneTexture>& texin)
         :   Component(std::move(inst)),
-            moveSpeed(speedIn),
-            jumpStr(jumpStrIn)
-        {}
+            texture(texin)
+        {
+            glm::i32 x = texin->getWidth();
+            glm::i32 y = texin->getHeight();
+            size = glm::vec2(x, y);
+        }
+
+    void Image::OnAddToEntity()
+    {
+        inst->requestAddTag("drawable");
+    }
+    
+    void Image::OnRemoveFromEntity()
+    {
+        inst->requestRemoveTag("drawable");
+    }
         
     TransformHierarchy::TransformHierarchy(Inst inst)
         :   Component(std::move(inst))

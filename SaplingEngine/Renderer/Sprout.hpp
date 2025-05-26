@@ -5,6 +5,7 @@
 
 #pragma once
 #include "Renderer/Font.hpp"
+#include "Renderer/StandaloneTexture.hpp"
 #include "Renderer/Texture.hpp"
 #include "Utility/Color.hpp"
 
@@ -31,6 +32,7 @@ namespace Sprout
 {
     
     const int MAX_QUADS = 8192;
+    const int MAX_STANDALONE_TEXTURES = 100;
     //const int MAX_VERTS = MAX_QUADS * 4;
         
     
@@ -39,6 +41,8 @@ namespace Sprout
         sg_pipeline pip;
         sg_bindings bind;
         sg_pass_action pass_action;
+        sg_buffer quad_vbuf;
+        sg_buffer standalone_vbuf;
     };
     
     /*
@@ -94,6 +98,10 @@ namespace Sprout
         glm::mat4 view_projection;
         glm::mat4 camera_xform;
         glm::vec4 viewport; // x, y, width, height
+        
+        std::array<Quad, MAX_STANDALONE_TEXTURES> standalone_quads; // for standalone textures
+        sg_image images[MAX_STANDALONE_TEXTURES]; // for standalone textures, indexed by ID
+        int num_images = 0; // number of standalone textures
     };
     
     /*
@@ -193,8 +201,31 @@ namespace Sprout
             */
             void draw_rectangle(float x, float y, float width, float height, const std::shared_ptr<Sprout::Texture>& texture, glm::vec4 color = Color::Red, bool worldSpace = true);
             
-            // TODO: draw text
+            /*
+                * Renders a text string to the screen.
+            */
             void draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale = 1.0f, Pivot pivot = Pivot::TOP_LEFT, bool worldSpace = true);
+
+            /*
+                * Draws a standalone texture to the screen.
+                * @param texture The stadnalone texture to draw
+                * @param position The position to draw the texture
+                * @param layer The layer to draw the texture
+                * @param rotation The rotation of the texture
+                * @param scale The scale of the texture
+                * @param pivot The pivot of the texture
+                * @param color_override The color override of the texture
+            */
+            void draw_standalone_texture(
+                const std::shared_ptr<Sprout::StandaloneTexture>& texture,
+                glm::vec2 position,
+                glm::f32 layer,
+                glm::f32 rotation = 0.0f,
+                glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
+                Pivot pivot = Pivot::CENTER,
+                glm::vec4 color_override = Color::Transparent
+            );
+
             
             /*
                 * Transforms a screen position to a world position.

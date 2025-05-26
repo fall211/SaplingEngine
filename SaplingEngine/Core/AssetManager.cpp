@@ -4,7 +4,7 @@
 //
 
 #include "Core/AssetManager.hpp"
-#include "Core//AudioEngine.hpp"
+#include "Core/AudioEngine.hpp"
 #include "Renderer/Font.hpp"
 #include "Utility/Debug.hpp"
 
@@ -38,6 +38,11 @@ void AssetManager::cleanUp()
         pair.second->release();
     }
     Instance->m_textures.clear();
+    
+    for (auto& pair : Instance->m_standaloneTextures) {
+        pair.second->release();
+    }
+    Instance->m_standaloneTextures.clear();
     
     for (auto& pair : Instance->m_fonts) {
         pair.second->release();
@@ -176,5 +181,27 @@ auto AssetManager::getFont(const std::string &name) -> std::shared_ptr<Sprout::F
     if (it == Instance->m_fonts.end()) {
         throw std::runtime_error("Font not found: " + name);
     }
+    return it->second;
+}
+
+void AssetManager::addStandaloneTexture(const std::string& name, const std::string& path)
+{
+    auto tex = std::make_shared<Sprout::StandaloneTexture>();
+    
+    if (!tex->prepareFromFile(getAssetsPath() + path)) 
+    {        
+        std::string fullPath = getAssetsPath() + path;
+        throw std::runtime_error("Error preparing standalone texture file: " + fullPath);
+    }
+    Instance->m_standaloneTextures[name] = tex;
+}
+
+auto AssetManager::getStandaloneTexture(const std::string& name) -> std::shared_ptr<Sprout::StandaloneTexture>
+{
+    auto it = Instance->m_standaloneTextures.find(name);
+    if (it == Instance->m_standaloneTextures.end()) {
+        throw std::runtime_error("Standalone texture not found: " + name);
+    }
+    
     return it->second;
 }

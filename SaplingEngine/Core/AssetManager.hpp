@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Renderer/Texture.hpp"
+#include "Renderer/StandaloneTexture.hpp"
 #include "Renderer/Font.hpp"
 
 #include "glm/glm.hpp"
@@ -21,6 +22,7 @@ class AudioEngine;
 
 class AssetManager {
     std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>> m_textures = std::unordered_map<std::string, std::shared_ptr<Sprout::Texture>>();
+    std::unordered_map<std::string, std::shared_ptr<Sprout::StandaloneTexture>> m_standaloneTextures = std::unordered_map<std::string, std::shared_ptr<Sprout::StandaloneTexture>>();
     std::unordered_map<std::string, std::shared_ptr<Sprout::Font>> m_fonts = std::unordered_map<std::string, std::shared_ptr<Sprout::Font>>();
     
     std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>> m_tilesets = std::unordered_map<std::string, std::vector<std::shared_ptr<Sprout::Texture>>>();
@@ -112,5 +114,20 @@ public:
         * @return Pointer to the font with the given name
     */
     static auto getFont(const std::string& name) -> std::shared_ptr<Sprout::Font>;
+    
+    /*
+        * Adds a standalone texture to the asset manager
+        * @param name The name of the texture
+        * @param path The path to the texture
+    */
+    static void addStandaloneTexture(const std::string& name, const std::string& path);
+    
+    /*
+        * Gets the standalone texture with the given name
+        * @param name The name of the texture
+        * @return The standalone texture with the given name
+    */
+    static auto getStandaloneTexture(const std::string& name) -> std::shared_ptr<Sprout::StandaloneTexture>;
+    
 };
 

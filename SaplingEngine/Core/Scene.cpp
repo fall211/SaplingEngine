@@ -41,9 +41,17 @@ void Scene::disable()
 void Scene::sRender(EntityList& entities)
 {
     glm::f32 numEntities = entities.size();
+
     float dt = m_engine.deltaTime();
     for (const auto& e : entities)
     {
+        if (e->hasComponent<Comp::GridTransform>() && e->hasComponent<Comp::Transform>())
+        {
+            auto& gridTransform = e->getComponent<Comp::GridTransform>();
+            auto& transform = e->getComponent<Comp::Transform>();
+            transform.position = gridTransform.getWorldPosition();
+        }
+        
         if (e->hasComponent<Comp::Sprite>())
         {
             
@@ -59,7 +67,7 @@ void Scene::sRender(EntityList& entities)
                     cSprite.animationTime = 0.0f;
                 }
             }
-            glm::f32 layer = 0.0f;
+            glm::f32 depth = 1 - (static_cast<glm::f32>(cSprite.layer) + static_cast<glm::f32>(e->getId()) / numEntities) / static_cast<glm::f32>(Comp::Layer::Count);
             glm::vec2 pos = glm::vec2(0.0f);
             glm::vec3 scale = glm::vec3(1.0f);
             glm::f32 rotation = 0.0f;
@@ -69,7 +77,6 @@ void Scene::sRender(EntityList& entities)
             if (e->hasComponent<Comp::Transform>())
             {
                 auto& cTransform = e->getComponent<Comp::Transform>();
-                layer = (static_cast<glm::f32>(cSprite.layer) + + static_cast<glm::f32>(e->getId()) / numEntities) / static_cast<glm::f32>(Comp::Sprite::Layer::Count);
                 pos = cTransform.position + cSprite.transformOffset;
                 scale = cTransform.scale * cSprite.scaleOffset;
                 rotation = cTransform.rotation;
@@ -78,14 +85,13 @@ void Scene::sRender(EntityList& entities)
             else if (e->hasComponent<Comp::GUITransform>())
             {
                 auto& cUITransform = e->getComponent<Comp::GUITransform>();
-                layer = 1.0f;
                 worldSpace = false;
                 pos = cUITransform.screenPosition;
                 pivot = cUITransform.pivot;
                 scale = cUITransform.scale;
             }
             
-            m_engine.getWindow().draw_sprite(cSprite.texture, pos, layer, rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, pivot, worldSpace);
+            m_engine.getWindow().draw_sprite(cSprite.texture, pos, depth, rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, pivot, worldSpace);
             
             if (cSprite.colorOverrideTime > 0)
             {
@@ -122,8 +128,27 @@ void Scene::sRender(EntityList& entities)
             
             
             m_engine.getWindow().draw_text(cText.text, AssetManager::getFont(cText.font), pos, cText.color, scale, pivot, worldSpace);
+        }
+        
+        if (e->hasComponent<Comp::Image>())
+        {
+            auto& image = e->getComponent<Comp::Image>();
+            glm::vec2 pos = glm::vec2(0,0);
+            glm::f32 depth = 1 - (static_cast<glm::f32>(image.layer) + static_cast<glm::f32>(e->getId()) / numEntities) / static_cast<glm::f32>(Comp::Layer::Count);
+            glm::f32 rotation = 0.0f;
+            glm::vec3 scale = glm::vec3(1);
+            Sprout::Pivot pivot = Sprout::Pivot::TOP_LEFT;
             
             
+            if (e->hasComponent<Comp::Transform>())
+            {
+                auto& transform = e->getComponent<Comp::Transform>();
+                pos = transform.position + image.transformOffset;
+                scale = transform.scale * image.scaleOffset;
+                rotation = transform.rotation;
+                pivot = transform.pivot;
+            }
+            m_engine.getWindow().draw_standalone_texture(image.texture, pos, depth, rotation, scale, pivot);
         }
     }
 }

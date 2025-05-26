@@ -18,6 +18,8 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
+#include <sys/_types/_dev_t.h>
 
 #define STB_RECT_PACK_IMPLEMENTATION
 #include "stb/stb_rect_pack.h"
@@ -397,6 +399,70 @@ namespace Sprout
         draw_frame.num_quads++;
     }
     
+    void Window::draw_standalone_texture(
+        const std::shared_ptr<Sprout::StandaloneTexture>& texture,
+        glm::vec2 position,
+        glm::f32 depth,
+        glm::f32 rotation,
+        glm::vec3 scale,
+        Pivot pivot,
+        glm::vec4 color_override)
+    {
+        if (draw_frame.num_images >= MAX_STANDALONE_TEXTURES) {
+            return; // no more space for standalone textures
+        }
+        
+        glm::mat4 xform0 = glm::mat4(1.0f);
+        
+
+        // translate
+        xform0 = glm::translate(xform0, glm::vec3(position, 0.0f));
+        
+        // scale
+        xform0 = glm::scale(xform0, scale);
+        
+        // rotate
+        xform0 = glm::rotate(xform0, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        // draw
+        
+        glm::vec2 size = texture->getSize();
+        
+        glm::vec2 pivot_offset = getPivotOffset(pivot) * size;
+
+
+        glm::vec4 bottom_left = glm::vec4(0.0f - pivot_offset.x, 0.0f - pivot_offset.y, depth, 1.0f);
+        glm::vec4 bottom_right = glm::vec4(size.x - pivot_offset.x, 0.0f - pivot_offset.y, depth, 1.0f);
+        glm::vec4 top_left = glm::vec4(0.0f - pivot_offset.x, size.y - pivot_offset.y, depth, 1.0f);
+        glm::vec4 top_right = glm::vec4(size.x - pivot_offset.x, size.y - pivot_offset.y, depth, 1.0f);
+        
+        std::array<glm::vec4, 4> positions = {bottom_left, top_left, top_right, bottom_right};
+        glm::vec4 color = Color::White;;
+        std::array<glm::vec4, 4> colors = {color, color, color, color};
+        std::array<glm::vec2, 4> uvs = {
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f)
+        };
+        std::array<glm::vec4, 4> color_overrides = {color_override, color_override, color_override, color_override};
+        
+        glm::mat4 projection = draw_frame.view_projection * draw_frame.camera_xform * xform0;
+        
+        for (int i = 0; i < 4; i++)
+        {
+            Vertex& vertex = draw_frame.standalone_quads[draw_frame.num_images].vertices[i];
+            
+            vertex.pos = projection * positions[i];
+            vertex.color = colors[i];
+            vertex.uv = uvs[i];
+            vertex.color_override = color_overrides[i];
+            vertex.bytes = 0;
+        }
+        draw_frame.images[draw_frame.num_images] = texture->getImageHandle();
+        draw_frame.num_images++;
+    }
+    
     glm::vec2 Window::screenToWorld(glm::vec2 screen_pos) 
     {
         glm::vec2 viewport_pos = Instance->windowToViewport(screen_pos);
@@ -599,8 +665,8 @@ namespace Sprout
             {
                 projection = draw_frame.view_projection * charXform;
             }
-            
-            draw_rect_projected(projection, size, 1.0f, uv, color, Pivot::TOP_LEFT, font->fontId+1);
+            glm::f32 depth = 0.0f;
+            draw_rect_projected(projection, size, depth, uv, color, Pivot::TOP_LEFT, font->fontId+1);
             
             x = advance_x;
             y = advance_y;
