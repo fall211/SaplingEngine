@@ -241,6 +241,8 @@ namespace Sprout
             */
             glm::vec2 windowToViewport(glm::vec2 windowPos);
 
+            int getWidth() const { return sapp_width(); }
+            int getHeight() const { return sapp_height(); }
         private:
             static Window* Instance;
             
@@ -277,8 +279,7 @@ namespace Sprout
             void Cleanup();
             void Event(const sapp_event* e);
             
-            int getWidth() const { return sapp_width(); }
-            int getHeight() const { return sapp_height(); }
+
 
             
             void draw_rect_projected(
