@@ -75,15 +75,12 @@ namespace Sprout
         // If prepared, create GPU resources now
         if (m_isPrepared && m_pixels)
         {
-            std::cout << "Loading prepared texture: " << m_width << "x" << m_height << " from prepared pixels\n";
             bool success = loadFromMemory(m_pixels, m_width, m_height);
-        
             return success;
         }
     
         // If not prepared but we have a file path, load directly
         if (!m_filePath.empty()) {
-            std::cout << "Loading texture directly from file: " << m_filePath << "\n";
             return loadFromFile(m_filePath);
         }
     
@@ -92,9 +89,7 @@ namespace Sprout
     }
     
     auto StandaloneTexture::loadFromMemory(unsigned char* data, glm::i32 width, glm::i32 height) -> bool
-    {
-        release();
-        
+    {        
         m_width = width;
         m_height = height;
         
@@ -120,7 +115,7 @@ namespace Sprout
             std::cerr << "ERROR: Attempting to create texture before Sokol GFX is initialized!\n";
             m_isLoaded = false;
         }
-        
+
         return m_isLoaded;
     }
     
