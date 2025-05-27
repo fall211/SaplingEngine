@@ -26,16 +26,21 @@ void Scene::postUpdate()
     Input::clean();
 }
 
+void Scene::onSceneEnabled(){}
+void Scene::onSceneDisabled(){}
+
 void Scene::enable()
 {
     // set the window's event callback to our input system
     m_engine.getWindow().SetEventCallback([](const sapp_event* e) { Input::update(e); });
     Debug::log("enabling scene");
+    onSceneEnabled();
 }
 
 void Scene::disable()
 {
     Debug::log("disabling scene");
+    onSceneDisabled();
 }
 
 void Scene::sRender(EntityList& entities)

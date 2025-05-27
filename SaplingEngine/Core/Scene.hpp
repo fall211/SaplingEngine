@@ -61,6 +61,9 @@ class Scene
         */
         virtual void sRender(EntityList& entities);
         
+        virtual void onSceneEnabled();
+        virtual void onSceneDisabled();
+        
         /*
             * Called when the scene is switched to
         */
