@@ -20,6 +20,8 @@
 #include <random>
 #include <cstddef>
 #include <string>
+#include <functional>
+#include "Core/SceneMessage.hpp"
 
 class Entity;
 class Input;
@@ -63,6 +65,14 @@ class Scene
         
         virtual void onSceneEnabled();
         virtual void onSceneDisabled();
+        
+        /*
+            * Processes a message sent from the Engine
+            * Override this function to handle custom messages
+            * @param message The message to process
+            * @return True if the message was handled, false otherwise
+        */
+        virtual bool onMessage(const SceneMessage& /*message*/) { return false; }
         
         /*
             * Called when the scene is switched to

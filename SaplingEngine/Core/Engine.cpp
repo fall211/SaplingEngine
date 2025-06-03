@@ -5,7 +5,8 @@
 
 
 #include "Core/Engine.hpp"
-#include "Core//AssetManager.hpp"
+#include "Core/AssetManager.hpp"
+#include "Core/SceneMessage.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -75,5 +76,14 @@ auto Engine::getCurrentScene() -> std::shared_ptr<Scene>&
     return m_currentScene;
 }
 
+#include "Core/EngineTemplates.hpp"
+template bool Engine::sendToScene<int>(const std::string&, const std::string&, const int&);
+template bool Engine::sendToScene<float>(const std::string&, const std::string&, const float&);
+template bool Engine::sendToScene<std::string>(const std::string&, const std::string&, const std::string&);
+template bool Engine::sendToScene<bool>(const std::string&, const std::string&, const bool&);
 
+template bool Engine::sendToCurrentScene<int>(const std::string&, const int&);
+template bool Engine::sendToCurrentScene<float>(const std::string&, const float&);
+template bool Engine::sendToCurrentScene<std::string>(const std::string&, const std::string&);
+template bool Engine::sendToCurrentScene<bool>(const std::string&, const bool&);
 

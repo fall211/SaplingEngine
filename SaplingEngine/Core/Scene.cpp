@@ -7,6 +7,7 @@
 #include "Core/AudioEngine.hpp"
 #include "ECS/Component.hpp"
 #include "Renderer/Sprout.hpp"
+#include "Core/SceneMessage.hpp"
 
 
 Scene::Scene(Engine& engine) : m_engine(engine)

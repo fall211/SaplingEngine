@@ -8,6 +8,8 @@
 #include "Renderer/Sprout.hpp"
 #include "Core/Scene.hpp"
 #include "Core/AssetManager.hpp"
+#include "Core/SceneMessage.hpp"
+#include "Utility/Debug.hpp"
 
 #include <memory>
 #include <string>
@@ -90,7 +92,28 @@ public:
     auto getScene(const std::string& name) -> std::shared_ptr<Scene>;
     auto getCurrentScene() -> std::shared_ptr<Scene>&;
 
-
+    /**
+     * Sends a message to the current scene
+     *
+     * @tparam T The type of data to send
+     * @param type The type of the message
+     * @param data The data to send
+     * @return True if the message was handled by the scene, false otherwise
+     */
+    template <typename T>
+    bool sendToCurrentScene(const std::string& type, const T& data);
+    
+    /**
+     * Sends a message to a specific scene by name
+     *
+     * @tparam T The type of data to send
+     * @param sceneName The name of the scene to send the message to
+     * @param type The type of the message
+     * @param data The data to send
+     * @return True if the message was handled by the scene, false otherwise
+     */
+    template <typename T>
+    bool sendToScene(const std::string& sceneName, const std::string& type, const T& data);
     
 };
 
