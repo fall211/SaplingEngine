@@ -572,64 +572,87 @@ namespace Sprout
         return position / scale;
     }
     
-    void Window::draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale, Pivot pivot, bool worldSpace)
+    void Window::draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale, Pivot pivot, bool worldSpace, Sprout::TextJustify justify)
     {
-        float totalWidth = 0.0f, maxHeight = 0.0f;
-        float temp_x = 0.0f, temp_y = 0.0f;
         
-        // calculate width of the text
-        for (char c : text)
+        // first pass: get the total sizes
+        float totalWidth = 0.0f, maxHeight = 0.0f;
         {
-            int char_index = c - 32;
+            float temp_x = 0.0f, temp_y = 0.0f;
             
-            float advance_x = temp_x, advance_y = temp_y;
-            stbtt_aligned_quad quad;
+            for (char c : text)
+            {
+                int char_index = c - 32;
+                
+                float advance_x = temp_x, advance_y = temp_y;
+                stbtt_aligned_quad quad;
+                
+                stbtt_GetBakedQuad
+                (
+                    font->bakedChars, 
+                    m_fontAtlases[font->fontId].width, 
+                    m_fontAtlases[font->fontId].height, 
+                    char_index, 
+                    &advance_x, 
+                    &advance_y, 
+                    &quad, 
+                    1
+                );
+                
+                temp_x = advance_x;
+                temp_y = advance_y;
+                
+                float charHeight = quad.y1 - quad.y0;
+                if (charHeight > maxHeight) maxHeight = charHeight;
+            }
             
-            stbtt_GetBakedQuad
-            (
-                font->bakedChars, 
-                m_fontAtlases[font->fontId].width, 
-                m_fontAtlases[font->fontId].height, 
-                char_index, 
-                &advance_x, 
-                &advance_y, 
-                &quad, 
-                1
-            );
-            
-            temp_x = advance_x;
-            temp_y = advance_y;
-            
-            float charHeight = quad.y1 - quad.y0;
-            if (charHeight > maxHeight) maxHeight = charHeight;
+            totalWidth = temp_x;
         }
         
-        totalWidth = temp_x; // temp_x == total width
+        glm::mat4 globalXform = glm::mat4(1.0f);
         
-        float x = 0, y = 0;
-        
-        glm::mat4 globalXform = glm::mat4(1.0f);        
-
-        // translate
         if (worldSpace)
         {
-            globalXform = glm::translate(globalXform, glm::vec3(position, 0.0f));     
+            glm::vec2 adjustedPosition = position;
+            if (justify == Sprout::TextJustify::CENTER)
+            {
+                adjustedPosition.x -= (totalWidth * scale) / 2.0f;
+            } 
+            else if (justify == Sprout::TextJustify::RIGHT)
+            {
+                adjustedPosition.x -= totalWidth * scale;
+            }
+            globalXform = glm::translate(globalXform, glm::vec3(adjustedPosition, 0.0f));
         }
-        else // ui elements need to use pivot for an anchor as well as a pivot
+        else 
         {
             glm::vec2 anchor_offset = getAnchorOffset(pivot);
-            glm::vec2 pos = glm::vec2((totalWidth / 2.0f + position.x) * anchor_offset.x * -1, (position.y) * anchor_offset.y * -1);
-            if (anchor_offset.x == 0)       pos.x = position.x;
-            if (anchor_offset.y == 0)       pos.y = -position.y;
+            glm::vec2 pos;
             
-            anchor_offset.x = anchor_offset.x * m_viewportWidth + pos.x;
-            anchor_offset.y = anchor_offset.y * m_viewportHeight + pos.y;
+            pos.x = (anchor_offset.x != 0) ? -position.x * anchor_offset.x : position.x;
+            pos.y = (anchor_offset.y != 0) ? -position.y * anchor_offset.y : -position.y;
             
-            globalXform = glm::translate(globalXform, glm::vec3(anchor_offset, 0.0f));       
+            pos.x += anchor_offset.x * m_viewportWidth;
+            pos.y += anchor_offset.y * m_viewportHeight;
+            
+            if (justify == Sprout::TextJustify::CENTER)
+            {
+                pos.x -= (totalWidth * scale) / 2.0f;
+            } 
+            else if (justify == Sprout::TextJustify::RIGHT)
+            {
+                pos.x -= totalWidth * scale;
+            }
+            
+            globalXform = glm::translate(globalXform, glm::vec3(pos, 0.0f));
         }
+
 
         globalXform = glm::scale(globalXform, glm::vec3(scale, scale, 1.0f));
         
+        float x = 0, y = 0;
+        
+        // second pass: render text with pivot and justify transformations
         for (char c : text)
         {
             int char_index = c - 32;

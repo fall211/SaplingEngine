@@ -310,7 +310,7 @@ namespace Sprout
             {   
                 if (e->key_code == SAPP_KEYCODE_ESCAPE) 
                 {
-                    sapp_request_quit();
+                    // sapp_request_quit();
                 }
             }
             else if (e->type == SAPP_EVENTTYPE_RESIZED)

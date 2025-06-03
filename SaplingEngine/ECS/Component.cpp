@@ -200,11 +200,12 @@ namespace Comp
             pivot(pivotIn)
         {}
         
-    Text::Text(Inst inst, const std::string& text, const std::string& font, uint8_t size, glm::vec4 color)
-        :   Component(std::move(inst)),
-            text(text),
-            font(font),
-            size(size),
-            color(color)
-        {}
+    Text::Text(Inst inst, const std::string& text, const std::string& font, uint8_t size, glm::vec4 color, Sprout::TextJustify justify)
+            :   Component(std::move(inst)),
+                text(text),
+                font(font),
+                size(size),
+                color(color),
+                justify(justify)
+            {}
 }

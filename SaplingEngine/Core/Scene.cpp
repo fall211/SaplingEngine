@@ -139,7 +139,7 @@ void Scene::sRender(EntityList& entities)
             }
             
             
-            m_engine.getWindow().draw_text(cText.text, AssetManager::getFont(cText.font), pos, cText.color, scale, pivot, worldSpace);
+            m_engine.getWindow().draw_text(cText.text, AssetManager::getFont(cText.font), pos, cText.color, scale, pivot, worldSpace, cText.justify);
         }
         
         if (e->hasComponent<Comp::Image>())

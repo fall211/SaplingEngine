@@ -212,13 +212,14 @@ namespace Comp
     
     struct Text final : public Component
     {
-        Text(Inst inst, const std::string& text, const std::string& font, uint8_t size, glm::vec4 color);
+        Text(Inst inst, const std::string& text, const std::string& font, uint8_t size, glm::vec4 color, Sprout::TextJustify justify = Sprout::TextJustify::LEFT);
         
         std::string text = "";
         std::string font = "";
         uint8_t size = 1;
         glm::vec4 color = Color::Black;
         glm::vec2 transformOffset = glm::vec2(0, 0);
+        Sprout::TextJustify justify = Sprout::TextJustify::LEFT;
     };
 }
 
