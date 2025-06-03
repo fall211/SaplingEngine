@@ -46,6 +46,7 @@ void Scene::disable()
 void Scene::sRender(EntityList& entities)
 {
     glm::f32 numEntities = entities.size();
+    glm::f32 currentEnt = 0;
 
     float dt = m_engine.deltaTime();
     for (const auto& e : entities)
@@ -72,7 +73,7 @@ void Scene::sRender(EntityList& entities)
                     cSprite.animationTime = 0.0f;
                 }
             }
-            glm::f32 depth = 1 - (static_cast<glm::f32>(cSprite.layer) + static_cast<glm::f32>(e->getId()) / numEntities) / static_cast<glm::f32>(Comp::Layer::Count);
+            glm::f32 depth = 1 - (static_cast<glm::f32>(cSprite.layer) + currentEnt / numEntities) / static_cast<glm::f32>(Comp::Layer::Count);
             glm::vec2 pos = glm::vec2(0.0f);
             glm::vec3 scale = glm::vec3(1.0f);
             glm::f32 rotation = 0.0f;
@@ -94,6 +95,11 @@ void Scene::sRender(EntityList& entities)
                 pos = cUITransform.screenPosition;
                 pivot = cUITransform.pivot;
                 scale = cUITransform.scale;
+            }
+            
+            if (cSprite.flip_X)
+            {
+                scale.x *= -1;
             }
             
             m_engine.getWindow().draw_sprite(cSprite.texture, pos, depth, rotation, (int)cSprite.currentFrame, cSprite.color_override, scale, pivot, worldSpace);
@@ -139,7 +145,7 @@ void Scene::sRender(EntityList& entities)
         {
             auto& image = e->getComponent<Comp::Image>();
             glm::vec2 pos = glm::vec2(0,0);
-            glm::f32 depth = 1 - (static_cast<glm::f32>(image.layer) + static_cast<glm::f32>(e->getId()) / numEntities) / static_cast<glm::f32>(Comp::Layer::Count);
+            glm::f32 depth = 1 - (static_cast<glm::f32>(image.layer) + currentEnt / numEntities) / static_cast<glm::f32>(Comp::Layer::Count);
             glm::f32 rotation = 0.0f;
             glm::vec3 scale = glm::vec3(1);
             Sprout::Pivot pivot = Sprout::Pivot::TOP_LEFT;
@@ -155,5 +161,6 @@ void Scene::sRender(EntityList& entities)
             }
             m_engine.getWindow().draw_standalone_texture(image.texture, pos, depth, rotation, scale, pivot);
         }
+        currentEnt++;
     }
 }

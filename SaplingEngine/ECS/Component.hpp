@@ -143,7 +143,7 @@ namespace Comp
         glm::vec3 scaleOffset = glm::vec3(1.0f, 1.0f, 1.0f);
         
         void setLayer(Layer layerIn) { layer = layerIn; }
-        void flipX(bool flip);
+        void flipX(bool flip) { flip_X = flip; }
         void setColorOverride(const glm::vec4& color, float time);
         void setAnimated(const float animSpeed);
         
