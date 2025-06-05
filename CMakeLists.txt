@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
+project(Springuins)
+
+set(CMAKE_CXX_STANDARD 20)
 
 function(bundle_macos_app target app_name assets_src dylibs)
+    set(BUILD_DIR "${CMAKE_SOURCE_DIR}/Build")
     set(APP_DIR "${CMAKE_BINARY_DIR}/${app_name}.app")
     set(MACOS_DIR "${APP_DIR}/Contents/MacOS")
     set(RESOURCES_DIR "${APP_DIR}/Contents/Resources")
@@ -20,23 +24,22 @@ function(bundle_macos_app target app_name assets_src dylibs)
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCES_DIR}/Assets"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${assets_src}" "${RESOURCES_DIR}/Assets"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/Build/Icon.icns" "${RESOURCES_DIR}/Icon.icns"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/Build/Info.plist" "${APP_DIR}/Contents/Info.plist"
     )
 endfunction()
 
-
-project(Springuins)
-
-set(CMAKE_CXX_STANDARD 20)
-
-add_executable(${CMAKE_PROJECT_NAME})
+if(APPLE AND CMAKE_GENERATOR STREQUAL "Xcode")
+    add_executable(${CMAKE_PROJECT_NAME} MACOSX_BUNDLE)
+else()
+    add_executable(${CMAKE_PROJECT_NAME})
+endif()
 
 if(APPLE)
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/SaplingEngine/Renderer/SproutMetal.mm")
     set_source_files_properties("${CMAKE_SOURCE_DIR}/SaplingEngine/Renderer/SproutMetal.mm"
-                                PROPERTIES
-                                COMPILE_FLAGS "-x objective-c++")
+                                PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
-
 
 file(GLOB_RECURSE ENGINE_SOURCES 
     "${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/main.cpp"
@@ -47,18 +50,13 @@ file(GLOB_RECURSE GAME_CONTENT_SOURCES
     "${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/**/*.cpp"
     "${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/**/*.hpp"
 )
-
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${ENGINE_SOURCES} ${GAME_CONTENT_SOURCES})
 
-# FMOD setup
 set(FMOD_ROOT "${CMAKE_SOURCE_DIR}/SaplingEngine/thirdparty/fmod")
 set(FMOD_CORE_LIB_DIR "${FMOD_ROOT}/core/lib")
 set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT}/studio/lib")
 
 if(APPLE)
-    set(FMOD_CORE_LIB_DIR "${FMOD_ROOT}/core/lib")
-    set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT}/studio/lib")
-
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         "-framework Cocoa"
         "-framework QuartzCore"
@@ -68,6 +66,7 @@ if(APPLE)
         "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
     )
 
+    # copy FMOD dylibs next to the binary
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
@@ -89,7 +88,6 @@ elseif(WIN32)
         "${FMOD_STUDIO_LIB_DIR}/fmodstudio_vc.lib"
     )
 
-    # Copy FMOD DLLs after build
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${FMOD_CORE_LIB_DIR}/fmod.dll"
@@ -98,23 +96,8 @@ elseif(WIN32)
     )
 endif()
 
-
-
-# Set RPATH for the executable
-if(APPLE)
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-        BUILD_WITH_INSTALL_RPATH TRUE
-        INSTALL_RPATH "@executable_path"
-    )
-endif()
-
-if(APPLE)
-    target_compile_definitions(${CMAKE_PROJECT_NAME}
-        PUBLIC 
-            $<$<CONFIG:Debug>:ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Assets/">
-            $<$<CONFIG:Debug>:DEBUG>
-    )
-elseif(WIN32)
+# set asset path for debug builds
+if(APPLE OR WIN32)
     target_compile_definitions(${CMAKE_PROJECT_NAME}
         PUBLIC 
             $<$<CONFIG:Debug>:ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Assets/">
@@ -122,9 +105,7 @@ elseif(WIN32)
     )
 endif()
 
-
-
-# Add include directories
+# includes
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/SaplingEngine
     ${CMAKE_SOURCE_DIR}/SaplingEngine/Core
@@ -142,8 +123,33 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     /opt/homebrew/include
 )
 
+# Xcode-only builds
+if(APPLE AND CMAKE_GENERATOR STREQUAL "Xcode")
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/Build/Info.plist"
+    )
 
-if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_CONFIGURATION_TYPES)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "${CMAKE_BINARY_DIR}/Release/${CMAKE_PROJECT_NAME}.app/Contents/Resources/Assets"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Assets"
+                "${CMAKE_BINARY_DIR}/Release/${CMAKE_PROJECT_NAME}.app/Contents/Resources/Assets"
+        )
+    endif()
+    
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/Build/Icon.icns"
+            "${CMAKE_BINARY_DIR}/Release/${CMAKE_PROJECT_NAME}.app/Contents/Resources/Icon.icns"
+    )
+    
+endif()
+
+# non-Xcode macOS builds
+if(APPLE AND NOT CMAKE_GENERATOR STREQUAL "Xcode" AND CMAKE_BUILD_TYPE STREQUAL "Release")
     set(FMOD_DYLIBS
         "${FMOD_CORE_LIB_DIR}/libfmod.dylib"
         "${FMOD_STUDIO_LIB_DIR}/libfmodstudio.dylib"
@@ -151,24 +157,16 @@ if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
     bundle_macos_app(${CMAKE_PROJECT_NAME} "${CMAKE_PROJECT_NAME}" "${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Assets" "${FMOD_DYLIBS}")
 endif()
 
+# windows builds
 if (WIN32)
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE $<IF:$<CONFIG:Release>,YES,NO>
+    )
+
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "Checking config: $<CONFIG>"
         COMMAND ${CMAKE_COMMAND} -E $<IF:$<CONFIG:Release>,copy_directory,echo>
             "${CMAKE_SOURCE_DIR}/${CMAKE_PROJECT_NAME}/Assets"
             "$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/Assets"
     )
-
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-        WIN32_EXECUTABLE $<IF:$<CONFIG:Release>,YES,NO>
-    )
-
-
-    target_compile_definitions(${CMAKE_PROJECT_NAME}
-        PUBLIC 
-            $<$<NOT:$<CONFIG:Release>>:DEBUG>
-    )
-
-
 endif()
-
