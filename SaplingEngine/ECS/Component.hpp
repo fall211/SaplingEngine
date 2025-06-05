@@ -220,6 +220,7 @@ namespace Comp
         glm::vec4 color = Color::Black;
         glm::vec2 transformOffset = glm::vec2(0, 0);
         Sprout::TextJustify justify = Sprout::TextJustify::LEFT;
+        Layer layer = Layer::UserInterface;
     };
 }
 

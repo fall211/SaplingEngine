@@ -8,6 +8,7 @@
 #include "ECS/Component.hpp"
 #include "Renderer/Sprout.hpp"
 #include "Core/SceneMessage.hpp"
+#include "Utility/Debug.hpp"
 
 
 Scene::Scene(Engine& engine) : m_engine(engine)
@@ -59,7 +60,7 @@ void Scene::sRender(EntityList& entities)
             transform.position = gridTransform.getWorldPosition();
         }
         
-        if (e->hasComponent<Comp::Sprite>())
+        if (e->hasComponentEnabled<Comp::Sprite>())
         {
             
             auto& cSprite = e->getComponent<Comp::Sprite>();
@@ -115,7 +116,7 @@ void Scene::sRender(EntityList& entities)
                 }
             }
         }
-        if (e->hasComponent<Comp::Text>())
+        if (e->hasComponentEnabled<Comp::Text>())
         {
             auto& cText = e->getComponent<Comp::Text>();
             
@@ -123,6 +124,7 @@ void Scene::sRender(EntityList& entities)
             float scale = 0.025f * cText.size;
             Sprout::Pivot pivot = Sprout::Pivot::TOP_LEFT;
             bool worldSpace = true;
+            float depth = 1 - (static_cast<glm::f32>(cText.layer) + currentEnt / numEntities) / static_cast<glm::f32>(Comp::Layer::Count);
             
             if (e->hasComponent<Comp::Transform>())
             {
@@ -139,10 +141,10 @@ void Scene::sRender(EntityList& entities)
             }
             
             
-            m_engine.getWindow().draw_text(cText.text, AssetManager::getFont(cText.font), pos, cText.color, scale, pivot, worldSpace, cText.justify);
+            m_engine.getWindow().draw_text(cText.text, AssetManager::getFont(cText.font), pos, depth, cText.color, scale, pivot, worldSpace, cText.justify);
         }
         
-        if (e->hasComponent<Comp::Image>())
+        if (e->hasComponentEnabled<Comp::Image>())
         {
             auto& image = e->getComponent<Comp::Image>();
             glm::vec2 pos = glm::vec2(0,0);
@@ -150,7 +152,6 @@ void Scene::sRender(EntityList& entities)
             glm::f32 rotation = 0.0f;
             glm::vec3 scale = glm::vec3(1);
             Sprout::Pivot pivot = Sprout::Pivot::TOP_LEFT;
-            
             
             if (e->hasComponent<Comp::Transform>())
             {

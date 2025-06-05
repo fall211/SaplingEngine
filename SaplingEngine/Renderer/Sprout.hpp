@@ -211,7 +211,7 @@ namespace Sprout
             /*
                 * Renders a text string to the screen.
             */
-            void draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale = 1.0f, Pivot pivot = Pivot::TOP_LEFT, bool worldSpace = true, TextJustify justify = TextJustify::LEFT);
+            void draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, float depth, glm::vec4 color, float scale = 1.0f, Pivot pivot = Pivot::TOP_LEFT, bool worldSpace = true, TextJustify justify = TextJustify::LEFT);
 
             /*
                 * Draws a standalone texture to the screen.

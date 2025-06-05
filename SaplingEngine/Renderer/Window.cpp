@@ -572,7 +572,7 @@ namespace Sprout
         return position / scale;
     }
     
-    void Window::draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, glm::vec4 color, float scale, Pivot pivot, bool worldSpace, Sprout::TextJustify justify)
+    void Window::draw_text(const std::string& text, const std::shared_ptr<Font>& font, glm::vec2 position, float depth, glm::vec4 color, float scale, Pivot pivot, bool worldSpace, Sprout::TextJustify justify)
     {
         
         // first pass: get the total sizes
@@ -687,7 +687,6 @@ namespace Sprout
             {
                 projection = draw_frame.view_projection * charXform;
             }
-            glm::f32 depth = 0.0f;
             draw_rect_projected(projection, size, depth, uv, color, Pivot::TOP_LEFT, font->fontId+1);
             
             x = advance_x;

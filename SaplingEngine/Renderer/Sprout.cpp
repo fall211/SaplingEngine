@@ -284,7 +284,6 @@ namespace Sprout
         sg_apply_bindings(&m_state.bind);
         sg_draw(0, 6 * draw_frame.num_quads, 1);
         
-        // draw standalone textures
 
 
         // called once
